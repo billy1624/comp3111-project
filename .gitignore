@@ -4,3 +4,9 @@ target/*
 *.DS_STORE
 bin
 bin/*
+.idea
+.idea/*
+build
+build/*
+out
+out/*
