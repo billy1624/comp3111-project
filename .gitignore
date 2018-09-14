@@ -6,6 +6,8 @@ bin
 bin/*
 .idea
 .idea/*
+.gradle
+.gradle/*
 build
 build/*
 out
