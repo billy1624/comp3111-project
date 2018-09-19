@@ -13,6 +13,6 @@ Group Number: 77
 - **Ngan Cheuk Hei**
 	- Assigned Tasks: 1 & 4
 	- Email: chnganaa@connect.ust.hk
-- **澤**
+- **Yeung Chak Ho**
 	- Assigned Tasks: 5 & 6
 	- Email: chyeungam@connect.ust.hk
