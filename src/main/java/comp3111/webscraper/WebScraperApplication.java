@@ -52,10 +52,13 @@ public class WebScraperApplication extends Application {
     	loader.setLocation(getClass().getResource(UI_FILE));
    		VBox root = (VBox) loader.load();
    		Scene scene =  new Scene(root);
+   		Controller tmp = (Controller)loader.getController();
+    	tmp.setHostServices(getHostServices());
     	stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));    	
    		stage.setScene(scene);
    		stage.setTitle("WebScrapper");
    		stage.show();
+   		
     		
 
 	}
