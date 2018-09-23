@@ -31,6 +31,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.application.Application;
 import javafx.application.HostServices;
+import javafx.application.Platform;
 
 /**
  * 
@@ -140,52 +141,14 @@ public class Controller {
         teamName_label.setFont(Font.font(java.awt.Font.SERIF, 16));
         teamName_label.setFill(Color.DARKORCHID);
         
-        final Text member1_name_label = new Text("Chan Chi Wa");
-        final Text member1_itsc_label = new Text("cwchanbf");
         
-        final Hyperlink member1_github_label = new Hyperlink("billy1624");
-        member1_github_label.setVisited(false);
-        member1_github_label.setBorder(Border.EMPTY);
-        member1_github_label.setOnAction(new EventHandler<ActionEvent>() {
-         
-            @Override
-            public void handle(ActionEvent event) {
-            	String text = ((Hyperlink)event.getSource()).getText();
-            	hservices.showDocument("https://github.com/" + text);
-            }
-        });
-        
-        final Text member2_name_label = new Text("Ngan Cheuk Hei");
-        final Text member2_itsc_label = new Text("chnganaa");
-        
-        
-        final Hyperlink member2_github_label = new Hyperlink("nganhei");
-        member2_github_label.setVisited(false);
-        member2_github_label.setBorder(Border.EMPTY);
-        member2_github_label.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-            	String text = ((Hyperlink)event.getSource()).getText();
-            	hservices.showDocument("https://github.com/" + text);
-            }
-        });
-        
-        final Text member3_name_label = new Text("Yeung Chak Ho");
-        final Text member3_itsc_label = new Text("chyeungam");
-        final Hyperlink member3_github_label = new Hyperlink("sawaYch");
-        member3_github_label.setVisited(false);
-        member3_github_label.setBorder(Border.EMPTY);
-        member3_github_label.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-            	String text = ((Hyperlink)event.getSource()).getText();
-            	hservices.showDocument("https://github.com/" + text);
-            }
-        });
-
-        
+        String [] name = { "Chan Chi Wa", "Ngan Cheuk Hei","Yeung Chak Ho" };
+        String [] itsc = { "cwchanbf", "chnganaa", "chyeungam" };
+        String [] link = { "billy1624", "chnganaa", "sawaYch" };
+        Text [] member_name_label = new Text[3];
+        Text [] member_itsc_label = new Text[3];
+        Hyperlink [] member_github_link = new Hyperlink[3];
+                
         
         GridPane grid = new GridPane();
         ColumnConstraints column1 = new ColumnConstraints();
@@ -200,41 +163,40 @@ public class Controller {
         grid.add(nbox1, 0, 0, 4, 1);
         grid.add(teamName_label, 1, 1);
         
-        grid.add(member1_name_label, 0, 2);
-        grid.add(member1_itsc_label, 1, 2);
-        final ImageView imv = new ImageView();
-        final ImageView imv2 = new ImageView();
-        final ImageView imv3 = new ImageView();
-
+   
+        
+        ImageView []imvCollection = new ImageView[3];
         Image image = new Image( getClass().getResource("/github-icon.png").toString());   
-        imv.setImage(image);
-        imv.setFitHeight(16);
-        imv.setFitWidth(16);
-        imv.setSmooth(true);
-        
-        imv2.setImage(image);
-        imv2.setFitHeight(16);
-        imv2.setFitWidth(16);
-        imv2.setSmooth(true);
-        
-        imv3.setImage(image);
-        imv3.setFitHeight(16);
-        imv3.setFitWidth(16);
-        imv3.setSmooth(true);
         final HBox [] pictureRegion= new HBox[3];
-        
-    	pictureRegion[0] = new HBox();
-    	pictureRegion[0].getChildren().add(imv);
-    	pictureRegion[0].setAlignment(Pos.CENTER);
-    
-    	pictureRegion[1] = new HBox();
-    	pictureRegion[1].getChildren().add(imv2);
-    	pictureRegion[1].setAlignment(Pos.CENTER);
-    
-    	pictureRegion[2] = new HBox();
-    	pictureRegion[2].getChildren().add(imv3);
-    	pictureRegion[2].setAlignment(Pos.CENTER);
-    
+
+        for(int i = 0; i < 3; ++i) {
+        	imvCollection[i] = new ImageView();
+        	imvCollection[i].setImage(image);
+        	imvCollection[i].setFitHeight(16);
+        	imvCollection[i].setFitWidth(16);
+        	imvCollection[i].setSmooth(true);
+        	pictureRegion[i] = new HBox();
+        	pictureRegion[i].getChildren().add(imvCollection[i]);
+        	pictureRegion[i].setAlignment(Pos.CENTER);
+            member_name_label[i] = new Text(name[i]);
+            member_itsc_label[i] = new Text(itsc[i]);
+            member_github_link[i] = new Hyperlink(link[i]);
+            member_github_link[i].setVisited(false);
+            member_github_link[i].setBorder(Border.EMPTY);
+            member_github_link[i].setOnAction(new EventHandler<ActionEvent>() {             
+                @Override
+                public void handle(ActionEvent event) {
+                	String text = ((Hyperlink)event.getSource()).getText();
+                	hservices.showDocument("https://github.com/" + text);
+                }
+            });
+            grid.add(member_name_label[i], 0, 2+i);
+            grid.add(member_itsc_label[i], 1, 2+i);
+            grid.add(pictureRegion[i], 2, 2+i);
+            grid.add(member_github_link[i], 3, 2+i);
+        	
+        }
+            
     	Button button = new Button("Close");
     	button.setOnAction(new EventHandler<ActionEvent>() {
               @Override
@@ -242,22 +204,7 @@ public class Controller {
             	  dialog.close();
             	  System.out.println("About Your Team Dialog Closed");
               }
-          });
-
-        
-        grid.add(pictureRegion[0], 2,2);
-        grid.add(member1_github_label, 3, 2);
-        
-        grid.add(member2_name_label, 0, 3);
-        grid.add(member2_itsc_label, 1, 3);
-        grid.add(pictureRegion[1], 2, 3);
-        grid.add(member2_github_label, 3, 3);
-
-        grid.add(member3_name_label, 0, 4);
-        grid.add(member3_itsc_label, 1, 4);
-        grid.add(pictureRegion[2], 2, 4);
-        grid.add(member3_github_label, 3, 4);
-        
+          });        
         
         final HBox nbox2 = new HBox();
         nbox2.getChildren().add(button);
@@ -274,10 +221,23 @@ public class Controller {
         System.out.println("About Your Team Dialog Opened");      
     }
 
+    /**
+     * Pass hostService from MainApplication, for hyperlink function
+     * 
+     * @param obj HostServices of MainApplication
+     */
     public void setHostServices(HostServices obj) {
     	hservices = obj;
     }
     
+    /**
+     * Handle action related to leave the program and disconnect all connection
+     */
+    @FXML
+    public void quit() {
+    	Platform.exit();
+        System.exit(0);
+    }
     
 }
 

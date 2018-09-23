@@ -57,9 +57,7 @@ public class WebScraperApplication extends Application {
     	stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));    	
    		stage.setScene(scene);
    		stage.setTitle("WebScrapper");
-   		stage.show();
-   		
-    		
+   		stage.show();   		
 
 	}
 
