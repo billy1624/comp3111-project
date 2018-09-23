@@ -5,12 +5,28 @@ package comp3111.webscraper;
 
 
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.MenuBar;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.*;
+import javafx.stage.*;
+import javafx.scene.paint.Color;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
+import javafx.scene.text.Font;
+import javafx.scene.control.Button;
 import java.util.List;
-
+import javafx.geometry.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 
 /**
  * 
@@ -41,6 +57,12 @@ public class Controller {
     private TextArea textAreaConsole;
     
     private WebScraper scraper;
+    
+    
+    /* task 6 related data member */
+    
+    @FXML
+    private MenuBar menuBar; 
     
     /**
      * Default controller
@@ -80,5 +102,138 @@ public class Controller {
     private void actionNew() {
     	System.out.println("actionNew");
     }
+    
+    
+    /**
+     * Handle action related to "About your Team" menu item.
+     * 
+     * @param event Event on "About your Team" menu item.
+     */
+    @FXML
+    private void handleAboutYourTeamAction(final ActionEvent event)
+    {
+    	Stage dialog = new Stage();
+    	dialog.initStyle(StageStyle.DECORATED);
+    	dialog.initModality(Modality.APPLICATION_MODAL);
+    	dialog.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));    	
+    	dialog.setTitle("About Our Team");
+    	
+    	// add all information 
+        final Group sceneGroup = new Group();
+        final Scene scene = new Scene(sceneGroup, 380, 320, Color.WHITESMOKE);
+        
+        // center title 
+        final HBox nbox1 = new HBox();
+        final Text title_label = new Text("About Us");
+        title_label.setFont(Font.font(java.awt.Font.SERIF, 25));
+        nbox1.getChildren().add(title_label);
+        nbox1.setAlignment(Pos.CENTER);
+        
+        final Text teamName_label = new Text("404_Girl_Not_Found");
+        teamName_label.setFont(Font.font(java.awt.Font.SERIF, 16));
+        
+        final Text member1_name_label = new Text("Chan Chi Wa");
+        final Text member1_itsc_label = new Text("cwchanbf");
+        final Text member1_github_label = new Text("billy1624");
+        
+        final Text member2_name_label = new Text("Ngan Cheuk Hei");
+        final Text member2_itsc_label = new Text("chnganaa");
+        final Text member2_github_label = new Text("nganhei");
+        
+        final Text member3_name_label = new Text("Yeung Chak Ho");
+        final Text member3_itsc_label = new Text("chyeungam");
+        final Text member3_github_label = new Text("sawaYch");
+
+        
+        
+        GridPane grid = new GridPane();
+        
+        
+        grid.setGridLinesVisible(false);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+         
+        grid.add(nbox1, 1, 0);
+        grid.add(teamName_label, 1, 1);
+        
+        grid.add(member1_name_label, 0, 2);
+        grid.add(member1_itsc_label, 1, 2);
+        final ImageView imv = new ImageView();
+        final ImageView imv2 = new ImageView();
+        final ImageView imv3 = new ImageView();
+
+        Image image = new Image( getClass().getResource("/github-icon.png").toString());   
+        imv.setImage(image);
+        imv.setFitHeight(16);
+        imv.setFitWidth(16);
+        imv.setSmooth(true);
+        
+        imv2.setImage(image);
+        imv2.setFitHeight(16);
+        imv2.setFitWidth(16);
+        imv2.setSmooth(true);
+        
+        imv3.setImage(image);
+        imv3.setFitHeight(16);
+        imv3.setFitWidth(16);
+        imv3.setSmooth(true);
+        final HBox [] pictureRegion= new HBox[3];
+        
+    	pictureRegion[0] = new HBox();
+    	pictureRegion[0].getChildren().add(imv);
+    	pictureRegion[0].setAlignment(Pos.CENTER);
+    
+    	pictureRegion[1] = new HBox();
+    	pictureRegion[1].getChildren().add(imv2);
+    	pictureRegion[1].setAlignment(Pos.CENTER);
+    
+    	pictureRegion[2] = new HBox();
+    	pictureRegion[2].getChildren().add(imv3);
+    	pictureRegion[2].setAlignment(Pos.CENTER);
+    
+    	Button button = new Button("Close");
+    	button.setOnAction(new EventHandler<ActionEvent>() {
+              @Override
+              public void handle(ActionEvent event) {
+            	  dialog.close();
+            	  System.out.println("About Your Team Dialog Closed");
+              }
+          });
+
+        
+        grid.add(pictureRegion[0], 2,2);
+        grid.add(member1_github_label, 3, 2);
+        
+        grid.add(member2_name_label, 0, 3);
+        grid.add(member2_itsc_label, 1, 3);
+        grid.add(pictureRegion[1], 2, 3);
+        grid.add(member2_github_label, 3, 3);
+
+        grid.add(member3_name_label, 0, 4);
+        grid.add(member3_itsc_label, 1, 4);
+        grid.add(pictureRegion[2], 2, 4);
+        grid.add(member3_github_label, 3, 4);
+        
+        
+        final HBox nbox2 = new HBox();
+        nbox2.getChildren().add(button);
+        nbox2.setAlignment(Pos.CENTER);
+        grid.add(nbox2, 1, 10);
+        
+        sceneGroup.getChildren().add(grid);
+        
+    	// show it
+    	dialog.setScene(scene);
+    	dialog.setWidth(380);
+    	dialog.setHeight(300);
+    	dialog.setResizable(false);
+    	dialog.show();
+    	// debug message
+        System.out.println("About Your Team Dialog Opened");      
+    }
+
+    
+    
 }
 
