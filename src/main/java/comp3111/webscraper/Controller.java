@@ -34,15 +34,13 @@ import javafx.scene.text.Font;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 
+import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.layout.*;
-import com.gargoylesoftware.htmlunit.javascript.host.ApplicationCache;
 import javafx.geometry.*;
 import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.application.Application;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -109,10 +107,14 @@ public class Controller {
     @FXML
     private TableColumn<DataModel, String> posted_date_col;
 
+    @FXML
+    private Button refineBt;    
     
     private WebScraper scraper;
     
     private HostServices hservices;
+    
+    private List<Item> recordItem;
     
     
     /* task 6 related data member */
@@ -137,6 +139,7 @@ public class Controller {
     	
     	// disable at the beginning
     	lastSearchBt.setDisable(true);
+    	refineBt.setDisable(true);
     }
     
     /**
@@ -146,6 +149,7 @@ public class Controller {
     private void actionSearch() {
     	// enable last search function
     	lastSearchBt.setDisable(false);
+    	refineBt.setDisable(false);
 
     	System.out.println("actionSearch: " + textFieldKeyword.getText());
     	List<Item> result = scraper.scrape(textFieldKeyword.getText());
@@ -155,6 +159,8 @@ public class Controller {
     	}
     	textAreaConsole.setText(output);
     	
+    	// copy for further use
+    	recordItem = new ArrayList<Item>(result);
     	
     }
     
@@ -173,7 +179,16 @@ public class Controller {
      */   
     @FXML
     private void actionRefine() {
-    	
+    	// after click once, disable
+    	refineBt.setDisable(true);
+    	System.out.println("Refine:" + textFieldKeyword.getText());
+    	String output = "";
+    	for (Item item : recordItem) {
+    		if (item.getTitle().matches("(.*)"+ textFieldKeyword.getText() + "(.*)"))
+    			output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+    	}
+    	textAreaConsole.setText(output);
+    	// trigger: update of other page
     }
     
     
@@ -328,6 +343,7 @@ public class Controller {
      *		4. clear tableView items
      *		5. clear distribution
      *		6. clear trend
+     *		7. refine button
      */
     @FXML
     public void closeAndResetAll() {
@@ -356,6 +372,8 @@ public class Controller {
     	axis2.setUpperBound(110.0);
     	axis2.setLowerBound(0.0);
     	areaChartCb.getItems().clear();
+    	//7
+    	refineBt.setDisable(true);
     }
     
     
@@ -433,10 +451,11 @@ public class Controller {
             this.postedd = new SimpleStringProperty(_posted_date);
 
         }
-     
+        
         public String getTitle() {
             return title.get();
         }
+        
         public void setTitle(String _title) {
             title.set(_title);
         }
