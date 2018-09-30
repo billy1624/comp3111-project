@@ -14,14 +14,17 @@ import javafx.scene.image.Image;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.*;
+import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.stage.*;
 import javafx.scene.paint.Color;
@@ -29,6 +32,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+
 import java.util.List;
 import javafx.scene.layout.*;
 import com.gargoylesoftware.htmlunit.javascript.host.ApplicationCache;
@@ -84,6 +89,15 @@ public class Controller {
     private BarChart barChartHistogram;
     
     @FXML
+    private AreaChart areaChart; 
+    
+    @FXML
+    private ComboBox areaChartCb;
+    
+    @FXML
+    private MenuItem lastSearchBt;
+    
+    @FXML
     private TableColumn<DataModel, String> title_col;
     
     @FXML
@@ -120,6 +134,9 @@ public class Controller {
     private void initialize() {
     	// load test case, for test
     	task6_iii_testCase();
+    	
+    	// disable at the beginning
+    	lastSearchBt.setDisable(true);
     }
     
     /**
@@ -127,6 +144,9 @@ public class Controller {
      */
     @FXML
     private void actionSearch() {
+    	// enable last search function
+    	lastSearchBt.setDisable(false);
+
     	System.out.println("actionSearch: " + textFieldKeyword.getText());
     	List<Item> result = scraper.scrape(textFieldKeyword.getText());
     	String output = "";
@@ -321,23 +341,25 @@ public class Controller {
     	axis.setUpperBound(125.0);
     	axis.setLowerBound(0.0);
     	//6 
-    	
-    	
+    	areaChart.getData().clear();
+    	NumberAxis axis2 = (NumberAxis)areaChart.getYAxis();
+    	axis2.setUpperBound(110.0);
+    	axis2.setLowerBound(0.0);
+    	areaChartCb.getItems().clear();
     }
     
     
     /**
-     *	just a test case 
-     * 
-     * 
+     *	just a test case      
      */
 	final ObservableList<DataModel> data = FXCollections.observableArrayList(
-		    new DataModel("Jacob", "Smith", "jacob.smith@example.com","01/02/2018"),
-		    new DataModel("Isabella", "Johnson", "isabella.johnson@example.com","03/04/2018"),
-		    new DataModel("Ethan", "Williams", "ethan.williams@example.com","05/06/2018"),
-		    new DataModel("Emma", "Jones", "emma.jones@example.com","07/08/2018"),
-		    new DataModel("Michael", "Brown", "michael.brown@example.com","09/10/2018")
+		    new DataModel("Title1", "0.0", "item1@example.com","01/02/2018"),
+		    new DataModel("Title2", "10.0", "item2@example.com","03/04/2018"),
+		    new DataModel("Title3", "20.0", "item3@example.com","05/06/2018"),
+		    new DataModel("Title4", "100.0", "item4@example.com","07/08/2018"),
+		    new DataModel("Title5", "500.0", "item5@example.com","09/10/2018")
 		);
+	
     @SuppressWarnings("unchecked")
 	void task6_iii_testCase() {
     	title_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("title"));
@@ -348,29 +370,43 @@ public class Controller {
     	url_col.setCellFactory(TextFieldTableCell.forTableColumn());
     	posted_date_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("postedd"));
     	posted_date_col.setCellFactory(TextFieldTableCell.forTableColumn());
-
     	tableView.setItems(data);
-    	
-    	//tableView.getColumns().addAll(title_col, price_col, url_col, postedDate_col);
-    	
-    	
+    	    	 
+    	// just a test for table, bar chart
 		final String it1 = "Item1";
     	final String it2 = "Item2";
     	final String it3 = "Item3";
     	final String it4 = "Item4";
     	final String it5 = "Item5";
-    	// just a test for table, bar chart
-    	// tableView.getItems().add(new String("Hello"));
     	Series<String, Double> series1 = new Series<String, Double>();
-    	
         series1.setName("Test Data Set");       
         series1.getData().add(new XYChart.Data<String, Double>(it1, 25601.34));
         series1.getData().add(new XYChart.Data<String, Double>(it2, 20148.82));
         series1.getData().add(new XYChart.Data<String, Double>(it3, (double) 10000));
         series1.getData().add(new XYChart.Data<String, Double>(it4, 35407.15));
         series1.getData().add(new XYChart.Data<String, Double>(it5, (double) 12000));   
-    	//barChartHistogram.layout();
     	barChartHistogram.getData().addAll(series1);
+    	
+    	// trend test data set
+    	Series<String, Number> series2 = new XYChart.Series<String, Number>();
+    	series2.setName("Test Data Set");
+    	series2.getData().add(new Data<String, Number>("a", 4));
+    	series2.getData().add(new Data<String, Number>("b", 10));
+    	series2.getData().add(new Data<String, Number>("c", 15));
+    	series2.getData().add(new Data<String, Number>("d", 8));
+    	series2.getData().add(new Data<String, Number>("e", 5));
+    	series2.getData().add(new Data<String, Number>("f", 18));
+    	series2.getData().add(new Data<String, Number>("g", 15));
+    	series2.getData().add(new Data<String, Number>("h", 13));
+    	series2.getData().add(new Data<String, Number>("i", 19));
+    	series2.getData().add(new Data<String, Number>("j", 21));
+    	series2.getData().add(new Data<String, Number>("k", 21));
+    	areaChart.getData().addAll(series2);    	
+    	areaChartCb.getItems().addAll(
+    		    "Option 1",
+    		    "Option 2",
+    		    "Option 3"
+    		);
     }
     
     // my data model: for testing only
