@@ -55,13 +55,15 @@
     </MenuBar>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
          <children>
-            <SplitPane dividerPositions="0.3" layoutX="83.0" layoutY="70.0" prefHeight="375.0" prefWidth="640.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <SplitPane dividerPositions="0.33" layoutX="83.0" layoutY="70.0" prefHeight="375.0" prefWidth="640.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                      <children>
                         <TextField fx:id="textFieldKeyword" layoutX="14.0" layoutY="36.0" prefHeight="25.0" prefWidth="131.0" promptText="Keyword" />
                         <!--  this is the Go button. When it is clicked, it calls Controller.actionSearch() -->
                         <Button layoutX="145.0" layoutY="36.0" mnemonicParsing="false" onAction="#actionSearch" prefHeight="25.0" prefWidth="35.0" text="Go" />
+                        <Button layoutX="145.0" layoutY="66.0" mnemonicParsing="false" onAction="#actionRefine" prefHeight="25.0" prefWidth="60.0" text="Refine" />
+                        
 
                      </children>
                   </AnchorPane>

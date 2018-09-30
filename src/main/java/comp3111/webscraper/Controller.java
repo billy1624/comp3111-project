@@ -168,6 +168,16 @@ public class Controller {
     
     
     /**
+     * Task 5 Refine Search function
+     * 
+     */   
+    @FXML
+    private void actionRefine() {
+    	
+    }
+    
+    
+    /**
      * Handle action related to "About your Team" menu item.
      * 
      * @param event Event on "About your Team" menu item.
