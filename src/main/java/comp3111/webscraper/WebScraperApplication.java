@@ -3,6 +3,7 @@
  */
 package comp3111.webscraper;
 
+
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -54,6 +55,7 @@ public class WebScraperApplication extends Application {
    		Scene scene =  new Scene(root);
    		Controller tmp = (Controller)loader.getController();
     	tmp.setHostServices(getHostServices());
+        //setUserAgentStylesheet(STYLESHEET_CASPIAN);
     	stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));    	
    		stage.setScene(scene);
    		stage.setTitle("WebScrapper");

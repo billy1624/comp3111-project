@@ -40,7 +40,7 @@
             <MenuItem mnemonicParsing="false" onAction="#actionNew" text="New (call Controller.actionNew())" />
             <MenuItem mnemonicParsing="false" text="Open" />
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Close" />
+            <MenuItem mnemonicParsing="false" text="Close" onAction="#closeAndResetAll"/>
             <MenuItem mnemonicParsing="false" text="Save" />
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Quit" onAction="#quit"/>
@@ -102,12 +102,12 @@
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <TableView AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <TableView fx:id="tableView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
-                                              <TableColumn editable="false" prefWidth="154.0" text="Title" />
-                                              <TableColumn editable="false" prefWidth="90.0" text="Price" />
-                                                <TableColumn editable="false" prefWidth="78.0" text="URL" />
-                                                <TableColumn editable="false" prefWidth="88.0" text="Posted Date" />
+                                              <TableColumn fx:id="title_col" editable="false" prefWidth="154.0" text="Title" />
+                                              <TableColumn fx:id="price_col" editable="false" prefWidth="90.0" text="Price" />
+                                                <TableColumn fx:id="url_col" editable="false" prefWidth="78.0" text="URL" />
+                                                <TableColumn fx:id="posted_date_col" editable="false" prefWidth="88.0" text="Posted Date" />
                                             </columns>
                                           </TableView>
                                        </children>
