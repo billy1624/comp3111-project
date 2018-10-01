@@ -35,14 +35,20 @@ import javafx.scene.text.Font;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
+
 import javafx.scene.layout.*;
 import javafx.geometry.*;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.application.HostServices;
 import javafx.application.Platform;
@@ -123,6 +129,9 @@ public class Controller {
     
     private List<Item> recordItem;
     
+    private List<Boolean> bar_smVector;
+    
+    
     
     /* task 6 related data member */
     
@@ -150,6 +159,10 @@ public class Controller {
     	busy_idtr.setScaleX(0.3);
     	busy_idtr.setScaleY(0.3);
     	busy_idtr.setVisible(false);
+		barChartHistogram.getXAxis().setAnimated(false);
+		barChartHistogram.getYAxis().setAnimated(true);
+		barChartHistogram.setAnimated(true);
+		bar_smVector = new ArrayList<Boolean>();
     }
     
     /**
@@ -197,6 +210,36 @@ public class Controller {
     
     
     /*
+     * Check any bar is double clicked
+     * 
+     */
+    private Boolean has_bar_selected() {
+    	for(Boolean iter: bar_smVector)
+    		if (iter == true) return iter;
+		return false;
+    }
+    
+    /*
+     * If one bar selected, reset other
+     * 
+     */
+    private void update_bar_only_one(Integer var) {
+    	// reset the one which is selected first
+    	int myCounter = 0;
+    	for(Boolean itr: bar_smVector) {
+    		if(itr == true) {
+    			bar_smVector.set(myCounter, false);
+        		Series<String,Integer> serie =  ((Series<String,Integer>) barChartHistogram.getData().get(0));
+        		Data<String, Integer> item = serie.getData().get(myCounter);
+    			item.getNode().setStyle("-fx-bar-fill: #f3622d;");
+    		}
+    		myCounter ++;
+    	}
+    			
+    }
+    
+    
+    /*
      * Advance Task 1 ; just for fun
      * update distribution in Async way, non UI thread
      * 
@@ -206,10 +249,14 @@ public class Controller {
 	        @Override
 	        public void run() {
 	        	// reset it first
+	        	bar_smVector.clear();
 	          	barChartHistogram.getData().clear();
             	NumberAxis axis = (NumberAxis)barChartHistogram.getYAxis();
             	axis.setUpperBound(125.0);
             	axis.setLowerBound(0.0);
+            	
+            	if(dist_data.isEmpty()) return;
+            	
             	// do the calculation
             	Item minp= null;
             	Item maxp= null;
@@ -224,6 +271,21 @@ public class Controller {
             	Double rng= (minPrice + maxPrice)/10;
             	System.out.println("min" + minPrice);
             	System.out.println("max" + maxPrice);
+            	DecimalFormat formatter = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance( Locale.ENGLISH ));
+            	
+            	// only single price
+            	if (minPrice.compareTo(maxPrice)==0) {
+            		Series<String, Integer> dist_series = new Series<String, Integer>();
+                	dist_series.setName("The selling prize of '" + textFieldKeyword.getText() + "'");
+                	int iter = 0;
+                    dist_series.getData().add(new XYChart.Data<String, Integer>(Double.toString(maxPrice), dist_data.size()));            		
+                	barChartHistogram.setCategoryGap(200);
+                    barChartHistogram.getData().addAll(dist_series);    
+        			bar_smVector.add(false); // state 0: not selected
+            		return;
+            	}
+            	
+            	// multiple price
                 ArrayList<Double> v = new ArrayList<Double>();
                 int[] vv = new int[10];
                 double tmp = minPrice;
@@ -243,11 +305,8 @@ public class Controller {
 						return p.compareTo(it1.getPrice());
                 	}                	                	
                 });
-                // debug sort
-//                for(Item tmp1: dist_data) {
-//                	System.out.println(tmp1.getPrice());                	
-//                }
-               
+
+                
                 // count
                 for(Item tmp1: dist_data) {
                 	for(int i=0; i<9; ++i) {
@@ -259,19 +318,63 @@ public class Controller {
                 			break;
                 		}
                 	}
-                }
-                for(int i=0;i<10;++i) {
-                	System.out.println(vv[i]);
-                }
-                
+                }                
 
             	Series<String, Integer> dist_series = new Series<String, Integer>();
             	dist_series.setName("The selling prize of '" + textFieldKeyword.getText() + "'");
             	int iter = 0;
         		for (Double _price : v) {
-                dist_series.getData().add(new XYChart.Data<String, Integer>(Double.toString(_price), vv[iter++]));
+        			dist_series.getData().add(new XYChart.Data<String, Integer>(formatter.format(Math.round(_price)), vv[iter++]));
+        			bar_smVector.add(false); // state false/0: not selected
         		}
+
+            	barChartHistogram.setCategoryGap(0);
             	barChartHistogram.getData().addAll(dist_series);
+            	
+            	// add IDs
+            	for(int itr = 0; itr < 10; ++itr)
+            		dist_series.getData().get(itr).getNode().setId(Integer.toString(itr));
+
+            	
+            	 for (Object serie: barChartHistogram.getData()){
+            		 for (Data<String, Integer> item: ((Series<String,Integer>) serie).getData()){
+            			 item.getNode().setOnMouseEntered(e -> {
+            				 
+            				 for(Boolean see: bar_smVector)
+            			    		if (see == true) System.out.print("1");
+            			    		else System.out.print("0");
+            				 System.out.print("\n");
+            				 if(!has_bar_selected())
+            				 item.getNode().setStyle("-fx-bar-fill: #a9e200;");
+            			 });
+            			 item.getNode().setOnMouseExited(e -> {
+            				 if(!has_bar_selected())
+            				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
+            			 });
+            			 item.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
+            					    @Override
+            					    public void handle(MouseEvent mouseEvent) {
+            					        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+            					            if(mouseEvent.getClickCount() == 2){
+            					                System.out.println("Double clicked");
+            					                Boolean current_state = bar_smVector.get(Integer.parseInt(item.getNode().getId()));
+            					                if(!current_state) {
+                		            				item.getNode().setStyle("-fx-bar-fill: #9a42c8;");	
+            					                }else {
+            			            				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
+            					                }
+            					                
+            					                update_bar_only_one(Integer.parseInt(item.getNode().getId()));
+            					                
+            		            				bar_smVector.set(Integer.parseInt(item.getNode().getId()),
+            		            						!current_state);
+            					            }
+            					        }
+            					    }
+            				 }
+            			 );
+                     }
+                 }
         	
 	        }
 	    });
@@ -527,6 +630,10 @@ public class Controller {
         series1.getData().add(new XYChart.Data<String, Double>(it4, 35407.15));
         series1.getData().add(new XYChart.Data<String, Double>(it5, (double) 12000));   
     	barChartHistogram.getData().addAll(series1);
+    	barChartHistogram.getXAxis().setLabel("price");
+    	barChartHistogram.getYAxis().setLabel("number of items");
+    	
+
     	
     	// trend test data set
     	Series<String, Number> series2 = new XYChart.Series<String, Number>();
