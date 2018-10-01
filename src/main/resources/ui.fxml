@@ -24,6 +24,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ProgressIndicator?>
 
 <!-- this line specific which class is your controller - comp3111.webscraper.Controller. Thus all events shall be handled by this class -->
 
@@ -63,7 +64,7 @@
                         <!--  this is the Go button. When it is clicked, it calls Controller.actionSearch() -->
                         <Button layoutX="145.0" layoutY="36.0" mnemonicParsing="false" onAction="#actionSearch" prefHeight="25.0" prefWidth="35.0" text="Go" />
                         <Button fx:id="refineBt" layoutX="145.0" layoutY="66.0" mnemonicParsing="false" onAction="#actionRefine" prefHeight="25.0" prefWidth="60.0" text="Refine" />
-                        
+                        <ProgressIndicator fx:id="busy_idtr" layoutX="170.0" layoutY="22.0"/>
 
                      </children>
                   </AnchorPane>

@@ -15,6 +15,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.event.ActionEvent;
@@ -35,6 +36,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javafx.scene.layout.*;
 import javafx.geometry.*;
@@ -109,7 +112,10 @@ public class Controller {
     private TableColumn<DataModel, String> posted_date_col;
 
     @FXML
-    private Button refineBt;    
+    private Button refineBt;
+    
+    @FXML
+    private ProgressIndicator busy_idtr;
     
     private WebScraper scraper;
     
@@ -141,6 +147,9 @@ public class Controller {
     	// disable at the beginning
     	lastSearchBt.setDisable(true);
     	refineBt.setDisable(true);
+    	busy_idtr.setScaleX(0.3);
+    	busy_idtr.setScaleY(0.3);
+    	busy_idtr.setVisible(false);
     }
     
     /**
@@ -148,6 +157,8 @@ public class Controller {
      */
     @FXML
     private void actionSearch() {    	
+    	busy_idtr.setVisible(true);
+
         // use Async
     	Task<List<Item>> task = new Task<List<Item>>() {
             @Override protected List<Item> call() throws Exception {
@@ -163,6 +174,11 @@ public class Controller {
             	
             	// copy for further use
             	recordItem = new ArrayList<Item>(result);
+            	
+            	
+            	// update distribution bar chart      
+            	UpdateDistributionChart_Later(recordItem);
+            	
                 return null;
             }
         };
@@ -170,13 +186,96 @@ public class Controller {
         task.setOnSucceeded(eventHandler->{
         	// enable last search function
         	lastSearchBt.setDisable(false);
-        	refineBt.setDisable(false);        
+        	refineBt.setDisable(false);   
+        	busy_idtr.setVisible(false);
         }
         );
         
         new Thread(task).start();
     	
     }
+    
+    
+    /*
+     * Advance Task 1 ; just for fun
+     * update distribution in Async way, non UI thread
+     * 
+     */
+	private void UpdateDistributionChart_Later(List<Item> dist_data) {
+	    Platform.runLater(new Runnable() {
+	        @Override
+	        public void run() {
+	        	// reset it first
+	          	barChartHistogram.getData().clear();
+            	NumberAxis axis = (NumberAxis)barChartHistogram.getYAxis();
+            	axis.setUpperBound(125.0);
+            	axis.setLowerBound(0.0);
+            	// do the calculation
+            	Item minp= null;
+            	Item maxp= null;
+            	for(Item x:dist_data){
+            		minp=(minp==null||x.getPrice()<minp.getPrice())?x:minp;
+            	}
+            	for(Item x:dist_data){
+            		maxp=(maxp==null||x.getPrice()>maxp.getPrice())?x:maxp;
+            	}
+            	Double minPrice=minp.getPrice();
+            	Double maxPrice=maxp.getPrice();
+            	Double rng= (minPrice + maxPrice)/10;
+            	System.out.println("min" + minPrice);
+            	System.out.println("max" + maxPrice);
+                ArrayList<Double> v = new ArrayList<Double>();
+                int[] vv = new int[10];
+                double tmp = minPrice;
+                for(int i=0;i<10;++i) {
+                	if (i==0)
+                		v.add(minPrice);
+                	else
+                	if (i==9)
+                		v.add(maxPrice);
+                	else
+                		v.add(tmp+=rng);
+                }
+                //sort and count
+                dist_data.sort( new Comparator<Item>() {
+                	public int compare(Item it, Item it1) {
+						Double p = it.getPrice();
+						return p.compareTo(it1.getPrice());
+                	}                	                	
+                });
+                // debug sort
+//                for(Item tmp1: dist_data) {
+//                	System.out.println(tmp1.getPrice());                	
+//                }
+               
+                // count
+                for(Item tmp1: dist_data) {
+                	for(int i=0; i<9; ++i) {
+                		if(tmp1.getPrice() == maxPrice) {
+                			vv[9] = vv[9] + 1;
+                		}else
+                		if(tmp1.getPrice()>=v.get(i) && tmp1.getPrice()<v.get(i+1)) {                			
+                			vv[i] = vv[i] + 1;
+                			break;
+                		}
+                	}
+                }
+                for(int i=0;i<10;++i) {
+                	System.out.println(vv[i]);
+                }
+                
+
+            	Series<String, Integer> dist_series = new Series<String, Integer>();
+            	dist_series.setName("The selling prize of '" + textFieldKeyword.getText() + "'");
+            	int iter = 0;
+        		for (Double _price : v) {
+                dist_series.getData().add(new XYChart.Data<String, Integer>(Double.toString(_price), vv[iter++]));
+        		}
+            	barChartHistogram.getData().addAll(dist_series);
+        	
+	        }
+	    });
+	}
     
     /**
      * Called when the new button is pressed. Very dummy action - print something in the command prompt.
@@ -414,7 +513,7 @@ public class Controller {
     	posted_date_col.setCellFactory(TextFieldTableCell.forTableColumn());
     	tableView.setItems(data);
     	    	 
-    	// just a test for table, bar chart
+    	// just a test for bar chart
 		final String it1 = "Item1";
     	final String it2 = "Item2";
     	final String it3 = "Item3";
