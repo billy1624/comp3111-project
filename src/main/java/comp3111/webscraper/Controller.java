@@ -46,6 +46,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 
 
 
@@ -146,21 +147,34 @@ public class Controller {
      * Called when the search button is pressed.
      */
     @FXML
-    private void actionSearch() {
-    	// enable last search function
-    	lastSearchBt.setDisable(false);
-    	refineBt.setDisable(false);
-
-    	System.out.println("actionSearch: " + textFieldKeyword.getText());
-    	List<Item> result = scraper.scrape(textFieldKeyword.getText());
-    	String output = "";
-    	for (Item item : result) {
-    		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
-    	}
-    	textAreaConsole.setText(output);
-    	
-    	// copy for further use
-    	recordItem = new ArrayList<Item>(result);
+    private void actionSearch() {    	
+        // use Async
+    	Task<List<Item>> task = new Task<List<Item>>() {
+            @Override protected List<Item> call() throws Exception {
+            	
+            	List<Item> result = scraper.scrape(textFieldKeyword.getText());
+        		System.out.println("actionSearch: " + textFieldKeyword.getText());
+            	String output = "";
+            	for (Item item : result) {
+            		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+            	}
+            	textAreaConsole.textProperty().unbind();
+            	textAreaConsole.setText(output);
+            	
+            	// copy for further use
+            	recordItem = new ArrayList<Item>(result);
+                return null;
+            }
+        };
+        
+        task.setOnSucceeded(eventHandler->{
+        	// enable last search function
+        	lastSearchBt.setDisable(false);
+        	refineBt.setDisable(false);        
+        }
+        );
+        
+        new Thread(task).start();
     	
     }
     
