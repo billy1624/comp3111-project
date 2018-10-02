@@ -40,6 +40,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -220,22 +221,34 @@ public class Controller {
     }
     
     /*
+     * Advance Task 1 helper function
      * If one bar selected, reset other
      * 
      */
-    private void update_bar_only_one(Integer var) {
+    private void update_bar_only_one(Integer var, List<Item> _dist_data, Double ps, Double pe) {
     	// reset the one which is selected first
     	int myCounter = 0;
+    	int targetIndex = 0;
     	for(Boolean itr: bar_smVector) {
     		if(itr == true) {
     			bar_smVector.set(myCounter, false);
         		Series<String,Integer> serie =  ((Series<String,Integer>) barChartHistogram.getData().get(0));
         		Data<String, Integer> item = serie.getData().get(myCounter);
+        		targetIndex = myCounter;
     			item.getNode().setStyle("-fx-bar-fill: #f3622d;");
     		}
     		myCounter ++;
     	}
-    			
+    	
+    	String output = "";
+    	for(Item itr:  _dist_data){
+    		if (itr.getPrice() >= ps && itr.getPrice()< pe) {
+        		output += itr.getTitle() + "\t" + itr.getPrice() + "\t" + itr.getUrl() + "\n";
+    		}
+    	}
+    	textAreaConsole.textProperty().unbind();
+    	textAreaConsole.setText(output);
+
     }
     
     
@@ -269,8 +282,6 @@ public class Controller {
             	Double minPrice=minp.getPrice();
             	Double maxPrice=maxp.getPrice();
             	Double rng= (minPrice + maxPrice)/10;
-            	System.out.println("min" + minPrice);
-            	System.out.println("max" + maxPrice);
             	DecimalFormat formatter = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance( Locale.ENGLISH ));
             	
             	// only single price
@@ -312,6 +323,7 @@ public class Controller {
                 	for(int i=0; i<9; ++i) {
                 		if(tmp1.getPrice() == maxPrice) {
                 			vv[9] = vv[9] + 1;
+                			break;
                 		}else
                 		if(tmp1.getPrice()>=v.get(i) && tmp1.getPrice()<v.get(i+1)) {                			
                 			vv[i] = vv[i] + 1;
@@ -341,9 +353,9 @@ public class Controller {
             			 item.getNode().setOnMouseEntered(e -> {
             				 
             				 for(Boolean see: bar_smVector)
-            			    		if (see == true) System.out.print("1");
+            					 /*if (see == true) System.out.print("1");
             			    		else System.out.print("0");
-            				 System.out.print("\n");
+            				 	System.out.print("\n");*/
             				 if(!has_bar_selected())
             				 item.getNode().setStyle("-fx-bar-fill: #a9e200;");
             			 });
@@ -356,15 +368,20 @@ public class Controller {
             					    public void handle(MouseEvent mouseEvent) {
             					        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
             					            if(mouseEvent.getClickCount() == 2){
-            					                System.out.println("Double clicked");
             					                Boolean current_state = bar_smVector.get(Integer.parseInt(item.getNode().getId()));
             					                if(!current_state) {
-                		            				item.getNode().setStyle("-fx-bar-fill: #9a42c8;");	
+                		            				item.getNode().setStyle("-fx-bar-fill: #9a42c8;");
+                					                update_bar_only_one(Integer.parseInt(item.getNode().getId()), dist_data,Double.parseDouble(item.getXValue()),Double.parseDouble(item.getXValue())+rng );
             					                }else {
             			            				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
+            			            				 String output = "";
+        			            	            	for (Item item : dist_data) {
+        			            	            		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+        			            	            	}
+        			            	            	textAreaConsole.textProperty().unbind();
+        			            	            	textAreaConsole.setText(output);
             					                }
             					                
-            					                update_bar_only_one(Integer.parseInt(item.getNode().getId()));
             					                
             		            				bar_smVector.set(Integer.parseInt(item.getNode().getId()),
             		            						!current_state);
@@ -397,14 +414,22 @@ public class Controller {
     private void actionRefine() {
     	// after click once, disable
     	refineBt.setDisable(true);
-    	System.out.println("Refine:" + textFieldKeyword.getText());
     	String output = "";
-    	for (Item item : recordItem) {
-    		if (item.getTitle().matches("(.*)"+ textFieldKeyword.getText() + "(.*)"))
+    	// recordItem is being edited and update
+    	for (Iterator<Item> iter = recordItem.listIterator(); iter.hasNext(); ) {
+    		Item item = iter.next();
+    		if (item.getTitle().matches("(.*)"+ textFieldKeyword.getText() + "(.*)")) {
     			output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+    	    }else
+    	    	iter.remove();
     	}
     	textAreaConsole.setText(output);
-    	// trigger: update of other page
+    	/*
+    	 * trigger: update of other page 
+    	 */
+    	UpdateDistributionChart_Later(recordItem);
+    	
+    	
     }
     
     
@@ -473,7 +498,6 @@ public class Controller {
         grid.add(nbox3, 1, 1);
         grid.add(nbox4, 1, 2);
         
-   
         
         ImageView []imvCollection = new ImageView[3];
         Image image = new Image( getClass().getResource("/github-icon.png").toString());   
@@ -512,7 +536,6 @@ public class Controller {
               @Override
               public void handle(ActionEvent event) {
             	  dialog.close();
-            	  System.out.println("About Your Team Dialog Closed");
               }
           });        
         
@@ -528,7 +551,6 @@ public class Controller {
     	dialog.setResizable(false);
     	dialog.show();
     	// debug message
-        System.out.println("About Your Team Dialog Opened");      
     }
 
     /**
@@ -563,7 +585,6 @@ public class Controller {
      */
     @FXML
     public void closeAndResetAll() {
-    	System.out.println("closeAndResetAll()");
     	// 1
     	textAreaConsole.setText("");
     	// 2
