@@ -3,12 +3,14 @@
  */
 package comp3111.webscraper;
 
+
 import javafx.application.Application;
 import javafx.stage.Stage;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 
 
 /**
@@ -51,10 +53,13 @@ public class WebScraperApplication extends Application {
     	loader.setLocation(getClass().getResource(UI_FILE));
    		VBox root = (VBox) loader.load();
    		Scene scene =  new Scene(root);
+   		Controller tmp = (Controller)loader.getController();
+    	tmp.setHostServices(getHostServices());
+        //setUserAgentStylesheet(STYLESHEET_CASPIAN);
+    	stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));    	
    		stage.setScene(scene);
    		stage.setTitle("WebScrapper");
-   		stage.show();
-    		
+   		stage.show();   		
 
 	}
 

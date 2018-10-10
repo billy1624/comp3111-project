@@ -91,14 +91,15 @@ public class WebScraper {
 			HtmlPage page = client.getPage(searchUrl);
 
 			
-			List<?> items = (List<?>) page.getByXPath("//li[@class='result-row']");
+			List<?> items = (List<?>) page.getByXPath("//li	[@class='result-row']");
 			
 			Vector<Item> result = new Vector<Item>();
 
 			for (int i = 0; i < items.size(); i++) {
 				HtmlElement htmlItem = (HtmlElement) items.get(i);
 				HtmlAnchor itemAnchor = ((HtmlAnchor) htmlItem.getFirstByXPath(".//p[@class='result-info']/a"));
-				HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//a/span[@class='result-price']"));
+				// tiny fix for price not find - 0.0
+				HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@class='result-price']"));
 
 				// It is possible that an item doesn't have any price, we set the price to 0.0
 				// in this case
@@ -119,5 +120,15 @@ public class WebScraper {
 		}
 		return null;
 	}
+	
+	/**
+	 * Method for return web client instance, used for controller, e.g. for shutdown connection
+	 * @return Web
+	 * 
+	 */
+	WebClient getWebClient() {
+		return client;
+	}
+
 
 }
