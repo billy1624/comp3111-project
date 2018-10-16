@@ -58,6 +58,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
+import java.util.Queue;
+import java.util.LinkedList;
 
 
 
@@ -129,8 +131,12 @@ public class Controller {
     private HostServices hservices;
     
     private List<Item> recordItem;
-    
+        
     private List<Boolean> bar_smVector;
+    
+    Queue<String> lastSearchQueue;
+    
+    Queue<List<Item>> lastSearchItemQueue;
     
     
     
@@ -144,6 +150,12 @@ public class Controller {
      */
     public Controller() {
     	scraper = new WebScraper();
+    	
+    	// init last search keyword, record item
+    	lastSearchQueue = new LinkedList<String>();
+    	lastSearchQueue.offer("NULL");
+    	lastSearchItemQueue = new LinkedList<List<Item>>();
+    	lastSearchItemQueue.offer(null);
     }
 
     /**
@@ -166,13 +178,29 @@ public class Controller {
 		bar_smVector = new ArrayList<Boolean>();
     }
     
+    /*
+     * Update your last search keyword, item to queue 
+     * 
+     */
+    private void updateLastSearch_Keyword() {
+    	lastSearchQueue.offer(textFieldKeyword.getText());
+    	if (lastSearchQueue.size() == 3) lastSearchQueue.poll();  
+    	return;
+    }
+    
+    private void updateLastSearch_Item() {
+    	lastSearchItemQueue.offer(recordItem);
+    	if (lastSearchItemQueue.size() == 3) lastSearchItemQueue.poll();  
+    }
+    
     /**
      * Called when the search button is pressed.
      */
     @FXML
     private void actionSearch() {    	
     	busy_idtr.setVisible(true);
-
+    	updateLastSearch_Keyword();
+    	updateLastSearch_Item();
         // use Async
     	Task<List<Item>> task = new Task<List<Item>>() {
             @Override protected List<Item> call() throws Exception {
@@ -187,11 +215,12 @@ public class Controller {
             	textAreaConsole.setText(output);
             	
             	// copy for further use
-            	recordItem = new ArrayList<Item>(result);
-            	
+            	recordItem = new ArrayList<Item>(result);            	
             	
             	// update distribution bar chart      
             	UpdateDistributionChart_Later(recordItem);
+            	
+            	// update other page here
             	
                 return null;
             }
@@ -206,6 +235,7 @@ public class Controller {
         );
         
         new Thread(task).start();
+        
     	
     }
     
@@ -399,21 +429,56 @@ public class Controller {
     
     /**
      * Called when the new button is pressed. Very dummy action - print something in the command prompt.
+     * actionNew() actually is LastSearchAction
+     * The result will revert to the last Search
      */
     @FXML
     private void actionNew() {
-    	System.out.println("actionNew");
+    	lastSearchBt.setDisable(true);
+    	
+    	String lastKeyword = lastSearchQueue.peek();
+    	System.out.println("last Search : "+ lastKeyword);
+    	textFieldKeyword.setText(lastKeyword); // set back to last search keyword
+    	
+    	if (lastSearchItemQueue.peek() == null) {    		
+    		closeAndResetAll();
+    		return;
+    	}
+    	// Console page update
+    	String output = "";
+    	for (Item item : lastSearchItemQueue.peek()) {
+    		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+    	}
+    	textAreaConsole.setText(output);
+    	
+    	/*
+    	 * trigger: update of other page 
+    	 */
+    	// advance 1 distribution chart update
+    	UpdateDistributionChart_Later(lastSearchItemQueue.peek());
+    	
+    	// summary page update
+    	
+    	// table update
+
+    	
+    	
     }
     
     
     /**
      * Task 5 Refine Search function
-     * 
+     * Only extract the the data with certain keyword (handle locally),
+     * But not search again from portal
      */   
     @FXML
     private void actionRefine() {
     	// after click once, disable
     	refineBt.setDisable(true);
+    	updateLastSearch_Keyword();
+    	updateLastSearch_Item();    	
+    	
+    	// Console page update
     	String output = "";
     	// recordItem is being edited and update
     	for (Iterator<Item> iter = recordItem.listIterator(); iter.hasNext(); ) {
@@ -427,8 +492,12 @@ public class Controller {
     	/*
     	 * trigger: update of other page 
     	 */
+    	// advance 1 distribution chart update
     	UpdateDistributionChart_Later(recordItem);
     	
+    	// summary page update
+    	
+    	// table update
     	
     }
     
