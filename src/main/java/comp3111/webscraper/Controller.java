@@ -13,7 +13,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Hyperlink;
-<<<<<<< HEAD
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
@@ -52,13 +51,6 @@ import javafx.collections.ObservableList;
 
 
 
-
-
-=======
-import javafx.scene.control.TableView;
-import java.util.List;
-import java.net.URI;
->>>>>>> 42e716965e3c14baf6037dc9486504c420faa41f
 
 /**
  * 
@@ -120,7 +112,6 @@ public class Controller {
     
     private WebScraper scraper;
     
-<<<<<<< HEAD
     private HostServices hservices;
     
     private List<Item> recordItem;
@@ -130,15 +121,7 @@ public class Controller {
     
     @FXML
     private MenuBar menuBar; 
-=======
-    private TableView title; 
-   
-    private TableView price; 
-    
-    private TableView url; 
-    
-    private TableView posted; 
->>>>>>> 42e716965e3c14baf6037dc9486504c420faa41f
+  
     
     /**
      * Default controller
@@ -243,7 +226,6 @@ public class Controller {
     	int num = 0 ;
     	double TotalPrice = 0;
     	double LPrice = 0;
-<<<<<<< HEAD
     	
     	for ( int i = 0; i<tableView.getItems().size(); i++) {
     	    tableView.getItems().clear();
@@ -252,15 +234,11 @@ public class Controller {
     	// enable last search function
     	lastSearchBt.setDisable(false);
     	refineBt.setDisable(false);
-=======
-    	String link = "";
->>>>>>> 42e716965e3c14baf6037dc9486504c420faa41f
 
     	System.out.println("actionSearch: " + textFieldKeyword.getText());
     	List<Item> result = scraper.scrape(textFieldKeyword.getText());
     	String output = "";
     	for (Item item : result) {
-<<<<<<< HEAD
     		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getPosted_date()+ '\t'+ item.getUrl() + "\n";
     		 DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
     		 data.add(tmp);
@@ -332,26 +310,6 @@ public class Controller {
     		if( DateCompare(data.get(i).getPostedd(),data.get(i+1).getPostedd()) > 0){
     			Latest_item_link = data.get(i).getPostedd();
     		}
-=======
-    			output += item.getTitle() + "\n" + item.getPrice() + "\n" + item.getUrl() + "\n";
-   		
-    		if (num == 0)
-    		{
-    			LPrice = item.getPrice();
-    		} 
-	   		else
-	   			if (LPrice >  item.getPrice())
-	   			{
-	   				 LPrice = item.getPrice();
-	   				 link = item.getUrl();
-	   			}
-    		
-    	
-    			TotalPrice += item.getPrice(); 
-	   		 	num += 1; 
-	   		 
-    		
->>>>>>> 42e716965e3c14baf6037dc9486504c420faa41f
     	}
     	// copy for further use
     	recordItem = new ArrayList<Item>(result);
@@ -370,15 +328,7 @@ public class Controller {
 			labelLatest.setText("<Latest>");
 		}
     	
-<<<<<<< HEAD
-}
-    
-=======
-    	title.setItems(null);
-    	//price.setValue();
-    }
->>>>>>> 42e716965e3c14baf6037dc9486504c420faa41f
-    
+}    
     /**
      * Called when the new button is pressed. Very dummy action - print something in the command prompt.
      */

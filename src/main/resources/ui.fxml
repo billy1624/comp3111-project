@@ -104,21 +104,13 @@
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-<<<<<<< HEAD
                                           <TableView fx:id="tableView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
                                               <TableColumn fx:id="title_col" editable="false" prefWidth="154.0" text="Title" />
                                               <TableColumn fx:id="price_col" editable="false" prefWidth="90.0" text="Price" />
                                                 <TableColumn fx:id="url_col" editable="false" prefWidth="78.0" text="URL" />
                                                 <TableColumn fx:id="posted_date_col" editable="false" prefWidth="88.0" text="Posted Date" />
-=======
-                                          <TableView fx:id="table" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <columns>
-                                              <TableColumn fx:id="title" editable="false" prefWidth="154.0" text="Title" />
-                                              <TableColumn fx:id="price" editable="false" prefWidth="90.0" text="Price" />
-                                                <TableColumn fx:id="url" editable="false" prefWidth="78.0" text="URL" />
-                                                <TableColumn fx:id="posted" editable="false" prefWidth="88.0" text="Posted Date" />
->>>>>>> 42e716965e3c14baf6037dc9486504c420faa41f
+                                    
                                             </columns>
                                           </TableView>
                                        </children>
