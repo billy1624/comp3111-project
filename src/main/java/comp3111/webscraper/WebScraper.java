@@ -100,17 +100,19 @@ public class WebScraper {
 				HtmlAnchor itemAnchor = ((HtmlAnchor) htmlItem.getFirstByXPath(".//p[@class='result-info']/a"));
 				// tiny fix for price not find - 0.0
 				HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@class='result-price']"));
-
+				
+				HtmlElement spanPostedd = ((HtmlElement) htmlItem.getFirstByXPath(".//time[@class='result-date']"));
 				// It is possible that an item doesn't have any price, we set the price to 0.0
 				// in this case
 				String itemPrice = spanPrice == null ? "0.0" : spanPrice.asText();
-
+				String itemPosted_date = spanPostedd == null ? "N/A" : spanPostedd.asText();
+				
 				Item item = new Item();
 				item.setTitle(itemAnchor.asText());
 				item.setUrl(DEFAULT_URL + itemAnchor.getHrefAttribute());
 
 				item.setPrice(new Double(itemPrice.replace("$", "")));
-
+				item.setPosted_date(itemPosted_date);
 				result.add(item);
 			}
 			client.close();

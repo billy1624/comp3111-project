@@ -35,6 +35,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import javafx.scene.layout.*;
 import javafx.geometry.*;
@@ -128,6 +130,60 @@ public class Controller {
     public Controller() {
     	scraper = new WebScraper();
     }
+    
+    public int DateCompare(String a, String b){
+    	String a_mon;
+    	String b_mon;
+    	int a_day;
+    	int b_day;
+    	
+    	a_mon = a.substring(0, 3);
+    	b_mon = b.substring(0, 3);
+    	
+    	a_day = Integer.parseInt(a.substring(4, a.length()));
+    	b_day = Integer.parseInt(b.substring(4, b.length()));
+    	
+    	if( MonCompare(a_mon, b_mon)<0 )
+    		return -1;
+    	if( MonCompare(a_mon, b_mon)>0 )
+    		return 1;
+    	
+    	return a_day > b_day? 1 : a_day == b_day ? 0 : -1;
+    }
+    
+    
+    public int MonCompare(String a, String b){
+    	final List<String> monList = new ArrayList<String>(Arrays.asList(
+    			"Jan",
+    			"Feb",
+    			"Mar", 
+    			"Apr",
+    			"May",
+    			"Jun",
+    			"Jul",
+    			"Aug",
+    			"Sep",
+    			"Oct",
+    			"Nov",
+    			"Dec"));
+    	int a_index = 0;
+    	int b_index = 0;
+    	for (int i = 0; i < monList.size(); i++) {
+			if (a == monList.get(i)){
+				a_index = i;
+				break;
+			}		
+		}
+    	
+    	for (int i = 0; i < monList.size(); i++) {
+			if (b == monList.get(i)){
+				b_index = i;
+				break;
+			}
+		}
+    	return a_index < b_index ? -1 : a_index == b_index ? 0 : 1;
+    	
+    }
 
     /**
      * Default initializer. It is empty.
@@ -135,7 +191,25 @@ public class Controller {
     @FXML
     private void initialize() {
     	// load test case, for test
-    	task6_iii_testCase();
+    	//task6_iii_testCase();
+    	title_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("title"));
+    	title_col.setCellFactory(TextFieldTableCell.forTableColumn());
+    	price_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("price"));
+    	price_col.setCellFactory(TextFieldTableCell.forTableColumn());
+    	url_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("url"));
+    	url_col.setCellFactory(TextFieldTableCell.forTableColumn());
+    	posted_date_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("postedd"));
+    	posted_date_col.setCellFactory(TextFieldTableCell.forTableColumn());
+    	tableView.setItems(data);
+    	tableView.setEditable(false);
+    	Comparator<String> PriceCompare = (r1, r2)-> Double.parseDouble(r1) >  Double.parseDouble(r2)? 1: -1;
+				
+		Comparator<String> PostDateCompare = (r1, r2)
+				-> DateCompare(r1, r2);
+				
+    	price_col.setComparator(PriceCompare);	
+    	posted_date_col.setComparator(PostDateCompare);	
+
     	
     	// disable at the beginning
     	lastSearchBt.setDisable(true);
@@ -145,8 +219,19 @@ public class Controller {
     /**
      * Called when the search button is pressed.
      */
+	String lowset_item_link = "";
+	String Latest_item_link = "";
+
     @FXML
     private void actionSearch() {
+    	int num = 0 ;
+    	double TotalPrice = 0;
+    	double LPrice = 0;
+    	
+    	for ( int i = 0; i<tableView.getItems().size(); i++) {
+    	    tableView.getItems().clear();
+    	}
+    	
     	// enable last search function
     	lastSearchBt.setDisable(false);
     	refineBt.setDisable(false);
@@ -155,14 +240,84 @@ public class Controller {
     	List<Item> result = scraper.scrape(textFieldKeyword.getText());
     	String output = "";
     	for (Item item : result) {
-    		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
-    	}
-    	textAreaConsole.setText(output);
+    		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getPosted_date()+ '\t'+ item.getUrl() + "\n";
+    		 DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
+    		 data.add(tmp);
     	
+    	
+ 
+    	if (num == 0)
+		{
+			LPrice = item.getPrice();
+		} 
+   		else
+   			if (LPrice >  item.getPrice() && item.getPrice()!=0)
+   			{
+   				LPrice = item.getPrice();
+   				lowset_item_link = item.getUrl();
+   				lowset_item_link = lowset_item_link.substring(31);
+   			}
+		
+    	
+    	
+	//Total price of the items
+			TotalPrice += item.getPrice(); 
+   		 	num += 1; 
+   		 
+		
+	
+	textAreaConsole.setText(output);
+	
+	//number of items
+	labelCount.setText(Integer.toString(num));
+	
+	if (num == 0){
+		labelPrice.setText("-");
+		labelMin.setText("-");
+		labelLatest.setText("-");
+	}
+	else
+	{
+		labelPrice.setText(Double.toString(TotalPrice/num));
+		labelMin.setText(lowset_item_link);
+		labelMin.setOnAction( new EventHandler<ActionEvent>(){
+
+			@Override
+			public void handle(ActionEvent event) {
+				System.out.println(lowset_item_link);
+				hservices.showDocument(lowset_item_link);
+			}
+			
+		}
+		);
+		
+		labelLatest.setText(Latest_item_link);
+		System.out.println("lil:"+Latest_item_link);
+
+		labelLatest.setOnAction( new EventHandler<ActionEvent>(){
+
+			@Override
+			public void handle(ActionEvent event) {
+				hservices.showDocument(Latest_item_link);
+			}
+			
+		}
+		);
+		
+	}
+    	} 	
+    	
+    	for(int i = 0; i < result.size()-1 ;++i){
+    		if( DateCompare(data.get(i).getPostedd(),data.get(i+1).getPostedd()) > 0){
+    			Latest_item_link = data.get(i).getPostedd();
+    		}
+    	}
     	// copy for further use
     	recordItem = new ArrayList<Item>(result);
     	
-    }
+    	
+}
+    
     
     /**
      * Called when the new button is pressed. Very dummy action - print something in the command prompt.
@@ -380,13 +535,17 @@ public class Controller {
     /**
      *	just a test case      
      */
-	final ObservableList<DataModel> data = FXCollections.observableArrayList(
-		    new DataModel("Title1", "0.0", "item1@example.com","01/02/2018"),
-		    new DataModel("Title2", "10.0", "item2@example.com","03/04/2018"),
-		    new DataModel("Title3", "20.0", "item3@example.com","05/06/2018"),
-		    new DataModel("Title4", "100.0", "item4@example.com","07/08/2018"),
-		    new DataModel("Title5", "500.0", "item5@example.com","09/10/2018")
-		);
+    
+	//final ObservableList<DataModel> data = FXCollections.observableArrayList();
+	final ObservableList<DataModel> data = FXCollections.observableArrayList();
+
+//	= FXCollections.observableArrayList(
+//		    new DataModel("", "0.0", "item1@example.com","01/02/2018"),
+//		    new DataModel("Title2", "10.0", "item2@example.com","03/04/2018"),
+//		    new DataModel("Title3", "20.0", "item3@example.com","05/06/2018"),
+//		    new DataModel("Title4", "100.0", "item4@example.com","07/08/2018"),
+//		    new DataModel("Title5", "500.0", "item5@example.com","09/10/2018")
+//		);
 	
     @SuppressWarnings("unchecked")
 	void task6_iii_testCase() {
