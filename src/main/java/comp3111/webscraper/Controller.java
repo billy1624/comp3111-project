@@ -748,10 +748,10 @@ public class Controller {
     
     // my data model: for testing only
     public static class DataModel {
-        private final SimpleStringProperty title;
-        private final SimpleStringProperty price;
-        private final SimpleStringProperty url;
-        private final SimpleStringProperty postedd;
+        private SimpleStringProperty title;
+        private SimpleStringProperty price;
+        private SimpleStringProperty url;
+        private SimpleStringProperty postedd;
      
         public DataModel(String _title, String _price, String _url, String _posted_date) {
             this.title = new SimpleStringProperty(_title);
