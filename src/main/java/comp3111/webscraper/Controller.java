@@ -38,7 +38,6 @@ import javafx.scene.control.ComboBox;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -754,7 +753,7 @@ public class Controller {
         private final SimpleStringProperty url;
         private final SimpleStringProperty postedd;
      
-        private DataModel(String _title, String _price, String _url, String _posted_date) {
+        public DataModel(String _title, String _price, String _url, String _posted_date) {
             this.title = new SimpleStringProperty(_title);
             this.price = new SimpleStringProperty(_price);
             this.url = new SimpleStringProperty(_url);
