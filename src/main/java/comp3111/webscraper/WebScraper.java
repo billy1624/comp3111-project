@@ -126,9 +126,9 @@ public class WebScraper {
 					nextItemNum = 0;
 				}
 
-				String status = "Fetching form " + Portal.Craigslist + "... item " + rangefrom + " - " + rangeTo + ", " + totalCount + " in total, " + (totalCount-rangeTo) + " item left.";
+				String status = "Fetching form " + Portal.Craigslist + ": item " + rangefrom + " - " + rangeTo + ", " + totalCount + " in total, " + (totalCount-rangeTo) + " item left.";
 				System.out.println(status);
-				textAreaConsole.appendText(status + "\n\n");
+				textAreaConsole.appendText(status + "\n");
 
 				List<?> items = (List<?>) page.getByXPath("//li[@class='result-row']");
 
@@ -155,9 +155,11 @@ public class WebScraper {
 					result.add(item);
 				}
 				System.out.println("item count: " + items.size());
+				textAreaConsole.appendText("item count: " + items.size() + "\n");
 			} while (nextItemNum > 0);
 
 			System.out.println("result count: " + result.size());
+			textAreaConsole.appendText("result count: " + result.size() + "\n");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -193,7 +195,7 @@ public class WebScraper {
 
 				String status = "Fetching form " + Portal.Preloved + ": Page " + pageNum + " of " + totalPage + " was processed.";
 				System.out.println(status);
-				textAreaConsole.appendText(status + "\n\n");
+				textAreaConsole.appendText(status + "\n");
 
 				List<?> items = (List<?>) page.getByXPath("//ul[@id='search-results-list']//li[@class='search-result']");
 
@@ -220,9 +222,11 @@ public class WebScraper {
 					result.add(item);
 				}
 				System.out.println("item count: " + items.size());
+				textAreaConsole.appendText("item count: " + items.size() + "\n");
 			} while (pageNum < totalPage);
 
-			System.out.println("result count: " + result.size());
+		System.out.println("result count: " + result.size());
+		textAreaConsole.appendText("result count: " + result.size() + "\n");
 
 		} catch (Exception e) {
 			e.printStackTrace();
