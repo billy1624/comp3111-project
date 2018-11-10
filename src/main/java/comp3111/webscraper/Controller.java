@@ -63,16 +63,14 @@ public class Controller {
     @FXML
     private void actionSearch() {
     	System.out.println("actionSearch: " + textFieldKeyword.getText());
-    	List<Item> result = scraper.scrape(textFieldKeyword.getText());
+    	List<Item> result = scraper.scrape(textFieldKeyword.getText(), textAreaConsole);
     	String output = "";
     	for (Item item : result) {
-    		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+    		output += item.getTitle() + "\t\t" + item.getPrice() + "\t\t" + item.getPostedOn() + "\t\t" + item.getPortal() + "\t\t" + item.getUrl() + "\n";
     	}
-    	textAreaConsole.setText(output);
-    	
-    	
+    	textAreaConsole.appendText(output);
     }
-    
+
     /**
      * Called when the new button is pressed. Very dummy action - print something in the command prompt.
      */
@@ -80,5 +78,6 @@ public class Controller {
     private void actionNew() {
     	System.out.println("actionNew");
     }
+
 }
 
