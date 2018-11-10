@@ -748,8 +748,8 @@ public class Controller {
     		    "Option 3"
     		);
     }
-    
     */
+    
     // my data model: for testing only
     public static class DataModel {
         private final SimpleStringProperty title;
