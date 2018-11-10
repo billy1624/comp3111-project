@@ -163,7 +163,7 @@ public class Controller {
     @FXML
     private void initialize() {
     	// load test case, for test
-    	task6_iii_testCase();
+    	//task6_iii_testCase();
     	
     	// disable at the beginning
     	lastSearchBt.setDisable(true);
@@ -187,7 +187,8 @@ public class Controller {
     	return;
     }
     
-    private void updateLastSearch_Item() {
+
+	private void updateLastSearch_Item() {
     	lastSearchItemQueue.offer(recordItem);
     	if (lastSearchItemQueue.size() == 3) lastSearchItemQueue.poll();  
     }
@@ -629,6 +630,7 @@ public class Controller {
     public void setHostServices(HostServices obj) {
     	hservices = obj;
     }
+
     
     /**
      * Handle action related to leave the program and disconnect all connection     * 
@@ -693,6 +695,7 @@ public class Controller {
 		    new DataModel("Title5", "500.0", "item5@example.com","09/10/2018")
 		);
 	
+	/*
     @SuppressWarnings("unchecked")
 	void task6_iii_testCase() {
     	title_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("title"));
@@ -745,6 +748,7 @@ public class Controller {
     		    "Option 3"
     		);
     }
+    */
     
     // my data model: for testing only
     public static class DataModel {
