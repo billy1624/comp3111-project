@@ -76,7 +76,7 @@ public class Sawa_ControllerTest {
                     @Override
                     public void run() {
 							try {
-								new Task().start(new Stage());
+								new WebScraperApplication().start(new Stage());
 								Controller test = new Controller();
 								/* test aboutUs dialog */
 						    	test.createAboutUsDialog();
@@ -423,6 +423,29 @@ public class Sawa_ControllerTest {
 		method1111.invoke(test, (Object[])null);
     }
     
+    
+    @Test
+    public void test_actionSearch() throws Exception{
+    	Controller test = new Controller();
+    	Method method = null;
+  		method = test.getClass().getDeclaredMethod("actionSearch",(Class<?>[]) null);		
+      	method.setAccessible(true);
+      	
+      	final Field field12 = test.getClass().getDeclaredField("busy_idtr");
+        field12.setAccessible(true);
+        ProgressIndicator result_bsidtr = new ProgressIndicator();     
+        result_bsidtr.setVisible(true);
+        field12.set(test, result_bsidtr); 
+      	
+        final Field tfkeyword = test.getClass().getDeclaredField("textFieldKeyword");
+ 		tfkeyword.setAccessible(true);
+ 		TextField tf = new TextField();		
+ 		tfkeyword.set(test, tf);
+      	
+      	
+   		method.invoke(test, (Object[])null);
+    }
+  
     @Test
     public void test_updateLastSearchItem() throws Exception {
     	Controller test = new Controller();
