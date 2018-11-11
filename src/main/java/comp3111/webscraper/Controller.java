@@ -4,61 +4,53 @@
 package comp3111.webscraper;
 
 
-import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.image.Image;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.*;
-import javafx.scene.chart.AreaChart;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.chart.XYChart.Series;
-import javafx.stage.*;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
-import javafx.scene.text.Font;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Queue;
 
-import javafx.scene.layout.*;
-import javafx.geometry.*;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-
-import java.util.Queue;
-import java.util.LinkedList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.chart.AreaChart;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart.Data;
+import javafx.scene.chart.XYChart.Series;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 
 
@@ -136,6 +128,8 @@ public class Controller {
     private Queue<String> lastSearchQueue;
     
     private Queue<List<Item>> lastSearchItemQueue;
+    
+    private Thread scraperTh;
             
     
     /* task 6 related data member */
@@ -199,10 +193,10 @@ public class Controller {
     private void actionSearch() {    	
     	busy_idtr.setVisible(true);
     	updateLastSearch_Keyword();
-    	updateLastSearch_Item();
         // use Async
     	Task<List<Item>> task = new Task<List<Item>>() {
-            @Override protected List<Item> call() throws Exception {
+            @Override 
+            protected List<Item> call() throws Exception {
             	
             	List<Item> result = scraper.scrape(textFieldKeyword.getText(), textAreaConsole);
         		System.out.println("actionSearch: " + textFieldKeyword.getText());            	
@@ -214,7 +208,8 @@ public class Controller {
             	textAreaConsole.setText(output);
             	
             	// copy for further use
-            	recordItem = new ArrayList<Item>(result);            	
+            	recordItem = new ArrayList<Item>(result);    
+            	updateLastSearch_Item();
             	
             	// update distribution bar chart      
             	//UpdateDistributionChart_Later(recordItem);
@@ -231,12 +226,13 @@ public class Controller {
         	refineBt.setDisable(false);   
         	busy_idtr.setVisible(false);
         }
-        );
+        );       
         
-        new Thread(task).start();
+        scraperTh = new Thread(task);
+        scraperTh.start();
         
     	
-    }
+    }      
     
     
     /*
@@ -280,151 +276,14 @@ public class Controller {
 
     }
     
-    
-    /*
-     * Advance Task 1 ; just for fun
-     * update distribution in Async way, non UI thread
-     * 
-     */	
-//    private void UpdateDistributionChart_Later(List<Item> dist_data) {
-//	    Platform.runLater(new Runnable() {
-//	        @Override
-//	        public void run() {
-//	        	// reset it first
-//	        	bar_smVector.clear();
-//	          	barChartHistogram.getData().clear();
-//            	NumberAxis axis = (NumberAxis)barChartHistogram.getYAxis();
-//            	axis.setUpperBound(125.0);
-//            	axis.setLowerBound(0.0);
-//            	
-//            	if(dist_data.isEmpty()) return;
-//            	
-//            	// do the calculation
-//            	Item minp= null;
-//            	Item maxp= null;
-//            	for(Item x:dist_data){
-//            		minp=(minp==null||x.getPrice()<minp.getPrice())?x:minp;
-//            	}
-//            	for(Item x:dist_data){
-//            		maxp=(maxp==null||x.getPrice()>maxp.getPrice())?x:maxp;
-//            	}
-//            	Double minPrice=minp.getPrice();
-//            	Double maxPrice=maxp.getPrice();
-//            	Double rng= (minPrice + maxPrice)/10;
-//            	DecimalFormat formatter = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance( Locale.ENGLISH ));
-//            	
-//            	// only single price
-//            	if (minPrice.compareTo(maxPrice)==0) {
-//            		Series<String, Integer> dist_series = new Series<String, Integer>();
-//                	dist_series.setName("The selling prize of '" + textFieldKeyword.getText() + "'");
-//                	int iter = 0;
-//                    dist_series.getData().add(new XYChart.Data<String, Integer>(Double.toString(maxPrice), dist_data.size()));            		
-//                	barChartHistogram.setCategoryGap(200);
-//                    barChartHistogram.getData().addAll(dist_series);    
-//        			bar_smVector.add(false); // state 0: not selected
-//            		return;
-//            	}
-//            	
-//            	// multiple price
-//                ArrayList<Double> v = new ArrayList<Double>();
-//                int[] vv = new int[10];
-//                double tmp = minPrice;
-//                for(int i=0;i<10;++i) {
-//                	if (i==0)
-//                		v.add(minPrice);
-//                	else
-//                	if (i==9)
-//                		v.add(maxPrice);
-//                	else
-//                		v.add(tmp+=rng);
-//                }
-//                //sort and count
-//                dist_data.sort( new Comparator<Item>() {
-//                	public int compare(Item it, Item it1) {
-//						Double p = it.getPrice();
-//						return p.compareTo(it1.getPrice());
-//                	}                	                	
-//                });
-//
-//                
-//                // count
-//                for(Item tmp1: dist_data) {
-//                	for(int i=0; i<9; ++i) {
-//                		if(tmp1.getPrice() == maxPrice) {
-//                			vv[9] = vv[9] + 1;
-//                			break;
-//                		}else
-//                		if(tmp1.getPrice()>=v.get(i) && tmp1.getPrice()<v.get(i+1)) {                			
-//                			vv[i] = vv[i] + 1;
-//                			break;
-//                		}
-//                	}
-//                }                
-//
-//            	Series<String, Integer> dist_series = new Series<String, Integer>();
-//            	dist_series.setName("The selling prize of '" + textFieldKeyword.getText() + "'");
-//            	int iter = 0;
-//        		for (Double _price : v) {
-//        			dist_series.getData().add(new XYChart.Data<String, Integer>(formatter.format(Math.round(_price)), vv[iter++]));
-//        			bar_smVector.add(false); // state false/0: not selected
-//        		}
-//
-//            	barChartHistogram.setCategoryGap(0);
-//            	barChartHistogram.getData().addAll(dist_series);
-//            	
-//            	// add IDs
-//            	for(int itr = 0; itr < 10; ++itr)
-//            		dist_series.getData().get(itr).getNode().setId(Integer.toString(itr));
-//
-//            	
-//            	 for (Object serie: barChartHistogram.getData()){
-//            		 for (Data<String, Integer> item: ((Series<String,Integer>) serie).getData()){
-//            			 item.getNode().setOnMouseEntered(e -> {
-//            				 
-//            				 for(Boolean see: bar_smVector)
-//            					 /*if (see == true) System.out.print("1");
-//            			    		else System.out.print("0");
-//            				 	System.out.print("\n");*/
-//            				 if(!has_bar_selected())
-//            				 item.getNode().setStyle("-fx-bar-fill: #a9e200;");
-//            			 });
-//            			 item.getNode().setOnMouseExited(e -> {
-//            				 if(!has_bar_selected())
-//            				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
-//            			 });
-//            			 item.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
-//            					    @Override
-//            					    public void handle(MouseEvent mouseEvent) {
-//            					        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
-//            					            if(mouseEvent.getClickCount() == 2){
-//            					                Boolean current_state = bar_smVector.get(Integer.parseInt(item.getNode().getId()));
-//            					                if(!current_state) {
-//                		            				item.getNode().setStyle("-fx-bar-fill: #9a42c8;");
-//                					                update_bar_only_one(Integer.parseInt(item.getNode().getId()), dist_data,Double.parseDouble(item.getXValue()),Double.parseDouble(item.getXValue())+rng );
-//            					                }else {
-//            			            				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
-//            			            				 String output = "";
-//        			            	            	for (Item item : dist_data) {
-//        			            	            		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
-//        			            	            	}
-//        			            	            	textAreaConsole.textProperty().unbind();
-//        			            	            	textAreaConsole.setText(output);
-//            					                }
-//            					                
-//            					                
-//            		            				bar_smVector.set(Integer.parseInt(item.getNode().getId()),
-//            		            						!current_state);
-//            					            }
-//            					        }
-//            					    }
-//            				 }
-//            			 );
-//                     }
-//                 }
-//        	
-//	        }
-//	    });
-//	}
+    public class github_EventHandler implements EventHandler<ActionEvent>
+    {
+        @Override
+        public void handle(ActionEvent event) {
+        	String text = ((Hyperlink)event.getSource()).getText();
+        	hservices.showDocument("https://github.com/" + text);        	
+        }
+    }    
     
     /**
      * Called when the new button is pressed. Very dummy action - print something in the command prompt.
@@ -576,13 +435,7 @@ public class Controller {
             member_github_link[i] = new Hyperlink(link[i]);
             member_github_link[i].setVisited(false);
             member_github_link[i].setBorder(Border.EMPTY);
-            member_github_link[i].setOnAction(new EventHandler<ActionEvent>() {             
-                @Override
-                public void handle(ActionEvent event) {
-                	String text = ((Hyperlink)event.getSource()).getText();
-                	hservices.showDocument("https://github.com/" + text);
-                }
-            });
+            member_github_link[i].setOnAction(new github_EventHandler());
             grid.add(member_name_label[i], 0, 3+i);
             grid.add(member_itsc_label[i], 1, 3+i);
             grid.add(pictureRegion[i], 2, 3+i);
@@ -617,7 +470,7 @@ public class Controller {
      * @param event Event on "About your Team" menu item.
      */
     @FXML
-    private void handleAboutYourTeamAction(final ActionEvent event)
+    public void handleAboutYourTeamAction(final ActionEvent event)
     {
     	createAboutUsDialog();
     	// debug message
@@ -656,6 +509,11 @@ public class Controller {
      */
     @FXML
     public void closeAndResetAll() {
+    	// 0
+        scraper.getWebClient().close();
+    	scraperTh.stop();
+    	busy_idtr.setVisible(false);
+
     	// 1
     	textAreaConsole.setText("");
     	// 2
@@ -696,61 +554,6 @@ public class Controller {
 		    new DataModel("Title5", "500.0", "item5@example.com","09/10/2018")
 		);
 	
-	/*
-    @SuppressWarnings("unchecked")
-	void task6_iii_testCase() {
-    	title_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("title"));
-    	title_col.setCellFactory(TextFieldTableCell.forTableColumn());
-    	price_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("price"));
-    	price_col.setCellFactory(TextFieldTableCell.forTableColumn());
-    	url_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("url"));
-    	url_col.setCellFactory(TextFieldTableCell.forTableColumn());
-    	posted_date_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("postedd"));
-    	posted_date_col.setCellFactory(TextFieldTableCell.forTableColumn());
-    	tableView.setItems(data);
-    	    	 
-    	// just a test for bar chart
-		final String it1 = "Item1";
-    	final String it2 = "Item2";
-    	final String it3 = "Item3";
-    	final String it4 = "Item4";
-    	final String it5 = "Item5";
-    	Series<String, Double> series1 = new Series<String, Double>();
-        series1.setName("Test Data Set");       
-        series1.getData().add(new XYChart.Data<String, Double>(it1, 25601.34));
-        series1.getData().add(new XYChart.Data<String, Double>(it2, 20148.82));
-        series1.getData().add(new XYChart.Data<String, Double>(it3, (double) 10000));
-        series1.getData().add(new XYChart.Data<String, Double>(it4, 35407.15));
-        series1.getData().add(new XYChart.Data<String, Double>(it5, (double) 12000));   
-    	barChartHistogram.getData().addAll(series1);
-    	barChartHistogram.getXAxis().setLabel("price");
-    	barChartHistogram.getYAxis().setLabel("number of items");
-    	
-
-    	
-    	// trend test data set
-    	Series<String, Number> series2 = new XYChart.Series<String, Number>();
-    	series2.setName("Test Data Set");
-    	series2.getData().add(new Data<String, Number>("a", 4));
-    	series2.getData().add(new Data<String, Number>("b", 10));
-    	series2.getData().add(new Data<String, Number>("c", 15));
-    	series2.getData().add(new Data<String, Number>("d", 8));
-    	series2.getData().add(new Data<String, Number>("e", 5));
-    	series2.getData().add(new Data<String, Number>("f", 18));
-    	series2.getData().add(new Data<String, Number>("g", 15));
-    	series2.getData().add(new Data<String, Number>("h", 13));
-    	series2.getData().add(new Data<String, Number>("i", 19));
-    	series2.getData().add(new Data<String, Number>("j", 21));
-    	series2.getData().add(new Data<String, Number>("k", 21));
-    	areaChart.getData().addAll(series2);    	
-    	areaChartCb.getItems().addAll(
-    		    "Option 1",
-    		    "Option 2",
-    		    "Option 3"
-    		);
-    }
-    */
-    
     // my data model: for testing only
     public static class DataModel {
         private SimpleStringProperty title;

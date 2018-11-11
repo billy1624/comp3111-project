@@ -1,9 +1,9 @@
 package comp3111.webscraper;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -44,10 +44,10 @@ import javafx.stage.Stage;
 
 public class Sawa_ControllerTest {
 	
-	Task task;
+	MyTask task;
 	Thread myTaskThread;
     
-    public class Task extends Application{
+    public class MyTask extends Application{
     	
     	public Controller tmp;
 		@Override
@@ -57,11 +57,7 @@ public class Sawa_ControllerTest {
        		VBox root = (VBox) loader.load();
        		Scene scene =  new Scene(root);
        		tmp = (Controller)loader.getController();       		
-		}
-		
-		public Controller getController() {
-			return tmp;
-		}
+		}				
     	
     }
     
@@ -79,7 +75,7 @@ public class Sawa_ControllerTest {
 								new WebScraperApplication().start(new Stage());
 								Controller test = new Controller();
 								/* test aboutUs dialog */
-						    	test.createAboutUsDialog();
+								test.handleAboutYourTeamAction(new ActionEvent());
 							} catch (Exception e) {
 								e.printStackTrace();
 							}					
@@ -126,7 +122,7 @@ public class Sawa_ControllerTest {
     @Test
     public void test_setHostServices() throws Exception {
     	Controller test = new Controller();
-    	Task a = new Task();
+    	MyTask a = new MyTask();
     	HostServices target = a.getHostServices();
 
         //when
@@ -415,6 +411,24 @@ public class Sawa_ControllerTest {
 		testlist.add(item6);
    		refine_func.invoke(test,(Object[]) null);
    		
+   		/* test github event handler */
+   		MyTask a = new MyTask();
+    	HostServices target = a.getHostServices();
+
+        //when
+        test.setHostServices(target);
+
+        //then
+        final Field myfield = test.getClass().getDeclaredField("hservices");
+        myfield.setAccessible(true);
+        assertEquals(myfield.get(test), target);
+        
+        /* test GitHub EventHandler */
+   		Hyperlink hl = new Hyperlink();
+    	hl.setText("sawaYch");
+    	hl.setOnAction(test.new github_EventHandler());
+    	hl.fire();    	    	    
+   		
    		/* test quit */
    		Method method1111 = null;
 		method1111 = test.getClass().getDeclaredMethod("quit", (Class<?>[])null);		
@@ -480,5 +494,5 @@ public class Sawa_ControllerTest {
 		recorditm.set(test, testlist);
    		method.invoke(test, (Object[])null);   		
 
-    }    
+    }
 }
