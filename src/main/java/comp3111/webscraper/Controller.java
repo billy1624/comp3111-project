@@ -130,6 +130,8 @@ public class Controller {
     private Queue<List<Item>> lastSearchItemQueue;
     
     private Thread scraperTh;
+    
+    private boolean refine_lastSearch;
             
     
     /* task 6 related data member */
@@ -181,18 +183,18 @@ public class Controller {
     }
     
 
-	private void updateLastSearch_Item() {
-    	lastSearchItemQueue.offer(recordItem);
+	private void updateLastSearch_Item(List<Item> what_to_add) {
+    	lastSearchItemQueue.offer(what_to_add);
     	if (lastSearchItemQueue.size() == 3) lastSearchItemQueue.poll();  
     }
     
     /**
-     * Called when the search button is pressed.
+     * Called when the search(i.e. Go) button is pressed.
      */
     @FXML
     private void actionSearch() {    	
     	busy_idtr.setVisible(true);
-    	updateLastSearch_Keyword();
+
         // use Async
     	Task<List<Item>> task = new Task<List<Item>>() {
             @Override 
@@ -209,7 +211,6 @@ public class Controller {
             	
             	// copy for further use
             	recordItem = new ArrayList<Item>(result);    
-            	updateLastSearch_Item();
             	
             	// update distribution bar chart      
             	//UpdateDistributionChart_Later(recordItem);
@@ -225,6 +226,9 @@ public class Controller {
         	lastSearchBt.setDisable(false);
         	refineBt.setDisable(false);   
         	busy_idtr.setVisible(false);
+        	updateLastSearch_Item(recordItem);
+        	updateLastSearch_Keyword();
+        	refine_lastSearch = false;
         }
         );       
         
@@ -291,14 +295,17 @@ public class Controller {
      * The result will revert to the last Search
      */
     @FXML
-    private void actionNew() {
+    private void actionLastSearch() {
     	lastSearchBt.setDisable(true);
+    	refineBt.setDisable(false);
+
     	
     	String lastKeyword = lastSearchQueue.peek();
     	System.out.println("last Search : "+ lastKeyword);
     	textFieldKeyword.setText(lastKeyword); // set back to last search keyword
     	
-    	if (lastSearchItemQueue.peek() == null) {    		
+    	if (lastSearchItemQueue.peek() == null) {
+    		System.out.println("last search item queue EMPTY!");
     		closeAndResetAll();
     		return;
     	}
@@ -308,7 +315,7 @@ public class Controller {
     		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
     	}
     	textAreaConsole.setText(output);
-    	
+    	refine_lastSearch = true;
     	/*
     	 * trigger: update of other page 
     	 */
@@ -325,27 +332,34 @@ public class Controller {
 
     /**
      * Task 5 Refine Search function
-     * Only extract the the data with certain keyword (handle locally),
-     * But not search again from portal
+     * Only extract the the data with certain keyword, title field(handle locally),
+     * Refined result will NOT save as a search record
+     * LastSearch/Current can refine one time only
      */   
     @FXML
     private void actionRefine() {
     	// after click once, disable
     	refineBt.setDisable(true);
-    	updateLastSearch_Keyword();
-    	updateLastSearch_Item();    	
     	
-    	// Console page update
     	String output = "";
-    	// recordItem is being edited and update
-    	for (Iterator<Item> iter = recordItem.listIterator(); iter.hasNext(); ) {
+    	// if previous action is lastSearch, then use lastSearch Item List,
+    	// otherwise previous action can only be actionSearch, then use current Item List;
+    	Iterator<Item> iter = null;
+    	if (refine_lastSearch == true) {
+    		iter = lastSearchItemQueue.peek().listIterator();    	
+    	}
+    		else {
+    			iter = recordItem.listIterator();
+    		}
+    	
+    	for ( ; iter.hasNext(); ) {
     		Item item = iter.next();
     		if (item.getTitle().matches("(.*)"+ textFieldKeyword.getText() + "(.*)")) {
     			output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
     	    }else
     	    	iter.remove();
     	}
-    	textAreaConsole.setText(output);
+    	textAreaConsole.setText(output);    	
     	/*
     	 * trigger: update of other page 
     	 */
@@ -354,8 +368,7 @@ public class Controller {
     	
     	// summary page update
     	
-    	// table update
-    	
+    	// table update    	
     }
     
     public void createAboutUsDialog() {
@@ -509,6 +522,16 @@ public class Controller {
      */
     @FXML
     public void closeAndResetAll() {
+    	
+    	for(int i = 0; i < lastSearchQueue.size(); ++i ) {
+    		lastSearchQueue.poll();  
+    	}
+    	
+    	for(int i = 0; i < lastSearchItemQueue.size(); ++i ) {
+    		lastSearchItemQueue.poll();  
+    	}
+
+    	
     	// 0
         scraper.getWebClient().close();
     	scraperTh.stop();

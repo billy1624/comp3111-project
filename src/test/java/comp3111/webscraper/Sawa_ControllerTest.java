@@ -314,6 +314,10 @@ public class Sawa_ControllerTest {
         
         
         // execute target test function
+		final Field th1 = test.getClass().getDeclaredField("scraperTh");
+		th1.setAccessible(true);
+		Thread thh = new Thread();
+		th1.set(test, thh);
         test.closeAndResetAll();
         
         // assert result
@@ -360,7 +364,7 @@ public class Sawa_ControllerTest {
    		
    		/* test actionNew */
    		Method lastsearch_func = null;
-   		lastsearch_func = test.getClass().getDeclaredMethod("actionNew", (Class<?>[])null);		
+   		lastsearch_func = test.getClass().getDeclaredMethod("actionLastSearch", (Class<?>[])null);		
    		lastsearch_func.setAccessible(true);   
    		lastsearch_func.invoke(test, (Object[])null);   		
          
@@ -372,12 +376,14 @@ public class Sawa_ControllerTest {
     	item4.setPrice(50);
     	item4.setTitle("01");
     	item4.setUrl("www.testing.com");
-    	list4.add(item4); 
+    	list4.add(item4);
 		lsIQ.offer(list4);
 		q1.set(test,lsIQ);
          
          // execute test method
    		lastsearch_func.invoke(test, (Object[])null);
+
+
    		
    		
    		/* test actionRefine */
@@ -399,9 +405,13 @@ public class Sawa_ControllerTest {
    		refine_func = test.getClass().getDeclaredMethod("actionRefine", (Class<?>[])null);		
    		refine_func.setAccessible(true);
    		// null
+		final Field bool1 = test.getClass().getDeclaredField("refine_lastSearch");
+		bool1.setAccessible(true);
+		bool1.set(test, false);
    		refine_func.invoke(test, (Object[])null);
    		
    		// one, match
+		bool1.set(test, true);
 		testlist.add(item5);
    		refine_func.invoke(test,(Object[]) null);
    		
@@ -464,7 +474,7 @@ public class Sawa_ControllerTest {
     public void test_updateLastSearchItem() throws Exception {
     	Controller test = new Controller();
     	Method method = null;
-  		method = test.getClass().getDeclaredMethod("updateLastSearch_Item",(Class<?>[]) null);		
+  		method = test.getClass().getDeclaredMethod("updateLastSearch_Item", List.class);		
       	method.setAccessible(true);    	     		
   		// get ready for instance
 		final Field recorditm = test.getClass().getDeclaredField("recordItem");
@@ -482,7 +492,7 @@ public class Sawa_ControllerTest {
 		q1.setAccessible(true);
          
          // execute test method
-   		method.invoke(test, (Object[])null);
+   		method.invoke(test, testlist);
 
 		item1.setTitle("01");
 		item1.setUrl("www.testing.com");
@@ -492,7 +502,7 @@ public class Sawa_ControllerTest {
 		item11.setUrl("www.testing.com");
 		testlist.add(item11);
 		recorditm.set(test, testlist);
-   		method.invoke(test, (Object[])null);   		
+   		method.invoke(test, testlist);   		
 
     }
 }
