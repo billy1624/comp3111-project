@@ -3,6 +3,7 @@ package comp3111.webscraper;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.chart.AreaChart;
@@ -73,7 +75,7 @@ public class ControllerTest {
                     @Override
                     public void run() {
 							try {
-								new Task().start(new Stage());
+								new Task().start(new Stage());								
 							} catch (Exception e) {
 								e.printStackTrace();
 							}					
@@ -133,7 +135,7 @@ public class ControllerTest {
     }
     
     @Test // fuck my life
-    public void test_closeAndResetAll() throws Exception {
+    public void test_closeAndResetAll_initialize() throws Exception {
     	Controller test = new Controller();
     	// ready
         final Field field = test.getClass().getDeclaredField("textAreaConsole");
@@ -189,6 +191,7 @@ public class ControllerTest {
     	final String it4 = "Item4";
     	final String it5 = "Item5";
     	Series<String, Double> series1 = new Series<String, Double>();
+    	series1.getData().add(new Data("item1",50.0));
         final Field field7 = test.getClass().getDeclaredField("barChartHistogram");
         field7.setAccessible(true);
     	NumberAxis yaxis = new NumberAxis();
@@ -258,14 +261,56 @@ public class ControllerTest {
         Button current_rbt = (Button)field10.get(test);
         MenuItem current_lsbt = (MenuItem)field11.get(test);
         ProgressIndicator current_bsidtr = (ProgressIndicator)field12.get(test);    
-
         
         assertEquals(current_rbt.isDisable(), true);
         assertEquals(current_lsbt.isDisable(), true);
         assertEquals(current_bsidtr.isVisible(), false);
 
-
-
+        /* test update_bar_only_one() */
+        Method method1 = null;
+		method1 = test.getClass().getDeclaredMethod("update_bar_only_one", Integer.class, List.class, Double.class, Double.class);		
+		method1.setAccessible(true);    
+		
+        
+        final Field field21 = test.getClass().getDeclaredField("bar_smVector");
+        field21.setAccessible(true);
+        
+    	List<Item> list = new ArrayList<>();
+    	Item item = new Item();
+    	item.setPrice(50);
+    	item.setTitle("01");
+    	item.setUrl("www.testing.com");
+    	list.add(item); 
+    	
+    	List<Item> list2 = new ArrayList<>();
+    	Item item2 = new Item();
+    	item2.setPrice(500.0);
+    	item2.setTitle("02");
+    	item2.setUrl("www.testing.com");
+    	list2.add(item2);
+    	
+    	List<Item> list3 = new ArrayList<>();
+    	Item item3 = new Item();
+    	item3.setPrice(-11.0);
+    	item3.setTitle("03");
+    	item3.setUrl("www.testing.com");
+    	list3.add(item3);
+    	
+    	List<Boolean> boollist = new ArrayList<>();
+    	boollist.add(true);    	
+    	field21.set(test, boollist);
+            	    	
+		method1.invoke(test, 0, list, 0.0, 100.0);
+		assertNotEquals(result_ta.getText(), "");
+		
+		List<Boolean> boollist2 = new ArrayList<>();
+    	boollist2.add(false);    	
+    	field21.set(test, boollist);
+    	method1.invoke(test, 0, list2, 50.0, 100.0);
+		assertEquals(result_ta.getText(), "");
+		
+		method1.invoke(test, 0, list3, 50.0, 100.0);
+		assertEquals(result_ta.getText(), "");
         
         
         // execute target test function
@@ -298,11 +343,50 @@ public class ControllerTest {
         assertEquals(((ValueAxis<Number>) current_ac.getYAxis()).getUpperBound(), 110.0, 0.001);
         assertEquals(((ValueAxis<Number>) current_ac.getYAxis()).getLowerBound(), 0.0, 0.001);
         assertEquals(current_cbx.getItems().size(), 0);
-        assertEquals(current_rbt.isDisable(), true);
+        assertEquals(current_rbt.isDisable(), true);    	
+        
+        
+        
 
-
-
-    	
+        
+        
+        
     }
     
+    
+//    @Test
+//    public void test_handleAboutYourTeamAction() throws Exception  {
+//    	// test initialize
+//        new JFXPanel(); // Initializes the JavaFx Platform
+//        Platform.runLater(new Runnable() {
+//            @Override
+//            public void run() {
+//					try {
+//						new Task().start(new Stage());
+//						Controller test = new Controller();
+//						Method method = null;
+//						method = test.getClass().getDeclaredMethod("handleAboutYourTeamAction", ActionEvent.class);		
+//						method.setAccessible(true);    
+//						ActionEvent a = new ActionEvent();											
+//						final Field field = test.getClass().getDeclaredField("dialog");
+//				        field.setAccessible(true);
+//				        Stage dialog_stage = (Stage)field.get(test);
+//				        dialog_stage.setResizable(true);				        
+//				        field.set(test, dialog_stage);
+//						method.invoke(test, a);
+//						
+//						Stage current_dialog_stage = (Stage)field.get(test);    
+//
+//				        assertEquals(current_dialog_stage.getTitle(),"About Our Team");
+//						
+//											
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}					
+//				                                  
+//            }
+//        });
+//       
+//    }
+	
 }
