@@ -26,131 +26,95 @@ public class DataModelTest {
 	@Test
 	public void dataBinding_test() {
 		DataModel data = new DataModel("Title1", "0.0", "item1@example.com","01/02/2018");
-		Class progClass = data.getClass();
 		
 		/* postedd */
-		Field postedd_field = null;		
-		SimpleStringProperty x;
-        SimpleStringProperty src1 = new SimpleStringProperty();
-            
 		try {
-			postedd_field = progClass.getDeclaredField("postedd");
-			x =  (SimpleStringProperty) postedd_field.get(this);
-	        x.bind(src1);
+			data.setPostedd("01/01/2001");
+			Field postedd_field = DataModel.class.getDeclaredField("postedd");
+			postedd_field.setAccessible(true);
+			SimpleStringProperty x = (SimpleStringProperty) postedd_field.get(data);
+	        assertThat(x.get(),is("01/01/2001"));
 
-		} catch (NoSuchFieldException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		} catch (SecurityException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		postedd_field.setAccessible(true);
-        String expected = "01/01/2001";
-		data.setPostedd(expected);
         
-		src1.set(expected);
-        String actual = data.getPostedd();
-        assertThat(actual,is(expected));
         
         /* price */
-		Field price_field = null;		
-        SimpleStringProperty y;
-        SimpleStringProperty src2 = new SimpleStringProperty();
-
 		try {
-			price_field = progClass.getDeclaredField("price");
-			y =  (SimpleStringProperty) price_field.get(this);
-	        y.bind(src2);
+			data.setPrice("55.6");
+			Field price_field = DataModel.class.getDeclaredField("price");
+			price_field.setAccessible(true);
+			SimpleStringProperty x = (SimpleStringProperty) price_field.get(data);
+	        assertThat(x.get(),is("55.6"));
 
-		} catch (NoSuchFieldException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		} catch (SecurityException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		price_field.setAccessible(true);
-        expected = "5.5";
-		data.setPrice(expected);
-        
-		src2.set(expected);
-        actual = data.getPrice();
-        assertThat(actual,is(expected));
-        
+		
         /* title */
-        Field title_field = null;		
-        SimpleStringProperty z;
-        SimpleStringProperty src3 = new SimpleStringProperty();
-
 		try {
-			title_field = progClass.getDeclaredField("title");
-			z =  (SimpleStringProperty) price_field.get(this);
-	        z.bind(src3);
+			data.setTitle("Hi");
+			Field title_field = DataModel.class.getDeclaredField("title");
+			title_field.setAccessible(true);
+			SimpleStringProperty x = (SimpleStringProperty) title_field.get(data);
+	        assertThat(x.get(),is("Hi"));
 
-		} catch (NoSuchFieldException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		} catch (SecurityException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		title_field.setAccessible(true);
-        expected = "hi";
-		data.setTitle(expected);
-        
-		src3.set(expected);
-        actual = data.getTitle();
-        assertThat(actual,is(expected));
         
         /* url */
-        Field url_field = null;		
-        SimpleStringProperty a;
-        SimpleStringProperty src4 = new SimpleStringProperty();
-
 		try {
-			url_field = progClass.getDeclaredField("url");
-			a =  (SimpleStringProperty) price_field.get(this);
-	        a.bind(src4);
+			data.setUrl("www.google.com");
+			Field url_field = DataModel.class.getDeclaredField("url");
+			url_field.setAccessible(true);
+			SimpleStringProperty x = (SimpleStringProperty) url_field.get(data);	      
+	        assertThat(x.get(),is("www.google.com"));
 
-		} catch (NoSuchFieldException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		} catch (SecurityException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		url_field.setAccessible(true);
-        expected = "www.google.com";
-		data.setUrl(expected);
-        
-		src4.set(expected);
-        actual = data.getUrl();
-        assertThat(actual,is(expected));
 
 
 	}
