@@ -29,16 +29,11 @@ public class DataModelTest {
 		
 		/* postedd */
 		try {
-			Class progClass = data.getClass();
+			data.setPostedd("01/01/2001");
 			Field postedd_field = DataModel.class.getDeclaredField("postedd");
 			postedd_field.setAccessible(true);
 			SimpleStringProperty x = (SimpleStringProperty) postedd_field.get(data);
-	        SimpleStringProperty src = new SimpleStringProperty();
-	        x.bind(src);
-	        String expected = "01/01/2001";
-			src.set(expected);
-	        String actual = data.getPostedd();
-	        assertThat(actual,is(expected));
+	        assertThat(x.get(),is("01/01/2001"));
 
 		} catch (SecurityException e1) {
 			// TODO Auto-generated catch block
@@ -57,16 +52,11 @@ public class DataModelTest {
         
         /* price */
 		try {
-			Class progClass = data.getClass();
+			data.setPrice("55.6");
 			Field price_field = DataModel.class.getDeclaredField("price");
 			price_field.setAccessible(true);
 			SimpleStringProperty x = (SimpleStringProperty) price_field.get(data);
-	        SimpleStringProperty src = new SimpleStringProperty();
-	        x.bind(src);
-	        String expected = "55.6";
-			src.set(expected);
-	        String actual = data.getPrice();
-	        assertThat(actual,is(expected));
+	        assertThat(x.get(),is("55.6"));
 
 		} catch (SecurityException e1) {
 			// TODO Auto-generated catch block
@@ -84,16 +74,11 @@ public class DataModelTest {
 		
         /* title */
 		try {
-			Class progClass = data.getClass();
+			data.setTitle("Hi");
 			Field title_field = DataModel.class.getDeclaredField("title");
 			title_field.setAccessible(true);
 			SimpleStringProperty x = (SimpleStringProperty) title_field.get(data);
-	        SimpleStringProperty src = new SimpleStringProperty();
-	        x.bind(src);
-	        String expected = "Hello World";
-			src.set(expected);
-	        String actual = data.getTitle();
-	        assertThat(actual,is(expected));
+	        assertThat(x.get(),is("Hi"));
 
 		} catch (SecurityException e1) {
 			// TODO Auto-generated catch block
@@ -111,16 +96,11 @@ public class DataModelTest {
         
         /* url */
 		try {
-			Class progClass = data.getClass();
+			data.setUrl("www.google.com");
 			Field url_field = DataModel.class.getDeclaredField("url");
 			url_field.setAccessible(true);
-			SimpleStringProperty x = (SimpleStringProperty) url_field.get(data);
-	        SimpleStringProperty src = new SimpleStringProperty();
-	        x.bind(src);
-	        String expected = "www.google.com";
-			src.set(expected);
-	        String actual = data.getUrl();
-	        assertThat(actual,is(expected));
+			SimpleStringProperty x = (SimpleStringProperty) url_field.get(data);	      
+	        assertThat(x.get(),is("www.google.com"));
 
 		} catch (SecurityException e1) {
 			// TODO Auto-generated catch block
