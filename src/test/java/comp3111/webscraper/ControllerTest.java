@@ -6,8 +6,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-
+import java.util.Queue;
 
 import org.junit.Test;
 
@@ -345,14 +346,42 @@ public class ControllerTest {
         assertEquals(current_cbx.getItems().size(), 0);
         assertEquals(current_rbt.isDisable(), true);    	
         
-        
-        
-
-        
-        
-        
     }
     
+    @Test
+    public void test_updateLastSearchItem() throws Exception {
+    	Controller test = new Controller();
+    	Method method = null;
+  		method = test.getClass().getDeclaredMethod("updateLastSearch_Item", null);		
+      	method.setAccessible(true);    	     		
+  		// get ready for instance
+		final Field recorditm = test.getClass().getDeclaredField("recordItem");
+		recorditm.setAccessible(true);
+		List<Item> testlist = new ArrayList<Item>();
+		Item item = new Item();
+		item.setPrice(50);
+		item.setTitle("01");
+		item.setUrl("www.testing.com");
+		Item item1 = new Item();
+		item1.setPrice(50);
+		recorditm.set(test, testlist);
+         
+		final Field q1 = test.getClass().getDeclaredField("lastSearchItemQueue");
+		q1.setAccessible(true);
+         
+         // execute test method
+   		method.invoke(test, null);
+
+		item1.setTitle("01");
+		item1.setUrl("www.testing.com");
+		Item item11 = new Item();
+		item11.setPrice(50);
+		item11.setTitle("01");
+		item11.setUrl("www.testing.com");
+		testlist.add(item11);
+		recorditm.set(test, testlist);
+   		method.invoke(test, null);
+    }
     
 //    @Test
 //    public void test_handleAboutYourTeamAction() throws Exception  {
