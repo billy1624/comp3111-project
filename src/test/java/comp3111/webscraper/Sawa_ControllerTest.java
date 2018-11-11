@@ -36,6 +36,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -250,7 +251,25 @@ public class Sawa_ControllerTest {
         result_bsidtr.setVisible(true);
         field12.set(test, result_bsidtr); 
         
+        final Field title_col_field = test.getClass().getDeclaredField("title_col");
+        title_col_field.setAccessible(true);
+        TableColumn<DataModel, String> title_col = new TableColumn<DataModel, String>();
+        title_col_field.set(test, title_col);
         
+        final Field price_col_field = test.getClass().getDeclaredField("price_col");
+        price_col_field.setAccessible(true);
+        TableColumn<DataModel, String> price_col = new TableColumn<DataModel, String>();
+        price_col_field.set(test, price_col);
+        
+        final Field url_col_field = test.getClass().getDeclaredField("url_col");
+        url_col_field.setAccessible(true);
+        TableColumn<DataModel, String> url_col = new TableColumn<DataModel, String>();
+        url_col_field.set(test, url_col);
+        
+        final Field posted_date_col_field = test.getClass().getDeclaredField("posted_date_col");
+        posted_date_col_field.setAccessible(true);
+        TableColumn<DataModel, String> posted_date_col = new TableColumn<DataModel, String>();
+        posted_date_col_field.set(test, posted_date_col);
         
         // test initialize
         Method method = null;
@@ -382,8 +401,6 @@ public class Sawa_ControllerTest {
          
          // execute test method
    		lastsearch_func.invoke(test, (Object[])null);
-
-
    		
    		
    		/* test actionRefine */
@@ -437,7 +454,29 @@ public class Sawa_ControllerTest {
    		Hyperlink hl = new Hyperlink();
     	hl.setText("sawaYch");
     	hl.setOnAction(test.new github_EventHandler());
-    	hl.fire();    	    	    
+    	hl.fire();
+    	
+    	/* test barchart histogram */
+    	Method barchart_update = test.getClass().getDeclaredMethod("UpdateDistributionChart_Later", List.class);		
+    	barchart_update.setAccessible(true);
+    	// prepare 3 set of list item
+    	List<Item> barchart_testlist = new ArrayList<Item>();	
+		for(int i = 0; i< 10; ++i) {
+			Item m1 = new Item();
+			m1.setPrice(50 + i);
+			barchart_testlist.add(m1);
+		}    	
+    	barchart_update.invoke(test, barchart_testlist);
+		
+		List<Item> barchart_testlist2 = new ArrayList<Item>();	
+		for(int i = 0; i< 10; ++i) {
+			Item m1 = new Item();
+			m1.setPrice(10-i);
+			barchart_testlist2.add(m1);
+		}    	
+    	barchart_update.invoke(test, barchart_testlist2);
+
+    	
    		
    		/* test quit */
    		Method method1111 = null;
@@ -472,37 +511,57 @@ public class Sawa_ControllerTest {
   
     @Test
     public void test_updateLastSearchItem() throws Exception {
+    	/*** Create all the things that required for the test ***/
+    	
+    	// controller init
     	Controller test = new Controller();
+    	
+    	// updateLastSearch_Item init
     	Method method = null;
   		method = test.getClass().getDeclaredMethod("updateLastSearch_Item", List.class);		
-      	method.setAccessible(true);    	     		
-  		// get ready for instance
+      	method.setAccessible(true);      	
+      	
+  		// recordItem instance init
 		final Field recorditm = test.getClass().getDeclaredField("recordItem");
 		recorditm.setAccessible(true);
+		
+		// create 2 item, add to List<Item>
 		List<Item> testlist = new ArrayList<Item>();
-		Item item = new Item();
-		item.setPrice(50);
-		item.setTitle("01");
-		item.setUrl("www.testing.com");
+		Item item0 = new Item();
+		item0.setPrice(50);
+		item0.setTitle("1");
+		item0.setUrl("www.testing.com");
+		
 		Item item1 = new Item();
-		item1.setPrice(50);
+		item1.setPrice(33.3);
+		item1.setTitle("2");
+		item1.setUrl("www.testing.com");
+		testlist.add(item0);
+		testlist.add(item1);
 		recorditm.set(test, testlist);
          
 		final Field q1 = test.getClass().getDeclaredField("lastSearchItemQueue");
 		q1.setAccessible(true);
-         
-         // execute test method
-   		method.invoke(test, testlist);
-
-		item1.setTitle("01");
-		item1.setUrl("www.testing.com");
-		Item item11 = new Item();
-		item11.setPrice(50);
-		item11.setTitle("01");
-		item11.setUrl("www.testing.com");
-		testlist.add(item11);
+		Queue<List<Item>> queue = (Queue<List<Item>>) q1.get(test);
+				         
+    	/** 
+    	 *  Execute the test method
+    	 *  When it it called, the queue "lastSearchItemQueue" 
+    	 *  will append the recordItem into the queue.
+    	 *  Assert it is not empty, size equal to 1    	
+    	 **/
+   		method.invoke(test, testlist);   
+   		assertEquals(queue.size(), 2);
+   		
+   		// add one more items
+		Item one_more = new Item();
+		one_more.setPrice(99.9);
+		one_more.setTitle("3");
+		one_more.setUrl("www.testing.com");
+		testlist.add(one_more);
 		recorditm.set(test, testlist);
-   		method.invoke(test, testlist);   		
-
+		
+   		method.invoke(test, testlist);   	
+   		assertEquals(queue.size(), 2);
     }
 }

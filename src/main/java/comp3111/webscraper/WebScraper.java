@@ -85,6 +85,7 @@ public class WebScraper {
 	 * The only method implemented in this class, to scrape web content from the craigslist
 	 * 
 	 * @param keyword - the keyword you want to search
+	 * @param textAreaConsole - the TextArea instance for outputting related hint
 	 * @return A list of Item that has found. A zero size list is return if nothing is found. Null if any exception (e.g. no connectivity)
 	 */
 	public List<Item> scrape(String keyword, TextArea textAreaConsole) {
