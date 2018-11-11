@@ -1,13 +1,18 @@
 package comp3111.webscraper;
 
 import java.net.URLEncoder;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import java.util.Vector;
+import javafx.application.Platform;
+import javafx.scene.control.TextArea;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 /**
  * WebScraper provide a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword, 
@@ -65,7 +70,6 @@ import java.util.Vector;
  */
 public class WebScraper {
 
-	private static final String DEFAULT_URL = "https://newyork.craigslist.org/";
 	private WebClient client;
 
 	/**
@@ -83,40 +87,153 @@ public class WebScraper {
 	 * @param keyword - the keyword you want to search
 	 * @return A list of Item that has found. A zero size list is return if nothing is found. Null if any exception (e.g. no connectivity)
 	 */
-	public List<Item> scrape(String keyword) {
+	public List<Item> scrape(String keyword, TextArea textAreaConsole) {
+		Vector<Item> combinedList = new Vector<Item>();
+		List<Item> craigslistList = scrapeFromCraigslist(keyword, textAreaConsole);
+		List<Item> prelovedList = scrapeFromPreloved(keyword, textAreaConsole);
+		combinedList.addAll(craigslistList);
+		combinedList.addAll(prelovedList);
+		Collections.sort(combinedList);
+		Collections.reverse(combinedList);
+		return combinedList;
+	}
+
+
+	public List<Item> scrapeFromCraigslist(String keyword, TextArea textAreaConsole) {
+		final String CRAIGSLIST_URL = "https://newyork.craigslist.org/";
+		Vector<Item> result = new Vector<Item>();
 
 		try {
-			String searchUrl = DEFAULT_URL + "search/sss?sort=rel&query=" + URLEncoder.encode(keyword, "UTF-8");
-			HtmlPage page = client.getPage(searchUrl);
+			int nextItemNum = 0;
 
+			do {
+				String searchUrl = CRAIGSLIST_URL + "search/sss?";
+				searchUrl += "s=" + nextItemNum + "&";
+				searchUrl += "sort=rel&query=" + URLEncoder.encode(keyword, "UTF-8");
+
+				HtmlPage page = client.getPage(searchUrl);
+
+				HtmlElement itemRangeFrom = page.getFirstByXPath("//form[@id='searchform']//span[@class='rangeFrom']");
+				HtmlElement itemRangeTo = page.getFirstByXPath("//form[@id='searchform']//span[@class='rangeTo']");
+				HtmlElement itemTotalCount = page.getFirstByXPath("//form[@id='searchform']//span[@class='totalcount']");
+				int rangefrom = Integer.valueOf(itemRangeFrom.asText());
+				int rangeTo = Integer.valueOf(itemRangeTo.asText());
+				int totalCount = Integer.valueOf(itemTotalCount.asText());
+				if ( rangeTo < totalCount ) {
+					nextItemNum = rangeTo;
+				} else {
+					nextItemNum = 0;
+				}
+
+				String status = "Fetching form " + Portal.Craigslist + ": item " + rangefrom + " - " + rangeTo + ", " + totalCount + " in total, " + (totalCount-rangeTo) + " item left.";
+				System.out.println(status);
+				textAreaConsole.appendText(status + "\n");
 			
 			List<?> items = (List<?>) page.getByXPath("//li	[@class='result-row']");
 			
-			Vector<Item> result = new Vector<Item>();
 
 			for (int i = 0; i < items.size(); i++) {
 				HtmlElement htmlItem = (HtmlElement) items.get(i);
 				HtmlAnchor itemAnchor = ((HtmlAnchor) htmlItem.getFirstByXPath(".//p[@class='result-info']/a"));
 				// tiny fix for price not find - 0.0	
 				HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@class='result-price']"));
+				HtmlElement postedDate = ((HtmlElement) htmlItem.getFirstByXPath(".//time[@class='result-date']"));
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+					Date postedOn= sdf.parse(postedDate.getAttribute("datetime"));
 
-				// It is possible that an item doesn't have any price, we set the price to 0.0
-				// in this case
-				String itemPrice = spanPrice == null ? "0.0" : spanPrice.asText();
+					// It is possible that an item doesn't have any price, we set the price to 0.0
+					// in this case
+					String itemPrice = spanPrice == null ? "0.0" : spanPrice.asText();
 
-				Item item = new Item();
-				item.setTitle(itemAnchor.asText());
-				item.setUrl(DEFAULT_URL + itemAnchor.getHrefAttribute());
-				item.setPrice(new Double(itemPrice.replace("$", "")));
+					Item item = new Item();
+					item.setTitle(itemAnchor.asText());
+					item.setPortal(Portal.Craigslist);
+					item.setUrl(itemAnchor.getHrefAttribute());
+					item.setPrice(new Double(itemPrice.replace("$", "").replace(",", "").replace(" ", "")));
+					item.setPostedOn(postedOn);
 
-				result.add(item);
-			}
-			client.close();
-			return result;
+					result.add(item);
+				}
+				System.out.println("item count: " + items.size());
+				textAreaConsole.appendText("item count: " + items.size() + "\n");
+			} while (nextItemNum > 0);
+
+			System.out.println("result count: " + result.size());
+			textAreaConsole.appendText("result count: " + result.size() + "\n");
+
 		} catch (Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			client.close();
 		}
-		return null;
+		return result;
+	}
+
+
+	public List<Item> scrapeFromPreloved(String keyword, TextArea textAreaConsole) {
+		final String PRELOVED_URL = "https://www.preloved.co.uk/";
+		Vector<Item> result = new Vector<Item>();
+
+		try {
+			int pageNum = 0;
+			int totalPage = 0;
+
+			do {
+				pageNum++;
+
+				String searchUrl = PRELOVED_URL + "search?";
+				searchUrl += "keyword=" + URLEncoder.encode(keyword, "UTF-8") + "&";
+				searchUrl += "page=" + pageNum;
+
+				HtmlPage page = client.getPage(searchUrl);
+
+				HtmlElement currPageNum = page.getFirstByXPath("//li[@class='pagination__nav__item pagination__nav__item--page pagination__nav__item--current-page']/a");
+				String[] pageNumSplit = currPageNum.asText().replace("Go to Search Results Page ", "").replace("of ", "").split(" ");
+
+				pageNum = Integer.valueOf(pageNumSplit[0]);
+				totalPage = Integer.valueOf(pageNumSplit[1]);
+
+				String status = "Fetching form " + Portal.Preloved + ": Page " + pageNum + " of " + totalPage + " was processed.";
+				System.out.println(status);
+				textAreaConsole.appendText(status + "\n");
+
+				List<?> items = (List<?>) page.getByXPath("//ul[@id='search-results-list']//li[@class='search-result']");
+
+				for (int i = 0; i < items.size(); i++) {
+					HtmlElement htmlItem = (HtmlElement) items.get(i);
+					HtmlElement itemName = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@itemprop='name']"));
+					HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@itemprop='price']"));
+					// HtmlElement postedDate = ((HtmlElement) htmlItem.getFirstByXPath(".//time[@class='result-date']"));
+					//
+					// SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+					// Date postedOn= sdf.parse(postedDate.getAttribute("datetime"));
+
+					// It is possible that an item doesn't have any price, we set the price to 0.0
+					// in this case
+					String itemPrice = spanPrice == null ? "0.0" : spanPrice.asText();
+
+					Item item = new Item();
+					item.setTitle(itemName.asText());
+					item.setPortal(Portal.Preloved);
+					item.setUrl(htmlItem.getAttribute("data-href"));
+					item.setPrice(new Double(itemPrice.replace("£", "").replace(",", "").replace(" ", "")));
+					// item.setPostedOn(postedOn);
+
+					result.add(item);
+				}
+				System.out.println("item count: " + items.size());
+				textAreaConsole.appendText("item count: " + items.size() + "\n");
+			} while (pageNum < totalPage);
+
+		System.out.println("result count: " + result.size());
+		textAreaConsole.appendText("result count: " + result.size() + "\n");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			client.close();
+		}
+		return result;
 	}
 	
 	/**

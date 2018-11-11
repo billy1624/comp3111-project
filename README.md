@@ -7,12 +7,25 @@ Group Number: 77
 
 ## Group Members
 
+|  Member | Task | Task |
+|----|----|----|
+| cwchanbf | Basic 2 | Basic 3 |
+| chnganaa | Basic 1 | Basic 4 |
+| chyeungam | Basic 5 | Basic 6 |
+
 - **Chan Chi Wa**
-	- Assigned Tasks: 2 & 3
+	- Tasks: Basic 2 & Basic 3
 	- Email: cwchanbf@connect.ust.hk
 - **Ngan Cheuk Hei**
-	- Assigned Tasks: 1 & 4
+	- Tasks: Basic 1 & Basic 4
 	- Email: chnganaa@connect.ust.hk
 - **Yeung Chak Ho**
-	- Assigned Tasks: 5 & 6
+	- Tasks: Basic 5 & Basic 6
 	- Email: chyeungam@connect.ust.hk
+
+## Assumptions & Special Note
+
+1. Basic Task 2
+	- Item `posted date` on newyork.craigslist.org will be fetched from ```<time class="result-date" datetime="2018-11-06 11:39" title="Tue 06 Nov 11:39:30 AM">Nov  6</time>```, this time tag from the row of item on search result grid. For this particular item the `posted date` is the value inside `datetime`, that is `2018-11-06 11:39`.
+2. Basic Task 3
+	- The total number of search result is not accurate on newyork.craigslist.org. For example, when I search for `toaster` on the site. On the first page of search result, it is showing item 1 to 120, and 503 items in total was show on the page. However, when I click next page, it now show there are 506 items in total. In fact, if I go to the last page of search result, it only contain 503 items instead of 506 items. **The message showing the current processing item is accurate, i.e. `Fetching... item 121 - 240`. However, the total number of items and the calculated waiting to process item might not be accurate, i.e. `506 in total, 266 item left`.**

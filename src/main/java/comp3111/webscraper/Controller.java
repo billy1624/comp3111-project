@@ -204,9 +204,9 @@ public class Controller {
     	Task<List<Item>> task = new Task<List<Item>>() {
             @Override protected List<Item> call() throws Exception {
             	
-            	List<Item> result = scraper.scrape(textFieldKeyword.getText());
-        		System.out.println("actionSearch: " + textFieldKeyword.getText());
-            	String output = "";
+            	List<Item> result = scraper.scrape(textFieldKeyword.getText(), textAreaConsole);
+        		System.out.println("actionSearch: " + textFieldKeyword.getText());            	
+        		String output = "";
             	for (Item item : result) {
             		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
             	}
@@ -463,8 +463,7 @@ public class Controller {
     	
     	
     }
-    
-    
+
     /**
      * Task 5 Refine Search function
      * Only extract the the data with certain keyword (handle locally),
@@ -797,6 +796,7 @@ public class Controller {
         }
             
     }
+
 }
 
 

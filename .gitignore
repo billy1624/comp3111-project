@@ -12,3 +12,5 @@ build
 build/*
 out
 out/*
+.project
+.classpath
