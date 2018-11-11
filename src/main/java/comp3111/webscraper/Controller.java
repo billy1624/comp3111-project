@@ -133,11 +133,10 @@ public class Controller {
         
     private List<Boolean> bar_smVector;
     
-    Queue<String> lastSearchQueue;
+    private Queue<String> lastSearchQueue;
     
-    Queue<List<Item>> lastSearchItemQueue;
-    
-    
+    private Queue<List<Item>> lastSearchItemQueue;
+            
     
     /* task 6 related data member */
     
@@ -218,7 +217,7 @@ public class Controller {
             	recordItem = new ArrayList<Item>(result);            	
             	
             	// update distribution bar chart      
-            	UpdateDistributionChart_Later(recordItem);
+            	//UpdateDistributionChart_Later(recordItem);
             	
             	// update other page here
             	
@@ -286,146 +285,146 @@ public class Controller {
      * Advance Task 1 ; just for fun
      * update distribution in Async way, non UI thread
      * 
-     */
-	private void UpdateDistributionChart_Later(List<Item> dist_data) {
-	    Platform.runLater(new Runnable() {
-	        @Override
-	        public void run() {
-	        	// reset it first
-	        	bar_smVector.clear();
-	          	barChartHistogram.getData().clear();
-            	NumberAxis axis = (NumberAxis)barChartHistogram.getYAxis();
-            	axis.setUpperBound(125.0);
-            	axis.setLowerBound(0.0);
-            	
-            	if(dist_data.isEmpty()) return;
-            	
-            	// do the calculation
-            	Item minp= null;
-            	Item maxp= null;
-            	for(Item x:dist_data){
-            		minp=(minp==null||x.getPrice()<minp.getPrice())?x:minp;
-            	}
-            	for(Item x:dist_data){
-            		maxp=(maxp==null||x.getPrice()>maxp.getPrice())?x:maxp;
-            	}
-            	Double minPrice=minp.getPrice();
-            	Double maxPrice=maxp.getPrice();
-            	Double rng= (minPrice + maxPrice)/10;
-            	DecimalFormat formatter = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance( Locale.ENGLISH ));
-            	
-            	// only single price
-            	if (minPrice.compareTo(maxPrice)==0) {
-            		Series<String, Integer> dist_series = new Series<String, Integer>();
-                	dist_series.setName("The selling prize of '" + textFieldKeyword.getText() + "'");
-                	int iter = 0;
-                    dist_series.getData().add(new XYChart.Data<String, Integer>(Double.toString(maxPrice), dist_data.size()));            		
-                	barChartHistogram.setCategoryGap(200);
-                    barChartHistogram.getData().addAll(dist_series);    
-        			bar_smVector.add(false); // state 0: not selected
-            		return;
-            	}
-            	
-            	// multiple price
-                ArrayList<Double> v = new ArrayList<Double>();
-                int[] vv = new int[10];
-                double tmp = minPrice;
-                for(int i=0;i<10;++i) {
-                	if (i==0)
-                		v.add(minPrice);
-                	else
-                	if (i==9)
-                		v.add(maxPrice);
-                	else
-                		v.add(tmp+=rng);
-                }
-                //sort and count
-                dist_data.sort( new Comparator<Item>() {
-                	public int compare(Item it, Item it1) {
-						Double p = it.getPrice();
-						return p.compareTo(it1.getPrice());
-                	}                	                	
-                });
-
-                
-                // count
-                for(Item tmp1: dist_data) {
-                	for(int i=0; i<9; ++i) {
-                		if(tmp1.getPrice() == maxPrice) {
-                			vv[9] = vv[9] + 1;
-                			break;
-                		}else
-                		if(tmp1.getPrice()>=v.get(i) && tmp1.getPrice()<v.get(i+1)) {                			
-                			vv[i] = vv[i] + 1;
-                			break;
-                		}
-                	}
-                }                
-
-            	Series<String, Integer> dist_series = new Series<String, Integer>();
-            	dist_series.setName("The selling prize of '" + textFieldKeyword.getText() + "'");
-            	int iter = 0;
-        		for (Double _price : v) {
-        			dist_series.getData().add(new XYChart.Data<String, Integer>(formatter.format(Math.round(_price)), vv[iter++]));
-        			bar_smVector.add(false); // state false/0: not selected
-        		}
-
-            	barChartHistogram.setCategoryGap(0);
-            	barChartHistogram.getData().addAll(dist_series);
-            	
-            	// add IDs
-            	for(int itr = 0; itr < 10; ++itr)
-            		dist_series.getData().get(itr).getNode().setId(Integer.toString(itr));
-
-            	
-            	 for (Object serie: barChartHistogram.getData()){
-            		 for (Data<String, Integer> item: ((Series<String,Integer>) serie).getData()){
-            			 item.getNode().setOnMouseEntered(e -> {
-            				 
-            				 for(Boolean see: bar_smVector)
-            					 /*if (see == true) System.out.print("1");
-            			    		else System.out.print("0");
-            				 	System.out.print("\n");*/
-            				 if(!has_bar_selected())
-            				 item.getNode().setStyle("-fx-bar-fill: #a9e200;");
-            			 });
-            			 item.getNode().setOnMouseExited(e -> {
-            				 if(!has_bar_selected())
-            				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
-            			 });
-            			 item.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
-            					    @Override
-            					    public void handle(MouseEvent mouseEvent) {
-            					        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
-            					            if(mouseEvent.getClickCount() == 2){
-            					                Boolean current_state = bar_smVector.get(Integer.parseInt(item.getNode().getId()));
-            					                if(!current_state) {
-                		            				item.getNode().setStyle("-fx-bar-fill: #9a42c8;");
-                					                update_bar_only_one(Integer.parseInt(item.getNode().getId()), dist_data,Double.parseDouble(item.getXValue()),Double.parseDouble(item.getXValue())+rng );
-            					                }else {
-            			            				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
-            			            				 String output = "";
-        			            	            	for (Item item : dist_data) {
-        			            	            		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
-        			            	            	}
-        			            	            	textAreaConsole.textProperty().unbind();
-        			            	            	textAreaConsole.setText(output);
-            					                }
-            					                
-            					                
-            		            				bar_smVector.set(Integer.parseInt(item.getNode().getId()),
-            		            						!current_state);
-            					            }
-            					        }
-            					    }
-            				 }
-            			 );
-                     }
-                 }
-        	
-	        }
-	    });
-	}
+     */	
+//    private void UpdateDistributionChart_Later(List<Item> dist_data) {
+//	    Platform.runLater(new Runnable() {
+//	        @Override
+//	        public void run() {
+//	        	// reset it first
+//	        	bar_smVector.clear();
+//	          	barChartHistogram.getData().clear();
+//            	NumberAxis axis = (NumberAxis)barChartHistogram.getYAxis();
+//            	axis.setUpperBound(125.0);
+//            	axis.setLowerBound(0.0);
+//            	
+//            	if(dist_data.isEmpty()) return;
+//            	
+//            	// do the calculation
+//            	Item minp= null;
+//            	Item maxp= null;
+//            	for(Item x:dist_data){
+//            		minp=(minp==null||x.getPrice()<minp.getPrice())?x:minp;
+//            	}
+//            	for(Item x:dist_data){
+//            		maxp=(maxp==null||x.getPrice()>maxp.getPrice())?x:maxp;
+//            	}
+//            	Double minPrice=minp.getPrice();
+//            	Double maxPrice=maxp.getPrice();
+//            	Double rng= (minPrice + maxPrice)/10;
+//            	DecimalFormat formatter = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance( Locale.ENGLISH ));
+//            	
+//            	// only single price
+//            	if (minPrice.compareTo(maxPrice)==0) {
+//            		Series<String, Integer> dist_series = new Series<String, Integer>();
+//                	dist_series.setName("The selling prize of '" + textFieldKeyword.getText() + "'");
+//                	int iter = 0;
+//                    dist_series.getData().add(new XYChart.Data<String, Integer>(Double.toString(maxPrice), dist_data.size()));            		
+//                	barChartHistogram.setCategoryGap(200);
+//                    barChartHistogram.getData().addAll(dist_series);    
+//        			bar_smVector.add(false); // state 0: not selected
+//            		return;
+//            	}
+//            	
+//            	// multiple price
+//                ArrayList<Double> v = new ArrayList<Double>();
+//                int[] vv = new int[10];
+//                double tmp = minPrice;
+//                for(int i=0;i<10;++i) {
+//                	if (i==0)
+//                		v.add(minPrice);
+//                	else
+//                	if (i==9)
+//                		v.add(maxPrice);
+//                	else
+//                		v.add(tmp+=rng);
+//                }
+//                //sort and count
+//                dist_data.sort( new Comparator<Item>() {
+//                	public int compare(Item it, Item it1) {
+//						Double p = it.getPrice();
+//						return p.compareTo(it1.getPrice());
+//                	}                	                	
+//                });
+//
+//                
+//                // count
+//                for(Item tmp1: dist_data) {
+//                	for(int i=0; i<9; ++i) {
+//                		if(tmp1.getPrice() == maxPrice) {
+//                			vv[9] = vv[9] + 1;
+//                			break;
+//                		}else
+//                		if(tmp1.getPrice()>=v.get(i) && tmp1.getPrice()<v.get(i+1)) {                			
+//                			vv[i] = vv[i] + 1;
+//                			break;
+//                		}
+//                	}
+//                }                
+//
+//            	Series<String, Integer> dist_series = new Series<String, Integer>();
+//            	dist_series.setName("The selling prize of '" + textFieldKeyword.getText() + "'");
+//            	int iter = 0;
+//        		for (Double _price : v) {
+//        			dist_series.getData().add(new XYChart.Data<String, Integer>(formatter.format(Math.round(_price)), vv[iter++]));
+//        			bar_smVector.add(false); // state false/0: not selected
+//        		}
+//
+//            	barChartHistogram.setCategoryGap(0);
+//            	barChartHistogram.getData().addAll(dist_series);
+//            	
+//            	// add IDs
+//            	for(int itr = 0; itr < 10; ++itr)
+//            		dist_series.getData().get(itr).getNode().setId(Integer.toString(itr));
+//
+//            	
+//            	 for (Object serie: barChartHistogram.getData()){
+//            		 for (Data<String, Integer> item: ((Series<String,Integer>) serie).getData()){
+//            			 item.getNode().setOnMouseEntered(e -> {
+//            				 
+//            				 for(Boolean see: bar_smVector)
+//            					 /*if (see == true) System.out.print("1");
+//            			    		else System.out.print("0");
+//            				 	System.out.print("\n");*/
+//            				 if(!has_bar_selected())
+//            				 item.getNode().setStyle("-fx-bar-fill: #a9e200;");
+//            			 });
+//            			 item.getNode().setOnMouseExited(e -> {
+//            				 if(!has_bar_selected())
+//            				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
+//            			 });
+//            			 item.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            					    @Override
+//            					    public void handle(MouseEvent mouseEvent) {
+//            					        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+//            					            if(mouseEvent.getClickCount() == 2){
+//            					                Boolean current_state = bar_smVector.get(Integer.parseInt(item.getNode().getId()));
+//            					                if(!current_state) {
+//                		            				item.getNode().setStyle("-fx-bar-fill: #9a42c8;");
+//                					                update_bar_only_one(Integer.parseInt(item.getNode().getId()), dist_data,Double.parseDouble(item.getXValue()),Double.parseDouble(item.getXValue())+rng );
+//            					                }else {
+//            			            				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
+//            			            				 String output = "";
+//        			            	            	for (Item item : dist_data) {
+//        			            	            		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+//        			            	            	}
+//        			            	            	textAreaConsole.textProperty().unbind();
+//        			            	            	textAreaConsole.setText(output);
+//            					                }
+//            					                
+//            					                
+//            		            				bar_smVector.set(Integer.parseInt(item.getNode().getId()),
+//            		            						!current_state);
+//            					            }
+//            					        }
+//            					    }
+//            				 }
+//            			 );
+//                     }
+//                 }
+//        	
+//	        }
+//	    });
+//	}
     
     /**
      * Called when the new button is pressed. Very dummy action - print something in the command prompt.
@@ -455,7 +454,7 @@ public class Controller {
     	 * trigger: update of other page 
     	 */
     	// advance 1 distribution chart update
-    	UpdateDistributionChart_Later(lastSearchItemQueue.peek());
+    	//UpdateDistributionChart_Later(lastSearchItemQueue.peek());
     	
     	// summary page update
     	
@@ -493,7 +492,7 @@ public class Controller {
     	 * trigger: update of other page 
     	 */
     	// advance 1 distribution chart update
-    	UpdateDistributionChart_Later(recordItem);
+    	//UpdateDistributionChart_Later(recordItem);
     	
     	// summary page update
     	
@@ -501,15 +500,7 @@ public class Controller {
     	
     }
     
-    
-    /**
-     * Handle action related to "About your Team" menu item.
-     * 
-     * @param event Event on "About your Team" menu item.
-     */
-    @FXML
-    private void handleAboutYourTeamAction(final ActionEvent event)
-    {
+    public void createAboutUsDialog() {
     	Stage dialog = new Stage();
     	dialog.initStyle(StageStyle.DECORATED);
     	dialog.initModality(Modality.APPLICATION_MODAL);
@@ -619,6 +610,17 @@ public class Controller {
     	dialog.setScene(scene);
     	dialog.setResizable(false);
     	dialog.show();
+    }
+    
+    /**
+     * Handle action related to "About your Team" menu item.
+     * 
+     * @param event Event on "About your Team" menu item.
+     */
+    @FXML
+    private void handleAboutYourTeamAction(final ActionEvent event)
+    {
+    	createAboutUsDialog();
     	// debug message
     }
 
@@ -639,7 +641,7 @@ public class Controller {
     public void quit() {
     	scraper.getWebClient().close();
     	Platform.exit();
-        System.exit(0);
+        //System.exit(0);
     }
     
     /**
