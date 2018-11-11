@@ -42,7 +42,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ControllerTest {
+public class Sawa_ControllerTest {
 	
 	Task task;
 	Thread myTaskThread;
@@ -76,7 +76,10 @@ public class ControllerTest {
                     @Override
                     public void run() {
 							try {
-								new Task().start(new Stage());								
+								new Task().start(new Stage());
+								Controller test = new Controller();
+								/* test aboutUs dialog */
+						    	test.createAboutUsDialog();
 							} catch (Exception e) {
 								e.printStackTrace();
 							}					
@@ -107,14 +110,14 @@ public class ControllerTest {
     	
     	Method method = null;
     	Method method2 = null;
-		method = test.getClass().getDeclaredMethod("has_bar_selected", null);
-		method2 = test2.getClass().getDeclaredMethod("has_bar_selected", null);		
+		method = test.getClass().getDeclaredMethod("has_bar_selected", (Class<?>[])null);
+		method2 = test2.getClass().getDeclaredMethod("has_bar_selected", (Class<?>[])null);		
     	method.setAccessible(true);    	
     	method2.setAccessible(true);    	
     	Boolean result1;
     	Boolean result2;
-		result1 = (Boolean) method.invoke(test, null);
-		result2 = (Boolean) method.invoke(test2, null);
+		result1 = (Boolean) method.invoke(test, (Object[])null);
+		result2 = (Boolean) method.invoke(test2,(Object[]) null);
     	assertEquals(result1, true);
     	assertEquals(result2, false);
 		
@@ -136,7 +139,7 @@ public class ControllerTest {
     }
     
     @Test // fuck my life
-    public void test_closeAndResetAll_initialize() throws Exception {
+    public void test_javafx_thread_releated() throws Exception {
     	Controller test = new Controller();
     	// ready
         final Field field = test.getClass().getDeclaredField("textAreaConsole");
@@ -255,9 +258,9 @@ public class ControllerTest {
         
         // test initialize
         Method method = null;
-		method = test.getClass().getDeclaredMethod("initialize", null);		
+		method = test.getClass().getDeclaredMethod("initialize",(Class<?>[]) null);		
     	method.setAccessible(true);    	   
-		method.invoke(test, null);        
+		method.invoke(test, (Object[])null);        
         
         Button current_rbt = (Button)field10.get(test);
         MenuItem current_lsbt = (MenuItem)field11.get(test);
@@ -344,15 +347,87 @@ public class ControllerTest {
         assertEquals(((ValueAxis<Number>) current_ac.getYAxis()).getUpperBound(), 110.0, 0.001);
         assertEquals(((ValueAxis<Number>) current_ac.getYAxis()).getLowerBound(), 0.0, 0.001);
         assertEquals(current_cbx.getItems().size(), 0);
-        assertEquals(current_rbt.isDisable(), true);    	
+        assertEquals(current_rbt.isDisable(), true);    
         
+        /* test_updateLastSearchKeyword */
+        Method method11 = null;
+  		method11 = test.getClass().getDeclaredMethod("updateLastSearch_Keyword",(Class<?>[]) null);		
+      	method11.setAccessible(true);    	     		
+  		// get ready for instance
+		final Field tfkeyword = test.getClass().getDeclaredField("textFieldKeyword");
+		tfkeyword.setAccessible(true);
+		TextField tf = new TextField();		
+		tfkeyword.set(test, tf);
+   		method11.invoke(test, (Object[])null);
+   		method11.invoke(test, (Object[])null);
+   		method11.invoke(test, (Object[])null);   		   		   
+   		
+   		/* test actionNew */
+   		Method lastsearch_func = null;
+   		lastsearch_func = test.getClass().getDeclaredMethod("actionNew", (Class<?>[])null);		
+   		lastsearch_func.setAccessible(true);   
+   		lastsearch_func.invoke(test, (Object[])null);   		
+         
+		final Field q1 = test.getClass().getDeclaredField("lastSearchItemQueue");
+		q1.setAccessible(true);
+		Queue<List<Item>> lsIQ = new LinkedList<List<Item>>();
+		List<Item> list4 = new ArrayList<>();
+    	Item item4 = new Item();
+    	item4.setPrice(50);
+    	item4.setTitle("01");
+    	item4.setUrl("www.testing.com");
+    	list4.add(item4); 
+		lsIQ.offer(list4);
+		q1.set(test,lsIQ);
+         
+         // execute test method
+   		lastsearch_func.invoke(test, (Object[])null);
+   		
+   		
+   		/* test actionRefine */
+   		final Field recorditm = test.getClass().getDeclaredField("recordItem");
+		recorditm.setAccessible(true);
+		List<Item> testlist = new ArrayList<Item>();
+		Item item5 = new Item();
+		item5.setPrice(50);
+		item5.setTitle("01");
+		item5.setUrl("www.testing.com");
+		Item item6 = new Item();
+		item6.setPrice(50);
+		item6.setTitle("123");
+		item6.setUrl("www.testing.com");
+		recorditm.set(test, testlist);
+		
+		
+   		Method refine_func = null;
+   		refine_func = test.getClass().getDeclaredMethod("actionRefine", (Class<?>[])null);		
+   		refine_func.setAccessible(true);
+   		// null
+   		refine_func.invoke(test, (Object[])null);
+   		
+   		// one, match
+		testlist.add(item5);
+   		refine_func.invoke(test,(Object[]) null);
+   		
+   		// one unmatch
+   		TextField kwtf = (TextField) field1.get(test);
+   		kwtf.setText("123");
+		testlist.add(item6);
+   		refine_func.invoke(test,(Object[]) null);
+   		
+   		/* test quit */
+   		Method method1111 = null;
+		method1111 = test.getClass().getDeclaredMethod("quit", (Class<?>[])null);		
+		method1111.setAccessible(true);    	     		
+		// get ready for instance	
+		method1111.invoke(test, (Object[])null);
     }
     
     @Test
     public void test_updateLastSearchItem() throws Exception {
     	Controller test = new Controller();
     	Method method = null;
-  		method = test.getClass().getDeclaredMethod("updateLastSearch_Item", null);		
+  		method = test.getClass().getDeclaredMethod("updateLastSearch_Item",(Class<?>[]) null);		
       	method.setAccessible(true);    	     		
   		// get ready for instance
 		final Field recorditm = test.getClass().getDeclaredField("recordItem");
@@ -370,7 +445,7 @@ public class ControllerTest {
 		q1.setAccessible(true);
          
          // execute test method
-   		method.invoke(test, null);
+   		method.invoke(test, (Object[])null);
 
 		item1.setTitle("01");
 		item1.setUrl("www.testing.com");
@@ -380,42 +455,7 @@ public class ControllerTest {
 		item11.setUrl("www.testing.com");
 		testlist.add(item11);
 		recorditm.set(test, testlist);
-   		method.invoke(test, null);
-    }
-    
-//    @Test
-//    public void test_handleAboutYourTeamAction() throws Exception  {
-//    	// test initialize
-//        new JFXPanel(); // Initializes the JavaFx Platform
-//        Platform.runLater(new Runnable() {
-//            @Override
-//            public void run() {
-//					try {
-//						new Task().start(new Stage());
-//						Controller test = new Controller();
-//						Method method = null;
-//						method = test.getClass().getDeclaredMethod("handleAboutYourTeamAction", ActionEvent.class);		
-//						method.setAccessible(true);    
-//						ActionEvent a = new ActionEvent();											
-//						final Field field = test.getClass().getDeclaredField("dialog");
-//				        field.setAccessible(true);
-//				        Stage dialog_stage = (Stage)field.get(test);
-//				        dialog_stage.setResizable(true);				        
-//				        field.set(test, dialog_stage);
-//						method.invoke(test, a);
-//						
-//						Stage current_dialog_stage = (Stage)field.get(test);    
-//
-//				        assertEquals(current_dialog_stage.getTitle(),"About Our Team");
-//						
-//											
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}					
-//				                                  
-//            }
-//        });
-//       
-//    }
-	
+   		method.invoke(test, (Object[])null);   		
+
+    }    
 }

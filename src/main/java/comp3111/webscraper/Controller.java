@@ -500,15 +500,7 @@ public class Controller {
     	
     }
     
-    
-    /**
-     * Handle action related to "About your Team" menu item.
-     * 
-     * @param event Event on "About your Team" menu item.
-     */
-    @FXML
-    private void handleAboutYourTeamAction(final ActionEvent event)
-    {
+    public void createAboutUsDialog() {
     	Stage dialog = new Stage();
     	dialog.initStyle(StageStyle.DECORATED);
     	dialog.initModality(Modality.APPLICATION_MODAL);
@@ -618,6 +610,17 @@ public class Controller {
     	dialog.setScene(scene);
     	dialog.setResizable(false);
     	dialog.show();
+    }
+    
+    /**
+     * Handle action related to "About your Team" menu item.
+     * 
+     * @param event Event on "About your Team" menu item.
+     */
+    @FXML
+    private void handleAboutYourTeamAction(final ActionEvent event)
+    {
+    	createAboutUsDialog();
     	// debug message
     }
 
@@ -638,7 +641,7 @@ public class Controller {
     public void quit() {
     	scraper.getWebClient().close();
     	Platform.exit();
-        System.exit(0);
+        //System.exit(0);
     }
     
     /**
