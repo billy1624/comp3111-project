@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import comp3111.webscraper.Controller.BarChart_BarDBClick_Handler;
@@ -52,28 +53,29 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class Sawa_ControllerTest {
-	
-	MyTask task;
-	Thread myTaskThread;
-    
-    public class MyTask extends Application{
-    	
-    	public Controller tmp;
+public class Sawa_ControllerTest {	   
+	/**
+	 * Dummy class for testing HostServices
+	 * It must inherit Application class
+	 * @author Sawa
+	 *
+	 */
+    public class MyTask extends Application{    	
 		@Override
 		public void start(Stage primaryStage) throws Exception {
-			FXMLLoader loader = new FXMLLoader();
-        	loader.setLocation(WebScraperApplication.class.getResource("/ui.fxml"));
-       		VBox root = (VBox) loader.load();
-       		Scene scene =  new Scene(root);
-       		tmp = (Controller)loader.getController();       		
+			// Dummy
 		}				
     	
     }
     
-    
-    @Test
-    public void test_controller() throws InterruptedException {
+    /**
+     * Jobs that calls before every test case
+     * Purpose: create a new JavaFx UI Thread for GUI related testing   
+     * @throws InterruptedException
+     * @author Sawa
+     */
+    @BeforeClass
+    public static void test_controller() throws InterruptedException {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -82,10 +84,7 @@ public class Sawa_ControllerTest {
                     @Override
                     public void run() {
 							try {
-								new WebScraperApplication().start(new Stage());
-								Controller test = new Controller();
-								/* test aboutUs dialog */
-								test.handleAboutYourTeamAction(new ActionEvent());
+								new WebScraperApplication().start(new Stage());								
 							} catch (Exception e) {
 								e.printStackTrace();
 							}					
@@ -94,18 +93,21 @@ public class Sawa_ControllerTest {
                 });
             }
         });
-        thread.start();// Initialize the thread    
+        // start the thread
+        thread.start(); 
     }
     
+
     @Test
     public void test_has_bar_selected() throws Exception {
     	Controller test = new Controller();
     	Controller test2 = new Controller();
-    	List<Boolean> list = new ArrayList<>();
-    	List<Boolean> list2 = new ArrayList<>();
+    	List<Boolean> list = new ArrayList<>(); // set1 has bar has been selected
+    	List<Boolean> list2 = new ArrayList<>(); // set2 no bar has been selected
     	list.add(true);
     	list2.add(false);
     	
+    	// use reflection to get private data member
     	Field field = test.getClass().getDeclaredField("bar_smVector");
     	field.setAccessible(true);
     	field.set(test, list);
@@ -114,6 +116,7 @@ public class Sawa_ControllerTest {
     	field2.setAccessible(true);
     	field2.set(test2, list2);
     	
+    	// use reflection to get private member funtion
     	Method method = null;
     	Method method2 = null;
 		method = test.getClass().getDeclaredMethod("has_bar_selected", (Class<?>[])null);
@@ -124,9 +127,10 @@ public class Sawa_ControllerTest {
     	Boolean result2;
 		result1 = (Boolean) method.invoke(test, (Object[])null);
 		result2 = (Boolean) method.invoke(test2,(Object[]) null);
-    	assertEquals(result1, true);
-    	assertEquals(result2, false);
-		
+
+		// validate result
+		assertEquals(result1, true);
+    	assertEquals(result2, false);		
     }
     
     @Test
@@ -135,12 +139,13 @@ public class Sawa_ControllerTest {
     	MyTask a = new MyTask();
     	HostServices target = a.getHostServices();
 
-        //when
+        // Get a host services first
         test.setHostServices(target);
-
-        //then
+         
         final Field field = test.getClass().getDeclaredField("hservices");
         field.setAccessible(true);
+        
+        // validate result
         assertEquals(field.get(test), target);
     }
     
@@ -642,5 +647,15 @@ public class Sawa_ControllerTest {
     public void test_barchart() {
     	Controller test = new Controller();
     	
+    }
+    
+    public void test_AboutUsDialog() {
+    	Controller test = new Controller();
+		/* test aboutUs dialog */
+    	try {
+    		test.handleAboutYourTeamAction(new ActionEvent());
+    	}catch(Exception ex) {
+    		ex.printStackTrace();
+    	}
     }
 }	
