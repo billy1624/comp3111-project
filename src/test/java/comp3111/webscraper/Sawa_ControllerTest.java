@@ -12,7 +12,11 @@ import java.util.Queue;
 
 import org.junit.Test;
 
+import comp3111.webscraper.Controller.BarChart_BarDBClick_Handler;
+import comp3111.webscraper.Controller.BarChart_BarEntered_Handler;
+import comp3111.webscraper.Controller.BarChart_BarExited_Handler;
 import comp3111.webscraper.Controller.DataModel;
+import comp3111.webscraper.Controller.SearchAsyncTask;
 import javafx.application.Application;
 import javafx.application.HostServices;
 import javafx.application.Platform;
@@ -20,7 +24,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.BarChart;
@@ -40,6 +47,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -146,7 +155,7 @@ public class Sawa_ControllerTest {
 
         final Field field1 = test.getClass().getDeclaredField("textFieldKeyword");
         field1.setAccessible(true);
-        TextField result_tf = new TextField("123");  
+        TextField result_tf = new TextField("google pixel");  
         field1.set(test, result_tf);   
         
         final Field field2 = test.getClass().getDeclaredField("labelCount");
@@ -192,7 +201,7 @@ public class Sawa_ControllerTest {
     	final String it4 = "Item4";
     	final String it5 = "Item5";
     	Series<String, Double> series1 = new Series<String, Double>();
-    	series1.getData().add(new Data("item1",50.0));
+    	series1.getData().add(new Data("50.0",50.0));
         final Field field7 = test.getClass().getDeclaredField("barChartHistogram");
         field7.setAccessible(true);
     	NumberAxis yaxis = new NumberAxis();
@@ -475,9 +484,74 @@ public class Sawa_ControllerTest {
 			barchart_testlist2.add(m1);
 		}    	
     	barchart_update.invoke(test, barchart_testlist2);
-
     	
-   		
+    	/** async task test **/
+    	SearchAsyncTask async_task = test.new SearchAsyncTask();
+    	Thread async_task_th = new Thread(async_task);
+    	async_task_th.start();
+
+    	/** test barchart event handler **/ 
+    	for(int itr = 0; itr < series1.getData().size(); ++itr) {
+    		series1.getData().get(itr).getNode().setId(Integer.toString(itr));
+    		System.out.println(series1.getData().get(itr).getXValue());
+    	}
+        result_bc.getData().addAll(series1);
+		 for (Object serie: result_bc.getData()){
+    		 for (Data<String, Integer> ittm: ((Series<String,Integer>) serie).getData()){
+    			 
+    			 BarChart_BarEntered_Handler beh_instance = test.new BarChart_BarEntered_Handler();
+    			 beh_instance.setData(ittm);
+    			 ittm.getNode().setOnMouseEntered(beh_instance);    			
+    			 beh_instance.handle(null);
+    			 
+    			 BarChart_BarExited_Handler bExith_instance = test.new BarChart_BarExited_Handler();
+    			 bExith_instance.setData(ittm);        			         			
+    			 ittm.getNode().setOnMouseExited(bExith_instance);
+    			 bExith_instance.handle(null);
+    			 
+    			 BarChart_BarDBClick_Handler bDBch_instance = test.new BarChart_BarDBClick_Handler();
+    			 bDBch_instance.setData(ittm);
+    			 bDBch_instance.setDistributionData(testlist);
+    			 bDBch_instance.setRange(0.0);
+    			 ittm.getNode().setOnMouseClicked(bDBch_instance);
+    			 bDBch_instance.handle(new MouseEvent(MouseEvent.MOUSE_CLICKED,
+    					   0, 0, 0, 0, MouseButton.PRIMARY, 2,
+    					   true, true, true, true, true, true, true, true, true, true, null));
+    			 
+		    	List<Boolean> oneBarSelcetList = new ArrayList<>();
+		    	List<Boolean> noBarSelectList = new ArrayList<>();
+		    	oneBarSelcetList.add(true);
+		    	noBarSelectList.add(false);
+		    	
+		    	Field smV1 = test.getClass().getDeclaredField("bar_smVector");
+		    	smV1.setAccessible(true);
+		    	smV1.set(test, oneBarSelcetList);
+		    	beh_instance.handle(null);
+		    	bExith_instance.handle(null);
+		    	 bDBch_instance.handle(new MouseEvent(MouseEvent.MOUSE_CLICKED,
+  					   0, 0, 0, 0, MouseButton.PRIMARY, 2,
+  					   true, true, true, true, true, true, true, true, true, true, null));
+
+
+		    	
+		    	Field smV2 = test.getClass().getDeclaredField("bar_smVector");
+		    	smV2.setAccessible(true);
+		    	smV2.set(test, noBarSelectList);
+		    	beh_instance.handle(null);
+		    	bExith_instance.handle(null);
+				bDBch_instance.handle(new MouseEvent(MouseEvent.MOUSE_CLICKED,
+					   0, 0, 0, 0, MouseButton.PRIMARY, 2,
+					   true, true, true, true, true, true, true, true, true, true, null));
+				bDBch_instance.handle(new MouseEvent(MouseEvent.MOUSE_MOVED,
+						   0, 0, 0, 0, MouseButton.MIDDLE, 2,
+						   true, true, true, true, true, true, true, true, true, true, null));
+				bDBch_instance.handle(new MouseEvent(MouseEvent.MOUSE_CLICKED,
+						   0, 0, 0, 0, MouseButton.PRIMARY, 1,
+						   true, true, true, true, true, true, true, true, true, true, null));
+             }
+         }
+		 
+    	
    		/* test quit */
    		Method method1111 = null;
 		method1111 = test.getClass().getDeclaredMethod("quit", (Class<?>[])null);		
@@ -485,8 +559,7 @@ public class Sawa_ControllerTest {
 		// get ready for instance	
 		method1111.invoke(test, (Object[])null);
     }
-    
-    
+        
     @Test
     public void test_actionSearch() throws Exception{
     	Controller test = new Controller();
@@ -564,4 +637,10 @@ public class Sawa_ControllerTest {
    		method.invoke(test, testlist);   	
    		assertEquals(queue.size(), 2);
     }
-}
+
+    @Test
+    public void test_barchart() {
+    	Controller test = new Controller();
+    	
+    }
+}	

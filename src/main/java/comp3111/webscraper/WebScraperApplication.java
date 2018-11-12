@@ -5,8 +5,10 @@ package comp3111.webscraper;
 
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.stage.Stage;
-
+import javafx.stage.WindowEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
@@ -59,7 +61,19 @@ public class WebScraperApplication extends Application {
     	stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));    	
    		stage.setScene(scene);
    		stage.setTitle("WebScrapper");
-   		stage.show();   		
+   		stage.setOnHidden(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                    	
+                        System.exit(0);
+                    }
+                });
+            }
+        });
+   		stage.show();
 
 	}
 

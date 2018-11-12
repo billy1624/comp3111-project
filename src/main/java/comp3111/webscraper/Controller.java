@@ -195,6 +195,34 @@ public class Controller {
     	if (lastSearchItemQueue.size() == 3) lastSearchItemQueue.poll();  
     }
     
+	
+	
+	public class SearchAsyncTask extends Task<List<Item>>{
+
+		@Override
+		protected List<Item> call() throws Exception {
+			List<Item> result = scraper.scrape(textFieldKeyword.getText(), textAreaConsole);
+    		System.out.println("actionSearch: " + textFieldKeyword.getText());            	
+    		String output = "";
+        	for (Item item : result) {
+        		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+        	}
+        	textAreaConsole.textProperty().unbind();
+        	textAreaConsole.setText(output);
+        	
+        	// copy for further use
+        	recordItem = new ArrayList<Item>(result);    
+        	
+        	// update distribution bar chart      
+        	UpdateDistributionChart_Later(recordItem);
+        	
+        	// update other page here
+        	
+            return null;
+		}
+		
+	};
+	
     /**
      * Called when the search(i.e. Go) button is pressed.
      */
@@ -203,31 +231,8 @@ public class Controller {
     	busy_idtr.setVisible(true);
 
         // use Async
-    	Task<List<Item>> task = new Task<List<Item>>() {
-            @Override 
-            protected List<Item> call() throws Exception {
-            	
-            	List<Item> result = scraper.scrape(textFieldKeyword.getText(), textAreaConsole);
-        		System.out.println("actionSearch: " + textFieldKeyword.getText());            	
-        		String output = "";
-            	for (Item item : result) {
-            		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
-            	}
-            	textAreaConsole.textProperty().unbind();
-            	textAreaConsole.setText(output);
-            	
-            	// copy for further use
-            	recordItem = new ArrayList<Item>(result);    
-            	
-            	// update distribution bar chart      
-            	UpdateDistributionChart_Later(recordItem);
-            	
-            	// update other page here
-            	
-                return null;
-            }
-        };
-        
+    	SearchAsyncTask task = new SearchAsyncTask();
+    	
         task.setOnSucceeded(eventHandler->{
         	// enable last search function
         	lastSearchBt.setDisable(false);
@@ -725,52 +730,101 @@ public class Controller {
         	
         	 for (Object serie: barChartHistogram.getData()){
         		 for (Data<String, Integer> item: ((Series<String,Integer>) serie).getData()){
-        			 item.getNode().setOnMouseEntered(e -> {
-        				 
-        				 for(Boolean see: bar_smVector)
-        					 /*if (see == true) System.out.print("1");
-        			    		else System.out.print("0");
-        				 	System.out.print("\n");*/
-        				 if(!has_bar_selected())
-        				 item.getNode().setStyle("-fx-bar-fill: #a9e200;");
-        			 });
-        			 item.getNode().setOnMouseExited(e -> {
-        				 if(!has_bar_selected())
-        				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
-        			 });
-        			 item.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
-        					    @Override
-        					    public void handle(MouseEvent mouseEvent) {
-        					        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
-        					            if(mouseEvent.getClickCount() == 2){
-        					                Boolean current_state = bar_smVector.get(Integer.parseInt(item.getNode().getId()));
-        					                if(!current_state) {
-            		            				item.getNode().setStyle("-fx-bar-fill: #9a42c8;");
-            					                update_bar_only_one(Integer.parseInt(item.getNode().getId()), dist_data,Double.parseDouble(item.getXValue()),Double.parseDouble(item.getXValue())+rng );
-        					                }else {
-        			            				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
-        			            				 String output = "";
-    			            	            	for (Item item : dist_data) {
-    			            	            		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
-    			            	            	}
-    			            	            	textAreaConsole.textProperty().unbind();
-    			            	            	textAreaConsole.setText(output);
-        					                }
-        					                
-        					                
-        		            				bar_smVector.set(Integer.parseInt(item.getNode().getId()),
-        		            						!current_state);
-        					            }
-        					        }
-        					    }
-        				 }
-        			 );
+        			 
+        			 BarChart_BarEntered_Handler beh_instance = new BarChart_BarEntered_Handler();
+        			 beh_instance.setData(item);
+        			 item.getNode().setOnMouseEntered(beh_instance);        			 
+        			 
+        			 BarChart_BarExited_Handler bExith_instance = new BarChart_BarExited_Handler();
+        			 bExith_instance.setData(item);        			         			
+        			 item.getNode().setOnMouseExited(bExith_instance);
+        			 
+        			 BarChart_BarDBClick_Handler bDBch_instance = new BarChart_BarDBClick_Handler();
+        			 bDBch_instance.setData(item);
+        			 bDBch_instance.setDistributionData(dist_data);
+        			 bDBch_instance.setRange(rng);
+        			 item.getNode().setOnMouseClicked(bDBch_instance);
                  }
              }
     	
         }
     });
 }
+  
+  
+  public class BarChart_BarEntered_Handler implements EventHandler<MouseEvent>  {
+	private Data<String, Integer> item;
+	  
+	@Override
+	public void handle(MouseEvent event) {
+		System.out.println("Cursor Enter Bar");
+		for(Boolean see: bar_smVector)        				
+			if(!has_bar_selected())
+				item.getNode().setStyle("-fx-bar-fill: #a9e200;");
+	}
+	
+	public void setData(Data<String, Integer> input) {
+		item = input;
+	}
+	  
+  }
+  
+  public class BarChart_BarExited_Handler implements EventHandler<MouseEvent>  {
+	private Data<String, Integer> item;
+	  
+	@Override
+	public void handle(MouseEvent event) {
+		 if(!has_bar_selected())
+			 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
+	}
+	
+	public void setData(Data<String, Integer> input) {
+		item = input;
+	}
+	  
+  }
+  
+  public class BarChart_BarDBClick_Handler implements EventHandler<MouseEvent>  {
+		private Data<String, Integer> item;
+		private List<Item> dist_data;
+		private Double rng;
+		@Override
+		public void handle(MouseEvent mouseEvent) {
+			if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+	            if(mouseEvent.getClickCount() == 2){
+	                Boolean current_state = bar_smVector.get(Integer.parseInt(item.getNode().getId()));
+	                if(!current_state) {
+        				item.getNode().setStyle("-fx-bar-fill: #9a42c8;");
+		                update_bar_only_one(Integer.parseInt(item.getNode().getId()), dist_data,Double.parseDouble(item.getXValue()),Double.parseDouble(item.getXValue())+rng );
+	                }else {
+        				 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
+        				 String output = "";
+    	            	for (Item item : dist_data) {
+    	            		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+    	            	}
+    	            	textAreaConsole.textProperty().unbind();
+    	            	textAreaConsole.setText(output);
+	                }
+	                
+	                
+    				bar_smVector.set(Integer.parseInt(item.getNode().getId()),
+    						!current_state);
+	            }
+	        }
+		}
+		
+		public void setData(Data<String, Integer> input) {
+			item = input;
+		}
+		
+		public void setDistributionData(List<Item> input) {
+			dist_data = input;
+		}
+		
+		public void setRange(Double range) {
+			rng = range;
+		}
+	  }
   
   void task6_iii_testCase() {
   	title_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("title"));
