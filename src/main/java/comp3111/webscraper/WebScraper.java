@@ -120,6 +120,15 @@ public class WebScraper {
 
 				HtmlPage page = client.getPage(searchUrl);
 
+				List<?> items = (List<?>) page.getByXPath("//li[@class='result-row']");
+
+				if ( items.size() == 0 ) {
+					String msg = "No matched items found on " + Portal.Craigslist + ".\n";
+					System.out.println(msg);
+					Platform.runLater(() -> textAreaConsole.appendText(msg));
+					break;
+				}
+
 				HtmlElement itemRangeFrom = page.getFirstByXPath("//form[@id='searchform']//span[@class='rangeFrom']");
 				HtmlElement itemRangeTo = page.getFirstByXPath("//form[@id='searchform']//span[@class='rangeTo']");
 				HtmlElement itemTotalCount = page.getFirstByXPath("//form[@id='searchform']//span[@class='totalcount']");
@@ -135,8 +144,6 @@ public class WebScraper {
 				String status = "Fetching form " + Portal.Craigslist + ": item " + rangefrom + " - " + rangeTo + ", " + totalCount + " in total.";
 				System.out.println(status);
 				Platform.runLater(() -> textAreaConsole.appendText(status + "\n"));
-
-				List<?> items = (List<?>) page.getByXPath("//li[@class='result-row']");
 
 				for (int i = 0; i < items.size(); i++) {
 					HtmlElement htmlItem = (HtmlElement) items.get(i);
@@ -155,7 +162,9 @@ public class WebScraper {
 					item.setTitle(itemAnchor.asText());
 					item.setPortal(Portal.Craigslist);
 					item.setUrl(itemAnchor.getHrefAttribute());
-					item.setPrice(new Double(itemPrice.replace("$", "").replace(",", "").replace(" ", "")));
+					Double price = new Double(itemPrice.replace("$", "").replace(",", "").replace(" ", ""));
+					price *= 7.8;
+					item.setPrice(price);
 					item.setPostedOn(postedOn);
 
 					result.add(item);
@@ -194,6 +203,15 @@ public class WebScraper {
 
 				HtmlPage page = client.getPage(searchUrl);
 
+				List<?> items = (List<?>) page.getByXPath("//ul[@id='search-results-list']//li[@class='search-result']");
+
+				if ( items.size() == 0 ) {
+					String msg = "No matched items found on " + Portal.Preloved + ".\n";
+					System.out.println(msg);
+					Platform.runLater(() -> textAreaConsole.appendText(msg));
+					break;
+				}
+
 				HtmlElement currPageNum = page.getFirstByXPath("//li[@class='pagination__nav__item pagination__nav__item--page pagination__nav__item--current-page']/a");
 				String[] pageNumSplit = currPageNum.asText().replace("Go to Search Results Page ", "").replace("of ", "").split(" ");
 
@@ -203,8 +221,6 @@ public class WebScraper {
 				String status = "Fetching form " + Portal.Preloved + ": Page " + pageNum + " of " + totalPage + " was processed.";
 				System.out.println(status);
 				Platform.runLater(() -> textAreaConsole.appendText(status + "\n"));
-
-				List<?> items = (List<?>) page.getByXPath("//ul[@id='search-results-list']//li[@class='search-result']");
 
 				for (int i = 0; i < items.size(); i++) {
 					HtmlElement htmlItem = (HtmlElement) items.get(i);
@@ -240,13 +256,20 @@ public class WebScraper {
 					item.setPortal(Portal.Preloved);
 
 					item.setUrl(itemUrl);
-					item.setPrice(new Double(itemPrice.replace("£", "").replace(",", "").replace(" ", "")));
+					Double price = new Double(itemPrice.replace("£", "").replace(",", "").replace(" ", ""));
+					price *= 10;
+					item.setPrice(price);
 					item.setPostedOn(postedOn);
 
 					result.add(item);
 				}
 				System.out.println("item count: " + items.size());
 				// Platform.runLater(() -> textAreaConsole.appendText("item count: " + items.size() + "\n"));
+				if ( FETCH_ONE_PAGE_ONLY ) {
+					final String ONE_PAGE_ONLY = "Fetching form " + Portal.Preloved + ": FETCH_ONE_PAGE_ONLY = true, only fetch the first page of result, the following page was skipped for faster loading speed.\n";
+					System.out.print(ONE_PAGE_ONLY);
+					Platform.runLater(() -> textAreaConsole.appendText(ONE_PAGE_ONLY));
+				}
 			} while (!FETCH_ONE_PAGE_ONLY && pageNum < totalPage);
 
 		System.out.println("result count: " + result.size());

@@ -3,12 +3,20 @@
  */
 package comp3111.webscraper;
 
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
+
+import javax.swing.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
 
 
 /**
@@ -63,6 +71,17 @@ public class WebScraperApplication extends Application {
 	 * @param args - not used.
 	 */
 	public static void main(String args[]) {
+		// try {
+		// 	final String CRAIGSLIST_URL = "https://newyork.craigslist.org/";
+		// 	String searchUrl = CRAIGSLIST_URL + "search/sss?";
+		// 	searchUrl += "s=" + 1 + "&";
+		// 	searchUrl += "sort=rel&query=" + URLEncoder.encode("abc", "UTF-8");
+		// 	WebClient client = new WebClient();
+		// 	HtmlPage page = client.getPage(searchUrl);
+		// 	page.save(new File("web-cache/abc.html"));
+		// } catch (Exception e) {
+		// 	e.printStackTrace();
+		// }
 		Application.launch(args);
 	}
 
