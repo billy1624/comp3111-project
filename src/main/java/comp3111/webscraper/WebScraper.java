@@ -97,8 +97,7 @@ public class WebScraper {
 			List<Item> prelovedList = scrapeFromPreloved(keyword, textAreaConsole);
 			combinedList.addAll(craigslistList);
 			combinedList.addAll(prelovedList);
-			Collections.sort(combinedList);
-			Collections.reverse(combinedList);
+			Collections.sort(combinedList, new ItemComparator());
 		// });
 		// thread.start();
 
@@ -162,10 +161,16 @@ public class WebScraper {
 					item.setTitle(itemAnchor.asText());
 					item.setPortal(Portal.Craigslist);
 					item.setUrl(itemAnchor.getHrefAttribute());
-					Double price = new Double(itemPrice.replace("$", "").replace(",", "").replace(" ", ""));
+					double price = Double.valueOf(itemPrice.replace("$", "").replace(",", "").replace(" ", ""));
 					price *= 7.8;
 					item.setPrice(price);
 					item.setPostedOn(postedOn);
+
+					// System.out.println(item);
+					// System.out.println(spanPrice);
+					// System.out.println(itemPrice);
+					// System.out.println(item.getPrice());
+					// System.out.println();
 
 					result.add(item);
 				}
@@ -222,6 +227,12 @@ public class WebScraper {
 				System.out.println(status);
 				Platform.runLater(() -> textAreaConsole.appendText(status + "\n"));
 
+				if ( FETCH_ONE_PAGE_ONLY ) {
+					final String ONE_PAGE_ONLY = "Fetching form " + Portal.Preloved + ": FETCH_ONE_PAGE_ONLY = true, only fetch the first page of result, the following page was skipped for faster loading speed.\n";
+					System.out.print(ONE_PAGE_ONLY);
+					Platform.runLater(() -> textAreaConsole.appendText(ONE_PAGE_ONLY));
+				}
+
 				for (int i = 0; i < items.size(); i++) {
 					HtmlElement htmlItem = (HtmlElement) items.get(i);
 					HtmlElement itemName = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@itemprop='name']"));
@@ -256,20 +267,21 @@ public class WebScraper {
 					item.setPortal(Portal.Preloved);
 
 					item.setUrl(itemUrl);
-					Double price = new Double(itemPrice.replace("£", "").replace(",", "").replace(" ", ""));
-					price *= 10;
+					double price = Double.valueOf(itemPrice.replace("£", "").replace(",", "").replace(" ", ""));
+					price *= 10.0;
 					item.setPrice(price);
 					item.setPostedOn(postedOn);
+
+					// System.out.println(item);
+					// System.out.println(spanPrice);
+					// System.out.println(itemPrice);
+					// System.out.println(item.getPrice());
+					// System.out.println();
 
 					result.add(item);
 				}
 				System.out.println("item count: " + items.size());
 				// Platform.runLater(() -> textAreaConsole.appendText("item count: " + items.size() + "\n"));
-				if ( FETCH_ONE_PAGE_ONLY ) {
-					final String ONE_PAGE_ONLY = "Fetching form " + Portal.Preloved + ": FETCH_ONE_PAGE_ONLY = true, only fetch the first page of result, the following page was skipped for faster loading speed.\n";
-					System.out.print(ONE_PAGE_ONLY);
-					Platform.runLater(() -> textAreaConsole.appendText(ONE_PAGE_ONLY));
-				}
 			} while (!FETCH_ONE_PAGE_ONLY && pageNum < totalPage);
 
 		System.out.println("result count: " + result.size());
@@ -283,4 +295,24 @@ public class WebScraper {
 		return result;
 	}
 
+}
+
+
+class ItemComparator implements Comparator<Item> {
+	@Override
+	public int compare(Item a, Item b) {
+		if ( a.compareTo(b) != 0 ) {
+			return a.compareTo(b);
+		} else {
+			if ( a.getPortal() == b.getPortal() ) {
+				return 0;
+			} else if ( a.getPortal() == Portal.Craigslist ) {
+				return -1;
+			} else if ( a.getPortal() == Portal.Preloved ){
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
 }

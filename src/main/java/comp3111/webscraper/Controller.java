@@ -69,9 +69,10 @@ public class Controller {
 		    String output = "";
 		    for (Item item : result) {
 			    output += item.getTitle() + "\t\t" + item.getPrice() + "\t\t" + item.getPostedOn() + "\t\t" + item.getPortal() + "\t\t" + item.getUrl() + "\n";
+			    // output += item.toString() + "\n";
 		    }
-		    final String s = output;
-		    Platform.runLater(() -> textAreaConsole.appendText(s));
+		    String finalOutput = output;
+		    Platform.runLater(() -> textAreaConsole.appendText(finalOutput));
 	    });
 	    thread.start();
     }
