@@ -57,7 +57,6 @@ public class WebScraperApplication extends Application {
    		Scene scene =  new Scene(root);
    		Controller tmp = (Controller)loader.getController();
     	tmp.setHostServices(getHostServices());
-        //setUserAgentStylesheet(STYLESHEET_CASPIAN);
     	stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));    	
    		stage.setScene(scene);
    		stage.setTitle("WebScrapper");
@@ -66,15 +65,13 @@ public class WebScraperApplication extends Application {
             public void handle(WindowEvent event) {
                 Platform.runLater(new Runnable() {
                     @Override
-                    public void run() {
-                    	
-                        System.exit(0);
+                    public void run() {                    	
+                		Platform.exit();
                     }
                 });
             }
         });
    		stage.show();
-
 	}
 
 	/**

@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -73,31 +75,19 @@ public class Sawa_ControllerTest {
      * Purpose: create a new JavaFx UI Thread for GUI related testing   
      * @throws InterruptedException
      * @author Sawa
-     */
+     */    
     @BeforeClass
-    public static void test_controller() throws InterruptedException {
+    public static void javaFxThread() throws InterruptedException {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 new JFXPanel(); // Initializes the JavaFx Platform
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-							try {
-								new WebScraperApplication().start(new Stage());								
-							} catch (Exception e) {
-								e.printStackTrace();
-							}					
-						                                  
-                    }
-                });
             }
         });
         // start the thread
         thread.start(); 
     }
     
-
     @Test
     public void test_has_bar_selected() throws Exception {
     	Controller test = new Controller();
@@ -149,6 +139,104 @@ public class Sawa_ControllerTest {
         assertEquals(field.get(test), target);
     }
     
+    @Test
+    public void test_updateLastSearchItem() throws Exception {
+    	/*** Create all the things that required for the test ***/
+    	
+    	// controller init
+    	Controller test = new Controller();
+    	
+    	// updateLastSearch_Item init
+    	Method method = null;
+  		method = test.getClass().getDeclaredMethod("updateLastSearch_Item", List.class);		
+      	method.setAccessible(true);      	
+      	
+  		// recordItem instance init
+		final Field recorditm = test.getClass().getDeclaredField("recordItem");
+		recorditm.setAccessible(true);
+		
+		// create 2 item, add to List<Item>
+		List<Item> testlist = new ArrayList<Item>();
+		Item item0 = new Item();
+		item0.setPrice(50);
+		item0.setTitle("1");
+		item0.setUrl("www.testing.com");
+		
+		Item item1 = new Item();
+		item1.setPrice(33.3);
+		item1.setTitle("2");
+		item1.setUrl("www.testing.com");
+		testlist.add(item0);
+		testlist.add(item1);
+		recorditm.set(test, testlist);
+         
+		final Field q1 = test.getClass().getDeclaredField("lastSearchItemQueue");
+		q1.setAccessible(true);
+		Queue<List<Item>> queue = (Queue<List<Item>>) q1.get(test);
+				         
+    	/** 
+    	 *  Execute the test method
+    	 *  When it it called, the queue "lastSearchItemQueue" 
+    	 *  will append the recordItem into the queue.
+    	 *  Assert it is not empty, size equal to 1    	
+    	 **/
+   		method.invoke(test, testlist);   
+   		assertEquals(queue.size(), 2);
+   		
+   		// add one more items
+		Item one_more = new Item();
+		one_more.setPrice(99.9);
+		one_more.setTitle("3");
+		one_more.setUrl("www.testing.com");
+		testlist.add(one_more);
+		recorditm.set(test, testlist);
+		
+   		method.invoke(test, testlist);   	
+   		assertEquals(queue.size(), 2);
+    }
+    
+    @Test
+    public void test_aboutUsDialog() {
+    	Platform.runLater(new Runnable() {
+    	    @Override
+    	    public void run() {
+    	        // Update UI here.
+    	    	Exception e = null;
+    	    	try {
+			    	Controller test = new Controller();
+					test.handleAboutYourTeamAction(new ActionEvent());
+    	    	}catch(Exception ex) {
+    	    		e = ex;
+    	    	}
+    	    	
+    	    	// validate not exception throw
+    	    	assertEquals(e, null);    	    	
+    	    }
+    	});    	
+    }
+    
+    @Test
+    public void test_actionSearch() throws Exception{
+    	Controller test = new Controller();
+    	Method method = null;
+  		method = test.getClass().getDeclaredMethod("actionSearch",(Class<?>[]) null);		
+      	method.setAccessible(true);
+      	
+      	final Field field12 = test.getClass().getDeclaredField("busy_idtr");
+        field12.setAccessible(true);
+        ProgressIndicator result_bsidtr = new ProgressIndicator();     
+        result_bsidtr.setVisible(true);
+        field12.set(test, result_bsidtr); 
+      	
+        final Field tfkeyword = test.getClass().getDeclaredField("textFieldKeyword");
+ 		tfkeyword.setAccessible(true);
+ 		TextField tf = new TextField();		
+ 		tfkeyword.set(test, tf);
+      	
+      	
+   		method.invoke(test, (Object[])null);
+    }
+  
     @Test // fuck my life
     public void test_javafx_thread_releated() throws Exception {
     	Controller test = new Controller();
@@ -215,26 +303,6 @@ public class Sawa_ControllerTest {
         result_bc.getData().addAll(series1);
         field7.set(test, result_bc);
         
-        Series<String, Number> series2 = new XYChart.Series<String, Number>();
-    	series2.setName("Test Data Set");
-    	series2.getData().add(new Data<String, Number>("a", 4));
-    	series2.getData().add(new Data<String, Number>("b", 10));
-    	series2.getData().add(new Data<String, Number>("c", 15));
-    	series2.getData().add(new Data<String, Number>("d", 8));
-    	series2.getData().add(new Data<String, Number>("e", 5));
-    	series2.getData().add(new Data<String, Number>("f", 18));
-    	series2.getData().add(new Data<String, Number>("g", 15));
-    	series2.getData().add(new Data<String, Number>("h", 13));
-    	series2.getData().add(new Data<String, Number>("i", 19));
-    	series2.getData().add(new Data<String, Number>("j", 21));
-    	series2.getData().add(new Data<String, Number>("k", 21));
-        final Field field8 = test.getClass().getDeclaredField("areaChart");
-        field8.setAccessible(true);
-        NumberAxis yaxis1 = new NumberAxis();
-    	CategoryAxis xaxis1 = new CategoryAxis();
-        AreaChart result_ac = new AreaChart(xaxis1, yaxis1);     
-        result_ac.getData().addAll(series2);
-        field8.set(test, result_ac);
         
         
         final Field field9 = test.getClass().getDeclaredField("areaChartCb");
@@ -284,6 +352,13 @@ public class Sawa_ControllerTest {
         posted_date_col_field.setAccessible(true);
         TableColumn<DataModel, String> posted_date_col = new TableColumn<DataModel, String>();
         posted_date_col_field.set(test, posted_date_col);
+        
+        final Field field8 = test.getClass().getDeclaredField("areaChart");
+        field8.setAccessible(true);
+        NumberAxis yaxis1 = new NumberAxis();
+    	CategoryAxis xaxis1 = new CategoryAxis();
+        AreaChart result_ac = new AreaChart(xaxis1, yaxis1);     
+        field8.set(test, result_ac);
         
         // test initialize
         Method method = null;
@@ -362,7 +437,6 @@ public class Sawa_ControllerTest {
         Hyperlink current_lbl = (Hyperlink)field5.get(test);   
         TableView current_tbw = (TableView)field6.get(test);   
         BarChart current_bc = (BarChart)field7.get(test);
-        AreaChart current_ac = (AreaChart)field8.get(test);
         ComboBox current_cbx = (ComboBox)field9.get(test);
 
 
@@ -375,10 +449,7 @@ public class Sawa_ControllerTest {
         assertEquals(current_tbw.getItems().size(), 0);
         assertEquals(current_bc.getData().size(), 0);
         assertEquals(((ValueAxis<Number>) current_bc.getYAxis()).getUpperBound(), 125.0, 0.001);
-        assertEquals(((ValueAxis<Number>) current_bc.getYAxis()).getLowerBound(), 0.0, 0.001);
-        assertEquals(current_ac.getData().size(), 0);
-        assertEquals(((ValueAxis<Number>) current_ac.getYAxis()).getUpperBound(), 110.0, 0.001);
-        assertEquals(((ValueAxis<Number>) current_ac.getYAxis()).getLowerBound(), 0.0, 0.001);
+        assertEquals(((ValueAxis<Number>) current_bc.getYAxis()).getLowerBound(), 0.0, 0.001);        
         assertEquals(current_cbx.getItems().size(), 0);
         assertEquals(current_rbt.isDisable(), true);    
         
@@ -565,97 +636,50 @@ public class Sawa_ControllerTest {
 		method1111.invoke(test, (Object[])null);
     }
         
-    @Test
-    public void test_actionSearch() throws Exception{
+    @Test 
+    public void test_javafx() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
     	Controller test = new Controller();
-    	Method method = null;
-  		method = test.getClass().getDeclaredMethod("actionSearch",(Class<?>[]) null);		
-      	method.setAccessible(true);
-      	
-      	final Field field12 = test.getClass().getDeclaredField("busy_idtr");
-        field12.setAccessible(true);
-        ProgressIndicator result_bsidtr = new ProgressIndicator();     
-        result_bsidtr.setVisible(true);
-        field12.set(test, result_bsidtr); 
-      	
-        final Field tfkeyword = test.getClass().getDeclaredField("textFieldKeyword");
- 		tfkeyword.setAccessible(true);
- 		TextField tf = new TextField();		
- 		tfkeyword.set(test, tf);
-      	
-      	
-   		method.invoke(test, (Object[])null);
-    }
-  
-    @Test
-    public void test_updateLastSearchItem() throws Exception {
-    	/*** Create all the things that required for the test ***/
-    	
-    	// controller init
-    	Controller test = new Controller();
-    	
-    	// updateLastSearch_Item init
-    	Method method = null;
-  		method = test.getClass().getDeclaredMethod("updateLastSearch_Item", List.class);		
-      	method.setAccessible(true);      	
-      	
-  		// recordItem instance init
-		final Field recorditm = test.getClass().getDeclaredField("recordItem");
-		recorditm.setAccessible(true);
-		
-		// create 2 item, add to List<Item>
-		List<Item> testlist = new ArrayList<Item>();
-		Item item0 = new Item();
-		item0.setPrice(50);
-		item0.setTitle("1");
-		item0.setUrl("www.testing.com");
-		
-		Item item1 = new Item();
-		item1.setPrice(33.3);
-		item1.setTitle("2");
-		item1.setUrl("www.testing.com");
-		testlist.add(item0);
-		testlist.add(item1);
-		recorditm.set(test, testlist);
-         
-		final Field q1 = test.getClass().getDeclaredField("lastSearchItemQueue");
-		q1.setAccessible(true);
-		Queue<List<Item>> queue = (Queue<List<Item>>) q1.get(test);
-				         
-    	/** 
-    	 *  Execute the test method
-    	 *  When it it called, the queue "lastSearchItemQueue" 
-    	 *  will append the recordItem into the queue.
-    	 *  Assert it is not empty, size equal to 1    	
-    	 **/
-   		method.invoke(test, testlist);   
-   		assertEquals(queue.size(), 2);
-   		
-   		// add one more items
-		Item one_more = new Item();
-		one_more.setPrice(99.9);
-		one_more.setTitle("3");
-		one_more.setUrl("www.testing.com");
-		testlist.add(one_more);
-		recorditm.set(test, testlist);
-		
-   		method.invoke(test, testlist);   	
-   		assertEquals(queue.size(), 2);
-    }
-
-    @Test
-    public void test_barchart() {
-    	Controller test = new Controller();
-    	
+    	// ready
+        final Field field = test.getClass().getDeclaredField("textAreaConsole");
+        field.setAccessible(true);
+        TextArea result_ta = new TextArea("123");       
+        field.set(test, result_ta);   
     }
     
-    public void test_AboutUsDialog() {
+    @Test
+    public void test_AreaChart() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
     	Controller test = new Controller();
-		/* test aboutUs dialog */
-    	try {
-    		test.handleAboutYourTeamAction(new ActionEvent());
-    	}catch(Exception ex) {
-    		ex.printStackTrace();
-    	}
+    	
+    	/* check if data can be added or not */
+    	// create data set
+    	Series<String, Number> series2 = new XYChart.Series<String, Number>();
+    	series2.setName("Test Data Set");
+    	series2.getData().add(new Data<String, Number>("a", 4));
+    	series2.getData().add(new Data<String, Number>("b", 10));
+    	series2.getData().add(new Data<String, Number>("c", 15));
+    	series2.getData().add(new Data<String, Number>("d", 8));
+    	series2.getData().add(new Data<String, Number>("e", 5));
+    	series2.getData().add(new Data<String, Number>("f", 18));
+    	series2.getData().add(new Data<String, Number>("g", 15));
+    	series2.getData().add(new Data<String, Number>("h", 13));
+    	series2.getData().add(new Data<String, Number>("i", 19));
+    	series2.getData().add(new Data<String, Number>("j", 21));
+    	series2.getData().add(new Data<String, Number>("k", 21));
+        final Field field8 = test.getClass().getDeclaredField("areaChart");
+        field8.setAccessible(true);
+        NumberAxis yaxis1 = new NumberAxis();
+    	CategoryAxis xaxis1 = new CategoryAxis();
+        AreaChart original_ac = new AreaChart(xaxis1, yaxis1);     
+        original_ac.getData().addAll(series2);
+        
+        // expected value
+    	int expected_num = original_ac.getData().size();
+
+    	// set it
+        field8.set(test, original_ac);
+        
+        // Get it and assert
+        AreaChart current_ac = (AreaChart)field8.get(test);        
+        assertEquals(current_ac.getData().size(), expected_num);        
     }
 }	

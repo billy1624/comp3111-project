@@ -407,6 +407,7 @@ public class Controller {
 	 * - member's github page link
 	 * 
 	 * @author Yeung Chak Ho - chyeungam
+	 * @throws Exception 
 	 */
 	public void createAboutUsDialog() {
 		Stage dialog = new Stage();
@@ -418,7 +419,7 @@ public class Controller {
 		// add all information
 		final Group sceneGroup = new Group();
 		final Scene scene = new Scene(sceneGroup, Color.WHITESMOKE);
-
+		
 		// center title
 		Image deca = new Image(getClass().getResource("/java-icon.png").toString());
 		ImageView deca_imvCollection = new ImageView();
@@ -544,7 +545,6 @@ public class Controller {
 	public void quit() {
 		scraper.getWebClient().close();
 		Platform.exit();
-		// System.exit(0);
 	}
 
 	/**
