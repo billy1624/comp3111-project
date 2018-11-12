@@ -4,6 +4,7 @@
 package comp3111.webscraper;
 
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -62,13 +63,17 @@ public class Controller {
      */
     @FXML
     private void actionSearch() {
-    	System.out.println("actionSearch: " + textFieldKeyword.getText());
-    	List<Item> result = scraper.scrape(textFieldKeyword.getText(), textAreaConsole);
-    	String output = "";
-    	for (Item item : result) {
-    		output += item.getTitle() + "\t\t" + item.getPrice() + "\t\t" + item.getPostedOn() + "\t\t" + item.getPortal() + "\t\t" + item.getUrl() + "\n";
-    	}
-    	textAreaConsole.appendText(output);
+	    Thread thread = new Thread(() -> {
+		    System.out.println("actionSearch: " + textFieldKeyword.getText());
+		    List<Item> result = scraper.scrape(textFieldKeyword.getText(), textAreaConsole);
+		    String output = "";
+		    for (Item item : result) {
+			    output += item.getTitle() + "\t\t" + item.getPrice() + "\t\t" + item.getPostedOn() + "\t\t" + item.getPortal() + "\t\t" + item.getUrl() + "\n";
+		    }
+		    final String s = output;
+		    Platform.runLater(() -> textAreaConsole.appendText(s));
+	    });
+	    thread.start();
     }
 
     /**
