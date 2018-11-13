@@ -571,6 +571,7 @@ public class Sawa_ControllerTest {
     		series1.getData().get(itr).getNode().setId(Integer.toString(itr));
     		System.out.println(series1.getData().get(itr).getXValue());
     	}
+    	
         result_bc.getData().addAll(series1);
 		 for (Object serie: result_bc.getData()){
     		 for (Data<String, Integer> ittm: ((Series<String,Integer>) serie).getData()){

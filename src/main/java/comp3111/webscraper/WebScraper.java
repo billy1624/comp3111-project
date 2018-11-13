@@ -71,6 +71,7 @@ import java.util.concurrent.FutureTask;
 public class WebScraper {
 
 	private WebClient client;
+	private Vector<Item> combinedList;
 
 	/**
 	 * Default Constructor 
@@ -89,13 +90,17 @@ public class WebScraper {
 	 * @return A list of Item that has found. A zero size list is return if nothing is found. Null if any exception (e.g. no connectivity)
 	 */
 	public List<Item> scrape(String keyword, TextArea textAreaConsole) {
-		Vector<Item> combinedList = new Vector<Item>();
-		List<Item> craigslistList = scrapeFromCraigslist(keyword, textAreaConsole);
-		List<Item> prelovedList = scrapeFromPreloved(keyword, textAreaConsole);
-		combinedList.addAll(craigslistList);
-		combinedList.addAll(prelovedList);
-		Collections.sort(combinedList);
-		Collections.reverse(combinedList);
+		combinedList = new Vector<Item>();
+
+		// Thread thread = new Thread(() -> {
+			List<Item> craigslistList = scrapeFromCraigslist(keyword, textAreaConsole);
+			List<Item> prelovedList = scrapeFromPreloved(keyword, textAreaConsole);
+			combinedList.addAll(craigslistList);
+			combinedList.addAll(prelovedList);
+			Collections.sort(combinedList, new ItemComparator());
+		// });
+		// thread.start();
+
 		return combinedList;
 	}
 
@@ -114,6 +119,15 @@ public class WebScraper {
 
 				HtmlPage page = client.getPage(searchUrl);
 
+				List<?> items = (List<?>) page.getByXPath("//li[@class='result-row']");
+
+				if ( items.size() == 0 ) {
+					String msg = "No matched items found on " + Portal.Craigslist + ".\n";
+					System.out.println(msg);
+					Platform.runLater(() -> textAreaConsole.appendText(msg));
+					break;
+				}
+
 				HtmlElement itemRangeFrom = page.getFirstByXPath("//form[@id='searchform']//span[@class='rangeFrom']");
 				HtmlElement itemRangeTo = page.getFirstByXPath("//form[@id='searchform']//span[@class='rangeTo']");
 				HtmlElement itemTotalCount = page.getFirstByXPath("//form[@id='searchform']//span[@class='totalcount']");
@@ -126,19 +140,30 @@ public class WebScraper {
 					nextItemNum = 0;
 				}
 
-				String status = "Fetching form " + Portal.Craigslist + ": item " + rangefrom + " - " + rangeTo + ", " + totalCount + " in total, " + (totalCount-rangeTo) + " item left.";
+				String status = "Fetching form " + Portal.Craigslist + ": item " + rangefrom + " - " + rangeTo + ", " + totalCount + " in total.";
 				System.out.println(status);
+//<<<<<<< HEAD
 				textAreaConsole.appendText(status + "\n");
-			
-			List<?> items = (List<?>) page.getByXPath("//li	[@class='result-row']");
-			
+//			
+//			List<?> items = (List<?>) page.getByXPath("//li	[@class='result-row']");
+//			
+//
+//			for (int i = 0; i < items.size(); i++) {
+//				HtmlElement htmlItem = (HtmlElement) items.get(i);
+//				HtmlAnchor itemAnchor = ((HtmlAnchor) htmlItem.getFirstByXPath(".//p[@class='result-info']/a"));
+//				// tiny fix for price not find - 0.0	
+//				HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@class='result-price']"));
+//				HtmlElement postedDate = ((HtmlElement) htmlItem.getFirstByXPath(".//time[@class='result-date']"));
+//=======
+//				Platform.runLater(() -> textAreaConsole.appendText(status + "\n"));
 
-			for (int i = 0; i < items.size(); i++) {
-				HtmlElement htmlItem = (HtmlElement) items.get(i);
-				HtmlAnchor itemAnchor = ((HtmlAnchor) htmlItem.getFirstByXPath(".//p[@class='result-info']/a"));
-				// tiny fix for price not find - 0.0	
-				HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@class='result-price']"));
-				HtmlElement postedDate = ((HtmlElement) htmlItem.getFirstByXPath(".//time[@class='result-date']"));
+				for (int i = 0; i < items.size(); i++) {
+					HtmlElement htmlItem = (HtmlElement) items.get(i);
+					HtmlAnchor itemAnchor = ((HtmlAnchor) htmlItem.getFirstByXPath(".//p[@class='result-info']/a"));
+					HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//a/span[@class='result-price']"));
+					HtmlElement postedDate = ((HtmlElement) htmlItem.getFirstByXPath(".//time[@class='result-date']"));
+
+//>>>>>>> billy-task
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 					Date postedOn= sdf.parse(postedDate.getAttribute("datetime"));
 
@@ -150,17 +175,25 @@ public class WebScraper {
 					item.setTitle(itemAnchor.asText());
 					item.setPortal(Portal.Craigslist);
 					item.setUrl(itemAnchor.getHrefAttribute());
-					item.setPrice(new Double(itemPrice.replace("$", "").replace(",", "").replace(" ", "")));
+					double price = Double.valueOf(itemPrice.replace("$", "").replace(",", "").replace(" ", ""));
+					price *= 7.8;
+					item.setPrice(price);
 					item.setPostedOn(postedOn);
+
+					// System.out.println(item);
+					// System.out.println(spanPrice);
+					// System.out.println(itemPrice);
+					// System.out.println(item.getPrice());
+					// System.out.println();
 
 					result.add(item);
 				}
 				System.out.println("item count: " + items.size());
-				textAreaConsole.appendText("item count: " + items.size() + "\n");
+				// Platform.runLater(() -> textAreaConsole.appendText("item count: " + items.size() + "\n"));
 			} while (nextItemNum > 0);
 
 			System.out.println("result count: " + result.size());
-			textAreaConsole.appendText("result count: " + result.size() + "\n");
+			// Platform.runLater(() -> textAreaConsole.appendText("result count: " + result.size() + "\n"));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -173,6 +206,7 @@ public class WebScraper {
 
 	public List<Item> scrapeFromPreloved(String keyword, TextArea textAreaConsole) {
 		final String PRELOVED_URL = "https://www.preloved.co.uk/";
+		final boolean FETCH_ONE_PAGE_ONLY = true;
 		Vector<Item> result = new Vector<Item>();
 
 		try {
@@ -188,6 +222,15 @@ public class WebScraper {
 
 				HtmlPage page = client.getPage(searchUrl);
 
+				List<?> items = (List<?>) page.getByXPath("//ul[@id='search-results-list']//li[@class='search-result']");
+
+				if ( items.size() == 0 ) {
+					String msg = "No matched items found on " + Portal.Preloved + ".\n";
+					System.out.println(msg);
+					Platform.runLater(() -> textAreaConsole.appendText(msg));
+					break;
+				}
+
 				HtmlElement currPageNum = page.getFirstByXPath("//li[@class='pagination__nav__item pagination__nav__item--page pagination__nav__item--current-page']/a");
 				String[] pageNumSplit = currPageNum.asText().replace("Go to Search Results Page ", "").replace("of ", "").split(" ");
 
@@ -196,18 +239,38 @@ public class WebScraper {
 
 				String status = "Fetching form " + Portal.Preloved + ": Page " + pageNum + " of " + totalPage + " was processed.";
 				System.out.println(status);
-				textAreaConsole.appendText(status + "\n");
+				Platform.runLater(() -> textAreaConsole.appendText(status + "\n"));
 
-				List<?> items = (List<?>) page.getByXPath("//ul[@id='search-results-list']//li[@class='search-result']");
+				if ( FETCH_ONE_PAGE_ONLY ) {
+					final String ONE_PAGE_ONLY = "Fetching form " + Portal.Preloved + ": FETCH_ONE_PAGE_ONLY = true, only fetch the first page of result, the following page was skipped for faster loading speed.\n";
+					System.out.print(ONE_PAGE_ONLY);
+					Platform.runLater(() -> textAreaConsole.appendText(ONE_PAGE_ONLY));
+				}
 
 				for (int i = 0; i < items.size(); i++) {
 					HtmlElement htmlItem = (HtmlElement) items.get(i);
 					HtmlElement itemName = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@itemprop='name']"));
 					HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@itemprop='price']"));
-					// HtmlElement postedDate = ((HtmlElement) htmlItem.getFirstByXPath(".//time[@class='result-date']"));
-					//
-					// SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-					// Date postedOn= sdf.parse(postedDate.getAttribute("datetime"));
+					String itemUrl = htmlItem.getAttribute("data-href");
+					Date postedOn = new Date();
+
+					HtmlPage itemPage = client.getPage(itemUrl);
+					HtmlElement lastUpdateHtml = itemPage.getFirstByXPath("//li[@class='classified__additional__meta__item classified__timeago']");
+					String lastUpdate = lastUpdateHtml.asText().replace("This advert was updated ", "");
+					String[] lastUpdateSplit = lastUpdate.split(" ");
+					long secondOffset = 0;
+					final int SECOND = 60*1000;
+					final int HOUR = 60*SECOND;
+					if ( lastUpdate.contains("hour ago") || lastUpdate.contains("hours ago") ) {
+						secondOffset += Integer.valueOf(lastUpdateSplit[0]) * HOUR;
+						postedOn = new Date(new Date().getTime() - secondOffset);
+					} else if ( lastUpdate.contains("day ago") || lastUpdate.contains("days ago") ) {
+						Calendar c = Calendar.getInstance();
+						c.setTime(postedOn);
+						c.add(Calendar.DATE, -Integer.valueOf(lastUpdateSplit[0]));
+						postedOn = c.getTime();
+					}
+
 
 					// It is possible that an item doesn't have any price, we set the price to 0.0
 					// in this case
@@ -216,18 +279,27 @@ public class WebScraper {
 					Item item = new Item();
 					item.setTitle(itemName.asText());
 					item.setPortal(Portal.Preloved);
-					item.setUrl(htmlItem.getAttribute("data-href"));
-					item.setPrice(new Double(itemPrice.replace("£", "").replace(",", "").replace(" ", "")));
-					// item.setPostedOn(postedOn);
+
+					item.setUrl(itemUrl);
+					double price = Double.valueOf(itemPrice.replace("£", "").replace(",", "").replace(" ", ""));
+					price *= 10.0;
+					item.setPrice(price);
+					item.setPostedOn(postedOn);
+
+					// System.out.println(item);
+					// System.out.println(spanPrice);
+					// System.out.println(itemPrice);
+					// System.out.println(item.getPrice());
+					// System.out.println();
 
 					result.add(item);
 				}
 				System.out.println("item count: " + items.size());
-				textAreaConsole.appendText("item count: " + items.size() + "\n");
-			} while (pageNum < totalPage);
+				// Platform.runLater(() -> textAreaConsole.appendText("item count: " + items.size() + "\n"));
+			} while (!FETCH_ONE_PAGE_ONLY && pageNum < totalPage);
 
 		System.out.println("result count: " + result.size());
-		textAreaConsole.appendText("result count: " + result.size() + "\n");
+		// Platform.runLater(() -> textAreaConsole.appendText("result count: " + result.size() + "\n"));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -247,4 +319,24 @@ public class WebScraper {
 	}
 
 
+}
+
+
+class ItemComparator implements Comparator<Item> {
+	@Override
+	public int compare(Item a, Item b) {
+		if ( a.compareTo(b) != 0 ) {
+			return a.compareTo(b);
+		} else {
+			if ( a.getPortal() == b.getPortal() ) {
+				return 0;
+			} else if ( a.getPortal() == Portal.Craigslist ) {
+				return -1;
+			} else if ( a.getPortal() == Portal.Preloved ){
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
 }
