@@ -243,7 +243,7 @@ public class Controller {
     @FXML
     private void initialize() {
         // load test case, for test
-        // task6_iii_testCase();
+        task6_iii_testCase();
 
         // disable at the beginning
         lastSearchBt.setDisable(true);

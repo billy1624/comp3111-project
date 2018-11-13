@@ -62,10 +62,18 @@ public class Sawa_ControllerTest {
 	 * @author Sawa
 	 *
 	 */
+	MyTask task;
+	Thread myTaskThread; 
+	Controller tmp;
     public class MyTask extends Application{    	
 		@Override
 		public void start(Stage primaryStage) throws Exception {
 			// Dummy
+			FXMLLoader loader = new FXMLLoader();
+        	loader.setLocation(WebScraperApplication.class.getResource("/ui.fxml"));
+       		VBox root = (VBox) loader.load();
+       		Scene scene =  new Scene(root);
+       		tmp = (Controller)loader.getController();       	
 		}				
     	
     }
@@ -86,6 +94,33 @@ public class Sawa_ControllerTest {
         });
         // start the thread
         thread.start(); 
+    }
+    	  
+    
+    
+    @Test
+    public void test_controller() throws InterruptedException {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new JFXPanel(); // Initializes the JavaFx Platform
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+							try {
+								new WebScraperApplication().start(new Stage());
+								Controller test = new Controller();
+								/* test aboutUs dialog */
+								test.handleAboutYourTeamAction(new ActionEvent());
+							} catch (Exception e) {
+								e.printStackTrace();
+							}					
+						                                  
+                    }
+                });
+            }
+        });
+        thread.start();// Initialize the thread    
     }
     
     @Test
