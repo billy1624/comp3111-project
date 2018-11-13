@@ -592,19 +592,20 @@ public class Sawa_ControllerTest {
 		}    	
     	barchart_update.invoke(test, barchart_testlist2);
     	
-    	/** async task test **/    	
-    	Platform.runLater(new Runnable() {         
-		    @Override
-		    public void run() {
-		    	SearchAsyncTask async_task = test.new SearchAsyncTask();
-		    	try {
-					async_task.call();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		    }
-		});
+//    	/** async task test **/
+//    	Platform.runLater(new Runnable() {         
+//		    @Override
+//		    public void run() {
+//		    	SearchAsyncTask async_task = test.new SearchAsyncTask();
+//		    	try {
+//					async_task.call();
+//				} catch (Exception e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//		    }
+//		});
+    	
 
     	/** test barchart event handler **/ 
     	for(int itr = 0; itr < series1.getData().size(); ++itr) {
@@ -632,7 +633,7 @@ public class Sawa_ControllerTest {
     			 bDBch_instance.setRange(0.0);
     			 ittm.getNode().setOnMouseClicked(bDBch_instance);
     			 bDBch_instance.handle(new MouseEvent(MouseEvent.MOUSE_CLICKED,
-    					   0, 0, 0, 0, MouseButton.PRIMARY, 2,
+    					   1024, 1024, 768, 768, MouseButton.PRIMARY, 2,
     					   true, true, true, true, true, true, true, true, true, true, null));
     			 
 		    	List<Boolean> oneBarSelcetList = new ArrayList<>();
@@ -722,5 +723,24 @@ public class Sawa_ControllerTest {
         // Get it and assert
         AreaChart current_ac = (AreaChart)field8.get(test);        
         assertEquals(current_ac.getData().size(), expected_num);        
+    }
+    
+    
+    @Test
+    public void test_Async() throws Exception{
+    	/** async task test **/
+    	Platform.runLater(new Runnable() {         
+		    @Override
+		    public void run() {
+		    	Controller test = new Controller();
+		    	SearchAsyncTask async_task = test.new SearchAsyncTask();
+		    	try {
+					async_task.call();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		    }
+		});
     }
 }	
