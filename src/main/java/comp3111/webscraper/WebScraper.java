@@ -142,20 +142,7 @@ public class WebScraper {
 
 				String status = "Fetching form " + Portal.Craigslist + ": item " + rangefrom + " - " + rangeTo + ", " + totalCount + " in total.";
 				System.out.println(status);
-//<<<<<<< HEAD
 				textAreaConsole.appendText(status + "\n");
-//			
-//			List<?> items = (List<?>) page.getByXPath("//li	[@class='result-row']");
-//			
-//
-//			for (int i = 0; i < items.size(); i++) {
-//				HtmlElement htmlItem = (HtmlElement) items.get(i);
-//				HtmlAnchor itemAnchor = ((HtmlAnchor) htmlItem.getFirstByXPath(".//p[@class='result-info']/a"));
-//				// tiny fix for price not find - 0.0	
-//				HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@class='result-price']"));
-//				HtmlElement postedDate = ((HtmlElement) htmlItem.getFirstByXPath(".//time[@class='result-date']"));
-//=======
-//				Platform.runLater(() -> textAreaConsole.appendText(status + "\n"));
 
 				for (int i = 0; i < items.size(); i++) {
 					HtmlElement htmlItem = (HtmlElement) items.get(i);
@@ -163,7 +150,6 @@ public class WebScraper {
 					HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//a/span[@class='result-price']"));
 					HtmlElement postedDate = ((HtmlElement) htmlItem.getFirstByXPath(".//time[@class='result-date']"));
 
-//>>>>>>> billy-task
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 					Date postedOn= sdf.parse(postedDate.getAttribute("datetime"));
 
