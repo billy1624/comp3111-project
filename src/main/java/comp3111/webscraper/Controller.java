@@ -211,10 +211,10 @@ public class Controller {
 			System.out.println("actionSearch: " + textFieldKeyword.getText());
 			String output = "";
 			for (Item item : result) {
-				output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+				output += item.getTitle() + "\t\t" + item.getPrice() +  "\t\t" + item.getPortal() + "\t\t" + item.getPostedOn() + "\t\t" + item.getUrl() + "\n";
 			}
 			textAreaConsole.textProperty().unbind();
-			textAreaConsole.setText(output);
+			textAreaConsole.appendText(output);
 
 			// copy for further use
 			recordItem = new ArrayList<Item>(result);
