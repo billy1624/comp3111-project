@@ -16,6 +16,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.TableView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -130,6 +131,7 @@ public class Controller {
     	scraper = new WebScraper();
     }
     
+    
     public int DateCompare(String a, String b){
     	String a_mon;
     	String b_mon;
@@ -141,16 +143,12 @@ public class Controller {
     	
     	a_day = Integer.parseInt(a.substring(4, a.length()));
     	b_day = Integer.parseInt(b.substring(4, b.length()));
-    	
-    	if( MonCompare(a_mon, b_mon)<0 )
-    		return -1;
-    	if( MonCompare(a_mon, b_mon)>0 )
-    		return 1;
-    	
+    	    	
+    	if( MonCompare(a_mon, b_mon)<0 ) return -1;
+    	if( MonCompare(a_mon, b_mon)>0 ) return 1;
     	return a_day > b_day? 1 : a_day == b_day ? 0 : -1;
     }
-    
-    
+
     public int MonCompare(String a, String b){
     	final List<String> monList = new ArrayList<String>(Arrays.asList(
     			"Jan",
@@ -168,14 +166,13 @@ public class Controller {
     	int a_index = 0;
     	int b_index = 0;
     	for (int i = 0; i < monList.size(); i++) {
-			if (a == monList.get(i)){
+			if (a.equals(monList.get(i))){
 				a_index = i;
 				break;
 			}		
-		}
-    	
+		}    	
     	for (int i = 0; i < monList.size(); i++) {
-			if (b == monList.get(i)){
+			if (b.equals(monList.get(i))){
 				b_index = i;
 				break;
 			}
@@ -201,13 +198,12 @@ public class Controller {
     	posted_date_col.setCellFactory(TextFieldTableCell.forTableColumn());
     	tableView.setItems(data);
     	tableView.setEditable(false);
-    	Comparator<String> PriceCompare = (r1, r2)-> Double.parseDouble(r1) >  Double.parseDouble(r2)? 1: -1;
+    	Comparator<String> PriceCompare = (r1, r2) -> Double.parseDouble(r1) >  Double.parseDouble(r2)? 1: -1;
 				
-		Comparator<String> PostDateCompare = (r1, r2)
-				-> DateCompare(r1, r2);
+		Comparator<String> PostDateCompare = (r1, r2) -> DateCompare(r1, r2);
 				
     	price_col.setComparator(PriceCompare);	
-    	posted_date_col.setComparator(PostDateCompare);	
+    	posted_date_col.setComparator(PostDateCompare);
 
     	
     	// disable at the beginning
@@ -239,96 +235,85 @@ public class Controller {
     	List<Item> result = scraper.scrape(textFieldKeyword.getText());
     	String output = "";
     	for (Item item : result) {
-    		output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getPosted_date()+ '\t'+ item.getUrl() + "\n";
-    		 DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
-    		 data.add(tmp);
-    	
-    	
- 
-    	if (num == 0)
-		{
-			LPrice = item.getPrice();
-		} 
-   		else
-   			if (LPrice >  item.getPrice() && item.getPrice()!=0)
-   			{
-   				LPrice = item.getPrice();
-   				lowset_item_link = item.getUrl();
-   				lowset_item_link = lowset_item_link.substring(31);
-   			}
-		
-    	
-    	
-	//Total price of the items
-			TotalPrice += item.getPrice(); 
-   		 	num += 1; 
-   		 
-		
-	
-	textAreaConsole.setText(output);
-	
-	//number of items
-	labelCount.setText(Integer.toString(num));
-	
-	if (num == 0){
-		labelPrice.setText("-");
-		labelMin.setText("-");
-		labelLatest.setText("-");
-	}
-	else
-	{
-		labelPrice.setText(Double.toString(TotalPrice/num));
-		labelMin.setText(lowset_item_link);
-		labelMin.setOnAction( new EventHandler<ActionEvent>(){
-
-			@Override
-			public void handle(ActionEvent event) {
-				System.out.println(lowset_item_link);
-				hservices.showDocument(lowset_item_link);
+			output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getPosted_date()+ '\t'+ item.getUrl() + "\n";
+			DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
+			data.add(tmp);			    	
+			if (num == 0)
+			{
+				LPrice = item.getPrice();
+			} 
+			else
+				if (LPrice >  item.getPrice() && item.getPrice()!=0)
+				{
+					LPrice = item.getPrice();
+					lowset_item_link = item.getUrl();
+					lowset_item_link = lowset_item_link.substring(31);
+				}
+				// Total price of the items
+				TotalPrice += item.getPrice(); 
+			 	num += 1; 
 			}
-			
-		}
-		);
+		   		 
 		
-		labelLatest.setText(Latest_item_link);
-		System.out.println("lil:"+Latest_item_link);
-
-		labelLatest.setOnAction( new EventHandler<ActionEvent>(){
-
-			@Override
-			public void handle(ActionEvent event) {
-				hservices.showDocument(Latest_item_link);
-			}
-			
-		}
-		);
-		
-	}
-    	} 	
-    	
-    	for(int i = 0; i < result.size()-1 ;++i){
-    		if( DateCompare(data.get(i).getPostedd(),data.get(i+1).getPostedd()) > 0){
-    			Latest_item_link = data.get(i).getPostedd();
-    		}
-    	}
-    	// copy for further use
-    	recordItem = new ArrayList<Item>(result);
-    	
-    	labelCount.setText(Integer.toString(num));
-    	
-    	if (num == 0){
-    		labelPrice.setText("-");
+	
+    	textAreaConsole.setText(output);
+	
+		//number of items
+		labelCount.setText(Integer.toString(num));
+	
+		if (num == 0){
+			labelPrice.setText("-");
 			labelMin.setText("-");
 			labelLatest.setText("-");
 		}
 		else
 		{
+			// find latest link
+			// init first
+			Latest_item_link =  data.get(0).getUrl().substring(31);	
+			for(int i = 0; i < result.size()-1 ;++i){
+	    		if( DateCompare(data.get(i).getPostedd(),data.get(i+1).getPostedd()) > 0){
+	    			Latest_item_link = data.get(i).getUrl().substring(31);
+	    		}
+	    	}
+			
 			labelPrice.setText(Double.toString(TotalPrice/num));
-			labelMin.setText("<Lowest>");
-			labelLatest.setText("<Latest>");
+			labelMin.setText(lowset_item_link);
+			labelMin.setOnAction( new EventHandler<ActionEvent>(){
+	
+				@Override
+				public void handle(ActionEvent event) {
+					System.out.println(lowset_item_link);
+					hservices.showDocument(lowset_item_link);
+				}
+				
+			}
+			);
+			
+			labelLatest.setText(Latest_item_link);
+			System.out.println("Latestil:"+Latest_item_link);
+	
+			labelLatest.setOnAction( new EventHandler<ActionEvent>(){
+	
+				@Override
+				public void handle(ActionEvent event) {
+					hservices.showDocument(Latest_item_link);
+				}
+				
+			}
+			);
+			
 		}
+    	 	
     	
-}    
+    
+    	// copy for further use
+    	recordItem = new ArrayList<Item>(result);
+    	
+    	labelCount.setText(Integer.toString(num));
+    	
+    }
+
     /**
      * Called when the new button is pressed. Very dummy action - print something in the command prompt.
      */
@@ -652,6 +637,5 @@ public class Controller {
             
     }
 }
-
 
 
