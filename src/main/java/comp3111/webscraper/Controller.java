@@ -1273,8 +1273,8 @@ public void UpdateTable(List<Item> result){
 	for (Item item : result) {
 	    //output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getPosted_date()+ '\t'+ item.getUrl() + "\n";
 	    
-//	DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
-//	data.add(tmp);
+	// DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
+	// data.add(tmp);
 	
 	
 			}
