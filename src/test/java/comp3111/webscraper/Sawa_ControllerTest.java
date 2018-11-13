@@ -73,7 +73,7 @@ public class Sawa_ControllerTest {
         	loader.setLocation(WebScraperApplication.class.getResource("/ui.fxml"));
        		VBox root = (VBox) loader.load();
        		Scene scene =  new Scene(root);
-       		tmp = (Controller)loader.getController();       	
+       		tmp = (Controller)loader.getController();        	
 		}				
     	
     }
@@ -95,8 +95,7 @@ public class Sawa_ControllerTest {
         // start the thread
         thread.start(); 
     }
-    	  
-    
+    	      
     
     @Test
     public void test_controller() throws InterruptedException {
@@ -108,10 +107,7 @@ public class Sawa_ControllerTest {
                     @Override
                     public void run() {
 							try {
-								new WebScraperApplication().start(new Stage());
-								Controller test = new Controller();
-								/* test aboutUs dialog */
-								test.handleAboutYourTeamAction(new ActionEvent());
+								new WebScraperApplication().start(new Stage());				
 							} catch (Exception e) {
 								e.printStackTrace();
 							}					
@@ -596,10 +592,19 @@ public class Sawa_ControllerTest {
 		}    	
     	barchart_update.invoke(test, barchart_testlist2);
     	
-    	/** async task test **/
-    	SearchAsyncTask async_task = test.new SearchAsyncTask();
-    	Thread async_task_th = new Thread(async_task);
-    	async_task_th.start();
+    	/** async task test **/    	
+    	Platform.runLater(new Runnable() {         
+		    @Override
+		    public void run() {
+		    	SearchAsyncTask async_task = test.new SearchAsyncTask();
+		    	try {
+					async_task.call();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		    }
+		});
 
     	/** test barchart event handler **/ 
     	for(int itr = 0; itr < series1.getData().size(); ++itr) {

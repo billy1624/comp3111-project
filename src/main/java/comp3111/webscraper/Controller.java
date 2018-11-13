@@ -648,8 +648,8 @@ public class Controller {
 
         // hard code :(
         String[] name = { "Chan Chi Wa", "Ngan Cheuk Hei", "Yeung Chak Ho" };
-        String[] itsc = { "cwchanbf", "chnganaa", "Yeung Chak Ho - chyeungam" };
-        String[] link = { "billy1624", "nganhei", "Yeung Chak Ho - chyeungamYch" };
+        String[] itsc = { "cwchanbf", "chnganaa", "chyeungam" };
+        String[] link = { "billy1624", "nganhei", "sawaYch" };
         Text[] member_name_label = new Text[3];
         Text[] member_itsc_label = new Text[3];
         Hyperlink[] member_github_link = new Hyperlink[3];
