@@ -461,6 +461,7 @@ public class Controller {
     /**
      * Helper function
      * Check any bar is double clicked
+     * @return Boolean - is any bar being selected
      * @author Yeung Chak Ho - chyeungam
      */
     private Boolean has_bar_selected() {
@@ -473,6 +474,10 @@ public class Controller {
     /**
      * Helper function
      * If a bar is selected, reset others
+     * @param var - reserved for implement multiple bar selcetion
+     * @param _dist_data - distribution data, list of item 
+     * @param ps - price start of bin 
+     * @param pe - price end of bin
      * @author Yeung Chak Ho - chyeungam
      */
     private void update_bar_only_one(Integer var, List<Item> _dist_data, Double ps, Double pe) {
@@ -609,7 +614,6 @@ public class Controller {
      * - member's github page link
      * 
      * @author Yeung Chak Ho - chyeungam
-     * @throws Exception 
      */
     public void createAboutUsDialog() {
         Stage dialog = new Stage();

@@ -81,11 +81,10 @@ public class Sawa_ControllerTest {
     /**
      * Jobs that calls before every test case
      * Purpose: create a new JavaFx UI Thread for GUI related testing   
-     * @throws InterruptedException
      * @author Sawa
      */    
     @BeforeClass
-    public static void javaFxThread() throws InterruptedException {
+    public static void javaFxThread() {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -95,10 +94,9 @@ public class Sawa_ControllerTest {
         // start the thread
         thread.start(); 
     }
-    	      
-    
+    	          
     @Test
-    public void test_controller() throws InterruptedException {
+    public void test_application() throws InterruptedException {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -263,15 +261,16 @@ public class Sawa_ControllerTest {
  		tfkeyword.setAccessible(true);
  		TextField tf = new TextField();		
  		tfkeyword.set(test, tf);
-      	
-      	
+      	      	
    		method.invoke(test, (Object[])null);
+   		ProgressIndicator a = (ProgressIndicator) field12.get(test);
+   		assertEquals(a.isVisible(), true);
     }
   
     @Test // fuck my life
     public void test_javafx_thread_releated() throws Exception {
     	Controller test = new Controller();
-    	// ready
+    	// ready, initialize all data member and using Java reflection to do assertion
         final Field field = test.getClass().getDeclaredField("textAreaConsole");
         field.setAccessible(true);
         TextArea result_ta = new TextArea("123");       
@@ -291,8 +290,7 @@ public class Sawa_ControllerTest {
         field3.setAccessible(true);
         Label result_lbp = new Label("123");  
         field3.set(test, result_lbp);   
-        
-        
+                
         final Field field4 = test.getClass().getDeclaredField("labelMin");
         field4.setAccessible(true);
         Hyperlink result_lbm = new Hyperlink();
@@ -304,8 +302,7 @@ public class Sawa_ControllerTest {
         Hyperlink result_lbl = new Hyperlink();  
         result_lbl.setText("123");        
         field5.set(test, result_lbl);
-        
-        
+                
         final ObservableList<DataModel> data = FXCollections.observableArrayList(
     		    new DataModel("Title1", "0.0", "item1@example.com","01/02/2018"),
     		    new DataModel("Title2", "10.0", "item2@example.com","03/04/2018"),
@@ -334,8 +331,7 @@ public class Sawa_ControllerTest {
         result_bc.getData().addAll(series1);
         field7.set(test, result_bc);
         
-        
-        
+                
         final Field field9 = test.getClass().getDeclaredField("areaChartCb");
         field9.setAccessible(true);
         ComboBox result_cbx = new ComboBox();     
@@ -391,7 +387,9 @@ public class Sawa_ControllerTest {
         AreaChart result_ac = new AreaChart(xaxis1, yaxis1);     
         field8.set(test, result_ac);
         
-        // test initialize
+        /* test initialize
+         * This funciton init some of javafx components's default state 
+         */
         Method method = null;
 		method = test.getClass().getDeclaredMethod("initialize",(Class<?>[]) null);		
     	method.setAccessible(true);    	   
@@ -440,6 +438,12 @@ public class Sawa_ControllerTest {
     	field21.set(test, boollist);
             	    	
 		method1.invoke(test, 0, list, 0.0, 100.0);
+		/* assertion explanation
+		 * TextArea will not equal to empty, 
+		 * since variable item's price is 50, and that set to the list of items, 
+		 * where fall between 0.0 to 100.0,
+		 * so textArea will show the information of 'item'
+		 */
 		assertNotEquals(result_ta.getText(), "");
 		
 		List<Boolean> boollist2 = new ArrayList<>();
@@ -450,16 +454,18 @@ public class Sawa_ControllerTest {
 		
 		method1.invoke(test, 0, list3, 50.0, 100.0);
 		assertEquals(result_ta.getText(), "");
-        
-        
-        // execute target test function
+                     
 		final Field th1 = test.getClass().getDeclaredField("scraperTh");
 		th1.setAccessible(true);
 		Thread thh = new Thread();
 		th1.set(test, thh);
+		
+		/* execute the method that required to test
+         * Reset all components 
+         */
         test.closeAndResetAll();
         
-        // assert result
+        // assert result: check if all close and clear
         TextArea current_ta = (TextArea)field.get(test);     
         TextField current_tf = (TextField)field1.get(test);   
         Label current_lbc = (Label)field2.get(test);
@@ -469,7 +475,6 @@ public class Sawa_ControllerTest {
         TableView current_tbw = (TableView)field6.get(test);   
         BarChart current_bc = (BarChart)field7.get(test);
         ComboBox current_cbx = (ComboBox)field9.get(test);
-
 
         assertEquals(current_ta.getText(), "");
         assertEquals(current_tf.getText(), "");
@@ -487,17 +492,30 @@ public class Sawa_ControllerTest {
         /* test_updateLastSearchKeyword */
         Method method11 = null;
   		method11 = test.getClass().getDeclaredMethod("updateLastSearch_Keyword",(Class<?>[]) null);		
-      	method11.setAccessible(true);    	     		
+      	method11.setAccessible(true);
   		// get ready for instance
+   		final Field q2 = test.getClass().getDeclaredField("lastSearchQueue");
+		q2.setAccessible(true);
+		Queue<List<Item>> ls_keyword_queue = (Queue<List<Item>>) q2.get(test);
+				         
 		final Field tfkeyword = test.getClass().getDeclaredField("textFieldKeyword");
 		tfkeyword.setAccessible(true);
-		TextField tf = new TextField();		
+		TextField tf = new TextField("google pixel");		
 		tfkeyword.set(test, tf);
+		/*
+    	 *  Execute the test method
+    	 *  When it it called, the queue "lastSearchQueue" 
+    	 *  will append the keyword into the queue.
+    	 *  Assert it is not empty, size equal to 2 (when it reach 3, it poll the head)    	
+    	 */
    		method11.invoke(test, (Object[])null);
    		method11.invoke(test, (Object[])null);
-   		method11.invoke(test, (Object[])null);   		   		   
+   		method11.invoke(test, (Object[])null);
+
+   		// assertion
+   		assertEquals(ls_keyword_queue.size(), 2);
    		
-   		/* test actionNew */
+   		/* test actionLastSearch */
    		Method lastsearch_func = null;
    		lastsearch_func = test.getClass().getDeclaredMethod("actionLastSearch", (Class<?>[])null);		
    		lastsearch_func.setAccessible(true);   
@@ -590,24 +608,9 @@ public class Sawa_ControllerTest {
 			m1.setPrice(10-i);
 			barchart_testlist2.add(m1);
 		}    	
-    	barchart_update.invoke(test, barchart_testlist2);
-    	
-//    	/** async task test **/
-//    	Platform.runLater(new Runnable() {         
-//		    @Override
-//		    public void run() {
-//		    	SearchAsyncTask async_task = test.new SearchAsyncTask();
-//		    	try {
-//					async_task.call();
-//				} catch (Exception e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//		    }
-//		});
-    	
+    	barchart_update.invoke(test, barchart_testlist2);    	
 
-    	/** test barchart event handler **/ 
+    	/* test barchart event handler */ 
     	for(int itr = 0; itr < series1.getData().size(); ++itr) {
     		series1.getData().get(itr).getNode().setId(Integer.toString(itr));
     		System.out.println(series1.getData().get(itr).getXValue());
@@ -724,8 +727,7 @@ public class Sawa_ControllerTest {
         AreaChart current_ac = (AreaChart)field8.get(test);        
         assertEquals(current_ac.getData().size(), expected_num);        
     }
-    
-    
+        
     @Test
     public void test_Async() throws Exception{
     	/** async task test **/
