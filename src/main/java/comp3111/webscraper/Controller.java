@@ -19,6 +19,20 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.image.Image;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.SortType;
+import javafx.scene.control.TableView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -46,6 +60,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import javafx.scene.layout.*;
+import javafx.geometry.*;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -59,6 +81,14 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.application.HostServices;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+
+
 
 /**
  * 
@@ -141,6 +171,8 @@ public class Controller {
     @FXML
     private MenuBar menuBar;
 
+    final ObservableList<DataModel> data = FXCollections.observableArrayList();
+
     /**
      * Default controller
      */
@@ -152,6 +184,55 @@ public class Controller {
         lastSearchQueue.offer("NULL");
         lastSearchItemQueue = new LinkedList<List<Item>>();
         lastSearchItemQueue.offer(null);
+
+    }
+    
+    public int DateCompare(String a, String b){
+        String a_mon;
+        String b_mon;
+        int a_day;
+        int b_day;
+        
+        a_mon = a.substring(0, 3);
+        b_mon = b.substring(0, 3);
+        
+        a_day = Integer.parseInt(a.substring(4, a.length()));
+        b_day = Integer.parseInt(b.substring(4, b.length()));
+                
+        if( MonCompare(a_mon, b_mon)<0 ) return -1;
+        if( MonCompare(a_mon, b_mon)>0 ) return 1;
+        return a_day > b_day? 1 : a_day == b_day ? 0 : -1;
+    }
+
+    public int MonCompare(String a, String b){
+        final List<String> monList = new ArrayList<String>(Arrays.asList(
+                "Jan",
+                "Feb",
+                "Mar", 
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"));
+        int a_index = 0;
+        int b_index = 0;
+        for (int i = 0; i < monList.size(); i++) {
+            if (a.equals(monList.get(i))){
+                a_index = i;
+                break;
+            }		
+        }    	
+        for (int i = 0; i < monList.size(); i++) {
+            if (b.equals(monList.get(i))){
+                b_index = i;
+                break;
+            }
+        }
+        return a_index < b_index ? -1 : a_index == b_index ? 0 : 1;
     }
 
     /**
@@ -162,7 +243,7 @@ public class Controller {
     @FXML
     private void initialize() {
         // load test case, for test
-        task6_iii_testCase();
+        // task6_iii_testCase();
 
         // disable at the beginning
         lastSearchBt.setDisable(true);
@@ -174,6 +255,24 @@ public class Controller {
         barChartHistogram.getYAxis().setAnimated(true);
         barChartHistogram.setAnimated(true);
         bar_smVector = new ArrayList<Boolean>();
+
+        //task6_iii_testCase();
+        title_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("title"));
+        title_col.setCellFactory(TextFieldTableCell.forTableColumn());
+        price_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("price"));
+        price_col.setCellFactory(TextFieldTableCell.forTableColumn());
+        url_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("url"));
+        url_col.setCellFactory(TextFieldTableCell.forTableColumn());
+        posted_date_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("postedd"));
+        posted_date_col.setCellFactory(TextFieldTableCell.forTableColumn());
+        tableView.setItems(data);
+        tableView.setEditable(false);
+        Comparator<String> PriceCompare = (r1, r2) -> Double.parseDouble(r1) >  Double.parseDouble(r2)? 1: -1;
+                
+        Comparator<String> PostDateCompare = (r1, r2) -> DateCompare(r1, r2);
+                
+        price_col.setComparator(PriceCompare);	
+        posted_date_col.setComparator(PostDateCompare);
     }
 
     /**
@@ -207,6 +306,105 @@ public class Controller {
     public class SearchAsyncTask extends Task<List<Item>> {
         @Override
         protected List<Item> call() throws Exception {
+
+            /* 
+            int num = 0 ;
+        double TotalPrice = 0;
+        double LPrice = 0;
+        
+        for ( int i = 0; i<tableView.getItems().size(); i++) {
+            tableView.getItems().clear();
+        }
+        
+        // enable last search function
+        lastSearchBt.setDisable(false);
+        refineBt.setDisable(false);
+
+        System.out.println("actionSearch: " + textFieldKeyword.getText());
+        List<Item> result = scraper.scrape(textFieldKeyword.getText());
+        String output = "";
+        for (Item item : result) {
+            output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getPosted_date()+ '\t'+ item.getUrl() + "\n";
+            DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
+            data.add(tmp);			    	
+            if (num == 0)
+            {
+                LPrice = item.getPrice();
+            } 
+            else
+                if (LPrice >  item.getPrice() && item.getPrice()!=0)
+                {
+                    LPrice = item.getPrice();
+                    lowset_item_link = item.getUrl();
+                    lowset_item_link = lowset_item_link.substring(31);
+                }
+                // Total price of the items
+                TotalPrice += item.getPrice(); 
+                 num += 1; 
+            }
+                    
+        
+    
+        textAreaConsole.setText(output);
+    
+        //number of items
+        labelCount.setText(Integer.toString(num));
+    
+        if (num == 0){
+            labelPrice.setText("-");
+            labelMin.setText("-");
+            labelLatest.setText("-");
+        }
+        else
+        {
+            // find latest link
+            // init first
+            Latest_item_link =  data.get(0).getUrl().substring(31);	
+            for(int i = 0; i < result.size()-1 ;++i){
+                if( DateCompare(data.get(i).getPostedd(),data.get(i+1).getPostedd()) > 0){
+                    Latest_item_link = data.get(i).getUrl().substring(31);
+                }
+            }
+            
+            labelPrice.setText(Double.toString(TotalPrice/num));
+            labelMin.setText(lowset_item_link);
+            labelMin.setOnAction( new EventHandler<ActionEvent>(){
+>>>>>>> test-nganhei-merge
+    
+                @Override
+                public void handle(ActionEvent event) {
+                    System.out.println(lowset_item_link);
+                    hservices.showDocument(lowset_item_link);
+                }
+                
+            }
+            );
+            
+            labelLatest.setText(Latest_item_link);
+            System.out.println("Latestil:"+Latest_item_link);
+    
+            labelLatest.setOnAction( new EventHandler<ActionEvent>(){
+    
+                @Override
+                public void handle(ActionEvent event) {
+                    hservices.showDocument(Latest_item_link);
+                }
+                
+            }
+            );
+            
+        }
+             
+        
+    
+        // copy for further use
+        recordItem = new ArrayList<Item>(result);
+        
+        labelCount.setText(Integer.toString(num));
+
+        */
+
+
             List<Item> result = scraper.scrape(textFieldKeyword.getText(), textAreaConsole);
             System.out.println("actionSearch: " + textFieldKeyword.getText());
             String output = "";
@@ -235,6 +433,9 @@ public class Controller {
      * @author Billy
      * @author Nganhei
      */
+    String lowset_item_link = "";
+    String Latest_item_link = "";
+
     @FXML
     private void actionSearch() {
         busy_idtr.setVisible(true);
@@ -299,7 +500,8 @@ public class Controller {
         textAreaConsole.setText(output);
 
     }
-    
+
+
     /**
      * hyperlink onclick handler
      * link to member's github page
@@ -524,6 +726,7 @@ public class Controller {
     @FXML
     public void handleAboutYourTeamAction(final ActionEvent event) {
         createAboutUsDialog();
+        // debug message
     }
 
     /**

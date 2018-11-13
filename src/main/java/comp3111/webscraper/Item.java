@@ -1,5 +1,6 @@
 package comp3111.webscraper;
 
+import javafx.beans.property.SimpleStringProperty;
 
 import java.util.Date;
 
@@ -9,6 +10,7 @@ public class Item implements Comparable<Item> {
 	private Portal portal;
 	private String url ;
 	private Date postedOn;
+	private String posted_date; // TODO: Need to remove
 
 	public Item() {
 
@@ -21,6 +23,7 @@ public class Item implements Comparable<Item> {
 		this.url = url;
 		this.postedOn = postedOn;
 	}
+	
 	
 	public String getTitle() {
 		return title;
@@ -53,6 +56,14 @@ public class Item implements Comparable<Item> {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+	
+	public String getPosted_date() {
+		return posted_date;
+	}
+	public void setPosted_date(String posted_date) {
+		this.posted_date = posted_date;
+	}
+	
 
 	public Date getPostedOn() {
 		return postedOn;

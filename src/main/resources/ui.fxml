@@ -111,6 +111,7 @@
                                               <TableColumn fx:id="price_col" editable="false" prefWidth="90.0" text="Price" />
                                                 <TableColumn fx:id="url_col" editable="false" prefWidth="78.0" text="URL" />
                                                 <TableColumn fx:id="posted_date_col" editable="false" prefWidth="88.0" text="Posted Date" />
+                                    
                                             </columns>
                                           </TableView>
                                        </children>
