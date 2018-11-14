@@ -407,7 +407,6 @@ public class Controller {
 	 * - member's github page link
 	 * 
 	 * @author Yeung Chak Ho - chyeungam
-	 * @throws Exception 
 	 */
 	public void createAboutUsDialog() {
 		Stage dialog = new Stage();
