@@ -20,6 +20,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.embed.swing.JFXPanel;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
@@ -414,18 +415,23 @@ public class Controller {
             String output = "";
             for (Item item : result) {
                 output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+                DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
+        	   	data.add(tmp);
             }
             textAreaConsole.textProperty().unbind();
             textAreaConsole.setText(output);
 
             // copy for further use
             recordItem = new ArrayList<Item>(result);
-
+            
             // update distribution bar chart
             UpdateDistributionChart_Later(recordItem);
-
             // update other page here
-
+            
+            // summary update
+            UpdateSummary(recordItem);
+            // table update
+            UpdateTable(recordItem);
             return null;
         }
 
@@ -561,8 +567,9 @@ public class Controller {
         UpdateDistributionChart_Later(lastSearchItemQueue.peek());
 
         // summary page update
-
+        UpdateSummary(lastSearchItemQueue.peek());
         // table update
+        UpdateTable(lastSearchItemQueue.peek());
     }
 
     /**
@@ -608,8 +615,15 @@ public class Controller {
         UpdateDistributionChart_Later(targetItem_list);
 
         // summary page update
+       
+				// TODO Auto-generated method stub
+		        UpdateSummary(targetItem_list);
 
+		
+      
+        
         // table update
+        //UpdateTable(targetItem_list);
     }
 
     /**
@@ -1187,4 +1201,111 @@ public class Controller {
         areaChart.getData().addAll(series2);
         areaChartCb.getItems().addAll("Option 1", "Option 2", "Option 3");
     }
+
+
+// summary update
+private void UpdateSummary(List<Item> result){
+	Platform.runLater(new Runnable() {
+        @Override
+        public void run() {
+	    int num = 0 ;
+	    double TotalPrice = 0;
+	    double LPrice = 0;
+	   // String output = "";
+	    for (Item item : result) {
+	        //output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getPosted_date()+ '\t'+ item.getUrl() + "\n";
+//	    	DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
+//	    	data.add(tmp);
+	    	
+	    	if (num == 0)
+		    {
+		        LPrice = item.getPrice();
+		    } 
+		    else
+		        if (Double.compare(LPrice, item.getPrice())>0 && item.getPrice()!=0)
+		        {
+		            LPrice = item.getPrice();
+		            lowset_item_link = item.getUrl();
+		        }
+		        // Total price of the items
+		        TotalPrice += item.getPrice(); 
+		         num += 1; 
+		    }
+		            
+	
+	
+	
+	
+	//number of items
+	labelCount.setText(Integer.toString(num));
+	
+	if (num == 0){
+	    labelPrice.setText("-");
+	    labelMin.setText("-");
+	    labelLatest.setText("-");
+	}
+	else
+	{
+	    // find latest link
+	    // init first
+	    Latest_item_link =  data.get(0).getUrl().substring(31);	
+	    for(int i = 0; i < result.size()-1 ;++i){
+	        if( result.get(i).getPostedOn().compareTo(result.get(i+1).getPostedOn()) > 0){
+	            Latest_item_link = result.get(i).getUrl();
+	        }
+	    }
+	    
+	    labelPrice.setText(Double.toString(TotalPrice/num));
+	    labelMin.setText(lowset_item_link);
+	    labelMin.setOnAction( new EventHandler<ActionEvent>(){
+	//>>>>>>> test-nganhei-merge
+
+	        @Override
+	        public void handle(ActionEvent event) {
+	            System.out.println(lowset_item_link);
+	            hservices.showDocument(lowset_item_link);
+	        }
+	        
+	    }
+	    );
+	    
+	    labelLatest.setText(Latest_item_link);
+	    System.out.println("Latestil:"+Latest_item_link);
+	
+	    labelLatest.setOnAction( new EventHandler<ActionEvent>(){
+	
+	        @Override
+	        public void handle(ActionEvent event) {
+	            hservices.showDocument(Latest_item_link);
+	        }
+	        
+	    }
+	    );
+	}
+        };
+	        
+ });
+}
+
+//table update
+public void UpdateTable(List<Item> result){
+	Platform.runLater(new Runnable() {
+     @Override
+	        public void run() {
+	for ( int i = 0; i< tableView.getItems().size(); i++) {
+		tableView.getItems().clear();
+	}
+	
+	//String output = "";
+	for (Item item : result) {
+	    //output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getPosted_date()+ '\t'+ item.getUrl() + "\n";
+	    
+	// DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
+	// data.add(tmp);
+	
+	
+			}
+		}
+	});
+}
 }
