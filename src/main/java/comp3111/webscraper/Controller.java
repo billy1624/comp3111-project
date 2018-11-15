@@ -192,9 +192,9 @@ public class Controller {
 
         // init last search keyword, record item
         lastSearchQueue = new LinkedList<String>();
-        //lastSearchQueue.offer("NULL");
+        lastSearchQueue.offer("NULL");
         lastSearchItemQueue = new LinkedList<List<Item>>();
-        //lastSearchItemQueue.offer(null);
+        lastSearchItemQueue.offer(null);
 
     }
     
@@ -740,8 +740,9 @@ public class Controller {
         refineBt.setDisable(true);
 
         // 8
-        if (lastSearchItemQueue.size() > 0 && lastSearchQueue.size() > 0) {        	
-	        final Alert alert = new Alert(AlertType.INFORMATION, "You are going to close current search record now.\nDo you also want to clear latest search history?", ButtonType.YES, ButtonType.NO); // ï¿½ï¿½ï¿½ï¿½ï¿½Alertï¿½ï¿½Ü®Øªï¿½ï¿½ï¿½Aï¿½Ãªï¿½ï¿½ï¿½ï¿½bï¿½Øºcï¿½lï¿½]ï¿½wï¿½ï¿½Ü®Øªï¿½ï¿½Tï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Bï¿½ï¿½rï¿½Mï¿½ï¿½ï¿½s
+
+        if (lastSearchItemQueue.size() > 0 && lastSearchQueue.size() > 0 && lastSearchQueue.poll()!="NULL" ) {        	
+	        final Alert alert = new Alert(AlertType.INFORMATION, "You are going to close current search record now.\nDo you also want to clear latest search history?", ButtonType.YES, ButtonType.NO); // ¹êÅé¤ÆAlert¹ï¸Ü®Øª«¥ó¡A¨Ãª½±µ¦b«Øºc¤l³]©w¹ï¸Ü®Øªº°T®§Ãþ«¬¡B¤å¦r©M«ö¶s
 	        alert.setTitle("Close current search");
 	        alert.setHeaderText("");
 	        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
@@ -749,7 +750,7 @@ public class Controller {
 	        final Optional<ButtonType> opt = alert.showAndWait();
 	        final ButtonType rtn = opt.get();
 	        if (rtn == ButtonType.YES) {
-	        	// clear search history
+	        	// clear search history	        	
 	            for (int i = 0; i < lastSearchQueue.size(); ++i)
 	                lastSearchQueue.poll();
 	
@@ -1142,10 +1143,7 @@ private void UpdateSummary(List<Item> result){
 		            lowset_item_link = item.getUrl();
 		         
 		           
-		        }
-	    	
-	    	    	
-	    	
+		        }	    			    	
 	    	
 		        // Total price of the items
 		        TotalPrice += item.getPrice(); 
@@ -1215,15 +1213,15 @@ public void UpdateTable(List<Item> result){
 	Platform.runLater(new Runnable() {
      @Override
 	        public void run() {
-     	   for ( int i = 0; i< tableView.getItems().size(); i++) {
-          		tableView.getItems().clear();
-          	}
+	     	   for ( int i = 0; i< tableView.getItems().size(); i++) {
+	          		tableView.getItems().clear();
+	          	}
      	   
-    	 for (Item item : result) {
-             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-             DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),df.format(item.getPostedOn()));
-     	   	data.add(tmp);        	
-         }
+			 for (Item item : result) {
+			     DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			     DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),df.format(item.getPostedOn()));
+			   	data.add(tmp);        	
+			 }
 	
 		}
 	});
