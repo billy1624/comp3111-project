@@ -7,6 +7,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.TextArea;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
 
+@Ignore
 public class CraigslistScraperTest {
 
 	/**
@@ -39,7 +41,7 @@ public class CraigslistScraperTest {
 		thread.start();
 	}
 
-
+	
 	@Test
 	public void scrapeTest() {
 		WebClient client = new WebClient();

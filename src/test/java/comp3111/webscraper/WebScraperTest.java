@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Vector;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.TextArea;
 
+@Ignore
 public class WebScraperTest {
 
 	/**
