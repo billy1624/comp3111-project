@@ -3,8 +3,11 @@
  */
 package comp3111.webscraper;
 
+import java.util.Date;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -13,6 +16,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Queue;
+
+import com.gargoylesoftware.css.parser.javacc.ParseException;
 
 import javafx.application.HostServices;
 import javafx.application.Platform;
@@ -177,6 +182,7 @@ public class Controller {
     private MenuBar menuBar;
 
     final ObservableList<DataModel> data = FXCollections.observableArrayList();
+    
 
     /**
      * Default controller
@@ -192,21 +198,10 @@ public class Controller {
 
     }
     
-    public int DateCompare(String a, String b){
-        String a_mon;
-        String b_mon;
-        int a_day;
-        int b_day;
-        
-        a_mon = a.substring(0, 3);
-        b_mon = b.substring(0, 3);
-        
-        a_day = Integer.parseInt(a.substring(4, a.length()));
-        b_day = Integer.parseInt(b.substring(4, b.length()));
-                
-        if( MonCompare(a_mon, b_mon)<0 ) return -1;
-        if( MonCompare(a_mon, b_mon)>0 ) return 1;
-        return a_day > b_day? 1 : a_day == b_day ? 0 : -1;
+    public int DateCompare(String a, String b) throws ParseException, java.text.ParseException {
+    	Date date1 = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(a);
+    	Date date2 = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(b);    
+		return date1.compareTo(date2);
     }
 
     public int MonCompare(String a, String b){
@@ -274,7 +269,19 @@ public class Controller {
         tableView.setEditable(false);
         Comparator<String> PriceCompare = (r1, r2) -> Double.parseDouble(r1) >  Double.parseDouble(r2)? 1: -1;
                 
-        Comparator<String> PostDateCompare = (r1, r2) -> DateCompare(r1, r2);
+        Comparator<String> PostDateCompare = (r1, r2) -> {
+        	int result = 0;
+			try {
+				result = DateCompare(r1, r2);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (java.text.ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return result;
+		};
                 
         price_col.setComparator(PriceCompare);	
         posted_date_col.setComparator(PostDateCompare);
@@ -312,111 +319,19 @@ public class Controller {
         @Override
         protected List<Item> call() throws Exception {
 
-            /* 
-            int num = 0 ;
-        double TotalPrice = 0;
-        double LPrice = 0;
-        
-        for ( int i = 0; i<tableView.getItems().size(); i++) {
-            tableView.getItems().clear();
-        }
-        
-        // enable last search function
-        lastSearchBt.setDisable(false);
-        refineBt.setDisable(false);
-
-        System.out.println("actionSearch: " + textFieldKeyword.getText());
-        List<Item> result = scraper.scrape(textFieldKeyword.getText());
-        String output = "";
-        for (Item item : result) {
-            output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getPosted_date()+ '\t'+ item.getUrl() + "\n";
-            DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
-            data.add(tmp);			    	
-            if (num == 0)
-            {
-                LPrice = item.getPrice();
-            } 
-            else
-                if (LPrice >  item.getPrice() && item.getPrice()!=0)
-                {
-                    LPrice = item.getPrice();
-                    lowset_item_link = item.getUrl();
-                    lowset_item_link = lowset_item_link.substring(31);
-                }
-                // Total price of the items
-                TotalPrice += item.getPrice(); 
-                 num += 1; 
-            }
-                    
-        
-    
-        textAreaConsole.setText(output);
-    
-        //number of items
-        labelCount.setText(Integer.toString(num));
-    
-        if (num == 0){
-            labelPrice.setText("-");
-            labelMin.setText("-");
-            labelLatest.setText("-");
-        }
-        else
-        {
-            // find latest link
-            // init first
-            Latest_item_link =  data.get(0).getUrl().substring(31);	
-            for(int i = 0; i < result.size()-1 ;++i){
-                if( DateCompare(data.get(i).getPostedd(),data.get(i+1).getPostedd()) > 0){
-                    Latest_item_link = data.get(i).getUrl().substring(31);
-                }
-            }
-            
-            labelPrice.setText(Double.toString(TotalPrice/num));
-            labelMin.setText(lowset_item_link);
-            labelMin.setOnAction( new EventHandler<ActionEvent>(){
->>>>>>> test-nganhei-merge
-    
-                @Override
-                public void handle(ActionEvent event) {
-                    System.out.println(lowset_item_link);
-                    hservices.showDocument(lowset_item_link);
-                }
-                
-            }
-            );
-            
-            labelLatest.setText(Latest_item_link);
-            System.out.println("Latestil:"+Latest_item_link);
-    
-            labelLatest.setOnAction( new EventHandler<ActionEvent>(){
-    
-                @Override
-                public void handle(ActionEvent event) {
-                    hservices.showDocument(Latest_item_link);
-                }
-                
-            }
-            );
-            
-        }
-             
-        
-    
-        // copy for further use
-        recordItem = new ArrayList<Item>(result);
-        
-        labelCount.setText(Integer.toString(num));
-
-        */
-
-
             List<Item> result = scraper.scrape(textFieldKeyword.getText(), textAreaConsole);
             System.out.println("actionSearch: " + textFieldKeyword.getText());
             String output = "";
+            
             for (Item item : result) {
                 output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
-                DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),df.format(item.getPostedOn()));
         	   	data.add(tmp);
+
+           	
+           	// DataModel("Title1", "0.0", "item1@example.com", df.format(item.getPostedOn()));
+           	
             }
             textAreaConsole.textProperty().unbind();
             textAreaConsole.setText(output);
@@ -623,7 +538,7 @@ public class Controller {
       
         
         // table update
-        //UpdateTable(targetItem_list);
+        UpdateTable(targetItem_list);
     }
 
     /**
@@ -1211,22 +1126,27 @@ private void UpdateSummary(List<Item> result){
 	    int num = 0 ;
 	    double TotalPrice = 0;
 	    double LPrice = 0;
-	   // String output = "";
+
 	    for (Item item : result) {
-	        //output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getPosted_date()+ '\t'+ item.getUrl() + "\n";
-//	    	DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
-//	    	data.add(tmp);
-	    	
-	    	if (num == 0)
-		    {
-		        LPrice = item.getPrice();
-		    } 
+	    	 
+	    	 if (item.getPrice()!=0 && LPrice == 0)
+	    	 {
+		        LPrice = item.getPrice();		        
+		        lowset_item_link = item.getUrl();
+		        
+	    	 } 
 		    else
-		        if (Double.compare(LPrice, item.getPrice())>0 && item.getPrice()!=0)
+		        if (LPrice != 0 && Double.compare(LPrice, item.getPrice())>0 && item.getPrice() != 0)
 		        {
 		            LPrice = item.getPrice();
 		            lowset_item_link = item.getUrl();
+		         
+		           
 		        }
+	    	
+	    	    	
+	    	
+	    	
 		        // Total price of the items
 		        TotalPrice += item.getPrice(); 
 		         num += 1; 
@@ -1248,29 +1168,32 @@ private void UpdateSummary(List<Item> result){
 	{
 	    // find latest link
 	    // init first
-	    Latest_item_link =  data.get(0).getUrl().substring(31);	
+	    Latest_item_link =  data.get(0).getUrl();	
+	    int latest_index = 0;
 	    for(int i = 0; i < result.size()-1 ;++i){
-	        if( result.get(i).getPostedOn().compareTo(result.get(i+1).getPostedOn()) > 0){
-	            Latest_item_link = result.get(i).getUrl();
+	        if( result.get(i).getPostedOn().compareTo(result.get(latest_index).getPostedOn()) > 0){
+	        	latest_index = i;
+	        	Latest_item_link = result.get(latest_index).getUrl();
 	        }
 	    }
 	    
-	    labelPrice.setText(Double.toString(TotalPrice/num));
+	    labelPrice.setText(Double.toString(Math.round(TotalPrice/num)));
 	    labelMin.setText(lowset_item_link);
+	   
 	    labelMin.setOnAction( new EventHandler<ActionEvent>(){
-	//>>>>>>> test-nganhei-merge
 
 	        @Override
 	        public void handle(ActionEvent event) {
-	            System.out.println(lowset_item_link);
+	           
 	            hservices.showDocument(lowset_item_link);
 	        }
 	        
 	    }
 	    );
 	    
-	    labelLatest.setText(Latest_item_link);
+	    labelLatest.setText("hi"+ Latest_item_link);
 	    System.out.println("Latestil:"+Latest_item_link);
+
 	
 	    labelLatest.setOnAction( new EventHandler<ActionEvent>(){
 	
@@ -1292,19 +1215,16 @@ public void UpdateTable(List<Item> result){
 	Platform.runLater(new Runnable() {
      @Override
 	        public void run() {
-	for ( int i = 0; i< tableView.getItems().size(); i++) {
-		tableView.getItems().clear();
-	}
+     	   for ( int i = 0; i< tableView.getItems().size(); i++) {
+          		tableView.getItems().clear();
+          	}
+     	   
+    	 for (Item item : result) {
+             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+             DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),df.format(item.getPostedOn()));
+     	   	data.add(tmp);        	
+         }
 	
-	//String output = "";
-	for (Item item : result) {
-	    //output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getPosted_date()+ '\t'+ item.getUrl() + "\n";
-	    
-	// DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),item.getPosted_date());
-	// data.add(tmp);
-	
-	
-			}
 		}
 	});
 }
