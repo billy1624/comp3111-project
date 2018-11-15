@@ -4,13 +4,25 @@
 package comp3111.webscraper;
 
 
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.stage.Stage;
-
+import javafx.stage.WindowEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
 
 
 /**
@@ -55,12 +67,21 @@ public class WebScraperApplication extends Application {
    		Scene scene =  new Scene(root);
    		Controller tmp = (Controller)loader.getController();
     	tmp.setHostServices(getHostServices());
-        //setUserAgentStylesheet(STYLESHEET_CASPIAN);
     	stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));    	
    		stage.setScene(scene);
    		stage.setTitle("WebScrapper");
-   		stage.show();   		
-
+   		stage.setOnHidden(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {                    	
+                		Platform.exit();
+                    }
+                });
+            }
+        });
+   		stage.show();
 	}
 
 	/**

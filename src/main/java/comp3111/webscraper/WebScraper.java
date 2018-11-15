@@ -1,13 +1,18 @@
 package comp3111.webscraper;
 
 import java.net.URLEncoder;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import java.util.Vector;
+import javafx.application.Platform;
+import javafx.scene.control.TextArea;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 /**
  * WebScraper provide a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword, 
@@ -65,8 +70,8 @@ import java.util.Vector;
  */
 public class WebScraper {
 
-	private static final String DEFAULT_URL = "https://newyork.craigslist.org/";
 	private WebClient client;
+	private Vector<Item> combinedList;
 
 	/**
 	 * Default Constructor 
@@ -81,42 +86,19 @@ public class WebScraper {
 	 * The only method implemented in this class, to scrape web content from the craigslist
 	 * 
 	 * @param keyword - the keyword you want to search
+	 * @param textAreaConsole - the TextArea instance for outputting related hint
 	 * @return A list of Item that has found. A zero size list is return if nothing is found. Null if any exception (e.g. no connectivity)
 	 */
-	public List<Item> scrape(String keyword) {
+	public List<Item> scrape(String keyword, TextArea textAreaConsole) {
+		combinedList = new Vector<Item>();
 
-		try {
-			String searchUrl = DEFAULT_URL + "search/sss?sort=rel&query=" + URLEncoder.encode(keyword, "UTF-8");
-			HtmlPage page = client.getPage(searchUrl);
+		List<Item> craigslistList = new CraigslistScraper().scrape(client, keyword, textAreaConsole);
+		List<Item> prelovedList = new PrelovedScraper().scrape(client, keyword, textAreaConsole);
+		combinedList.addAll(craigslistList);
+		combinedList.addAll(prelovedList);
+		Collections.sort(combinedList, new ItemComparator());
 
-			
-			List<?> items = (List<?>) page.getByXPath("//li	[@class='result-row']");
-			
-			Vector<Item> result = new Vector<Item>();
-
-			for (int i = 0; i < items.size(); i++) {
-				HtmlElement htmlItem = (HtmlElement) items.get(i);
-				HtmlAnchor itemAnchor = ((HtmlAnchor) htmlItem.getFirstByXPath(".//p[@class='result-info']/a"));
-				// tiny fix for price not find - 0.0	
-				HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//span[@class='result-price']"));
-
-				// It is possible that an item doesn't have any price, we set the price to 0.0
-				// in this case
-				String itemPrice = spanPrice == null ? "0.0" : spanPrice.asText();
-
-				Item item = new Item();
-				item.setTitle(itemAnchor.asText());
-				item.setUrl(DEFAULT_URL + itemAnchor.getHrefAttribute());
-				item.setPrice(new Double(itemPrice.replace("$", "")));
-
-				result.add(item);
-			}
-			client.close();
-			return result;
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		return null;
+		return combinedList;
 	}
 	
 	/**
@@ -129,4 +111,24 @@ public class WebScraper {
 	}
 
 
+}
+
+
+class ItemComparator implements Comparator<Item> {
+	@Override
+	public int compare(Item a, Item b) {
+		if ( a.compareTo(b) != 0 ) {
+			return a.compareTo(b);
+		} else {
+			if ( a.getPortal() == b.getPortal() ) {
+				return 0;
+			} else if ( a.getPortal() == Portal.Craigslist ) {
+				return -1;
+			} else if ( a.getPortal() == Portal.Preloved ){
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
 }
