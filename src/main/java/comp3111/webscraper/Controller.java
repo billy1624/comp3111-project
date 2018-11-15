@@ -729,6 +729,9 @@ public class Controller {
 	
 	            for (int i = 0; i < lastSearchItemQueue.size(); ++i)
 	                lastSearchItemQueue.poll();
+	            // push null indicate last record is null
+	            lastSearchQueue.offer("NULL");
+	            lastSearchItemQueue.offer(null);
 	        } else if (rtn == ButtonType.NO) {
 	        	lastSearchBt.setDisable(false);
 	        }
