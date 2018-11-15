@@ -5,6 +5,11 @@ import javafx.beans.property.SimpleStringProperty;
 import java.util.Date;
 
 public class Item implements Comparable<Item> {
+
+	/**
+	 * 
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	private String title ; 
 	private double price ;
 	private Portal portal;
