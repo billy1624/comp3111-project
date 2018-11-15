@@ -1,7 +1,5 @@
 package comp3111.webscraper;
 
-import javafx.beans.property.SimpleStringProperty;
-
 import java.util.Date;
 
 public class Item implements Comparable<Item> {
