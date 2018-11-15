@@ -1,31 +1,35 @@
 package comp3111.webscraper;
 
 import java.net.URLEncoder;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import java.util.Vector;
+import javafx.application.Platform;
+import javafx.scene.control.TextArea;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 /**
  * WebScraper provide a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword, 
  * the client will go to the default url and parse the page by looking at the HTML DOM.  
- * <br/>
+ * <br>
  * In this particular sample code, it access to craigslist.org. You can directly search on an entry by typing the URL
- * <br/>
+ * <br>
  * https://newyork.craigslist.org/search/sss?sort=rel&amp;query=KEYWORD
- *  <br/>
+ *  <br>
  * where KEYWORD is the keyword you want to search.
- * <br/>
+ * <br>
  * Assume you are working on Chrome, paste the url into your browser and press F12 to load the source code of the HTML. You might be freak
  * out if you have never seen a HTML source code before. Keep calm and move on. Press Ctrl-Shift-C (or CMD-Shift-C if you got a mac) and move your
  * mouse cursor around, different part of the HTML code and the corresponding the HTML objects will be highlighted. Explore your HTML page from
  * body &rarr; section class="page-container" &rarr; form id="searchform" &rarr; div class="content" &rarr; ul class="rows" &rarr; any one of the multiple 
  * li class="result-row" &rarr; p class="result-info". You might see something like this:
- * <br/>
+ * <br>
  * <pre>
  * {@code
  *    <p class="result-info">
@@ -52,7 +56,7 @@ import java.util.Vector;
  *   </p>
  *}
  *</pre>
- * <br/>
+ * <br>
  * The code 
  * <pre>
  * {@code
@@ -66,8 +70,8 @@ import java.util.Vector;
  */
 public class WebScraper {
 
-	private static final String DEFAULT_URL = "https://newyork.craigslist.org/";
 	private WebClient client;
+	private Vector<Item> combinedList;
 
 	/**
 	 * Default Constructor 
@@ -82,42 +86,49 @@ public class WebScraper {
 	 * The only method implemented in this class, to scrape web content from the craigslist
 	 * 
 	 * @param keyword - the keyword you want to search
+	 * @param textAreaConsole - the TextArea instance for outputting related hint
 	 * @return A list of Item that has found. A zero size list is return if nothing is found. Null if any exception (e.g. no connectivity)
 	 */
-	public List<Item> scrape(String keyword) {
+	public List<Item> scrape(String keyword, TextArea textAreaConsole) {
+		combinedList = new Vector<Item>();
 
-		try {
-			String searchUrl = DEFAULT_URL + "search/sss?sort=rel&query=" + URLEncoder.encode(keyword, "UTF-8");
-			HtmlPage page = client.getPage(searchUrl);
+		List<Item> craigslistList = new CraigslistScraper().scrape(client, keyword, textAreaConsole);
+		List<Item> prelovedList = new PrelovedScraper().scrape(client, keyword, textAreaConsole);
+		combinedList.addAll(craigslistList);
+		combinedList.addAll(prelovedList);
+		Collections.sort(combinedList, new ItemComparator());
 
-			
-			List<?> items = (List<?>) page.getByXPath("//li[@class='result-row']");
-			
-			Vector<Item> result = new Vector<Item>();
-
-			for (int i = 0; i < items.size(); i++) {
-				HtmlElement htmlItem = (HtmlElement) items.get(i);
-				HtmlAnchor itemAnchor = ((HtmlAnchor) htmlItem.getFirstByXPath(".//p[@class='result-info']/a"));
-				HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//a/span[@class='result-price']"));
-
-				// It is possible that an item doesn't have any price, we set the price to 0.0
-				// in this case
-				String itemPrice = spanPrice == null ? "0.0" : spanPrice.asText();
-
-				Item item = new Item();
-				item.setTitle(itemAnchor.asText());
-				item.setUrl(DEFAULT_URL + itemAnchor.getHrefAttribute());
-
-				item.setPrice(new Double(itemPrice.replace("$", "")));
-
-				result.add(item);
-			}
-			client.close();
-			return result;
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		return null;
+		return combinedList;
+	}
+	
+	/**
+	 * Method for return web client instance, used for controller, e.g. for shutdown connection
+	 * @return Web
+	 * 
+	 */
+	WebClient getWebClient() {
+		return client;
 	}
 
+
+}
+
+
+class ItemComparator implements Comparator<Item> {
+	@Override
+	public int compare(Item a, Item b) {
+		if ( a.compareTo(b) != 0 ) {
+			return a.compareTo(b);
+		} else {
+			if ( a.getPortal() == b.getPortal() ) {
+				return 0;
+			} else if ( a.getPortal() == Portal.Craigslist ) {
+				return -1;
+			} else if ( a.getPortal() == Portal.Preloved ){
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
 }
