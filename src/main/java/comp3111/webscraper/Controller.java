@@ -675,32 +675,50 @@ public class Controller {
 
         // 8
         if (lastSearchItemQueue.size() > 0 && lastSearchQueue.size() > 0 && lastSearchQueue.peek()!="NULL" ) {        	
-	        final Alert alert = new Alert(AlertType.INFORMATION, "You are going to close current search record now.\nDo you also want to clear latest search history?", ButtonType.YES, ButtonType.NO); // 實體化Alert對話框物件，並直接在建構子設定對話框的訊息類型、文字和按鈕
-	        alert.setTitle("Close current search");
-	        alert.setHeaderText("");
-	        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-	        stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));
-	        Optional<ButtonType> opt = alert.showAndWait();
-	        ButtonType rtn = ButtonType.YES;
-	        if (opt.isPresent())
-	        	rtn = opt.get();
-	        if (rtn == ButtonType.YES) {
-	        	// clear search history	        	
-	            for (int i = 0; i < lastSearchQueue.size(); ++i)
-	                lastSearchQueue.poll();
-	
-	            for (int i = 0; i < lastSearchItemQueue.size(); ++i)
-	                lastSearchItemQueue.poll();
-	            // push null indicate last record is null
-	            lastSearchQueue.offer("NULL");
-	            lastSearchItemQueue.offer(null);
-	        } else if (rtn == ButtonType.NO) {
-	        	lastSearchBt.setDisable(false);
-	        }
+        	clearHistory_Alert();
         }else {
         	lastSearchBt.setDisable(true);
         }
    
+    }
+    
+    public void clearHistory_Alert() {
+    	Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				final Alert alert = new Alert(AlertType.INFORMATION, "You are going to close current search record now.\nDo you also want to clear latest search history?", ButtonType.YES, ButtonType.NO); // 實體化Alert對話框物件，並直接在建構子設定對話框的訊息類型、文字和按鈕
+		        alert.setTitle("Close current search");
+		        alert.setHeaderText("");
+		        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+		        stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));
+		        Optional<ButtonType> opt = alert.showAndWait();
+		        ButtonType rtn = ButtonType.YES;
+		        if (opt.isPresent())
+		        	rtn = opt.get();
+		        if (rtn == ButtonType.YES) {
+		        	erase_search_history();
+		        } else if (rtn == ButtonType.NO) {
+		        	lastSearchBt.setDisable(false);
+		        }
+			}
+    		
+    	});
+    	
+    	
+    }
+    
+    public void erase_search_history() {
+      	// clear search history	        	
+        for (int i = 0; i < lastSearchQueue.size(); ++i)
+            lastSearchQueue.poll();
+
+        for (int i = 0; i < lastSearchItemQueue.size(); ++i)
+            lastSearchItemQueue.poll();
+        // push null indicate last record is null
+        lastSearchQueue.offer("NULL");
+        lastSearchItemQueue.offer(null);
     }
 
     /**

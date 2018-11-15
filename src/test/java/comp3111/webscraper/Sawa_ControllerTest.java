@@ -465,8 +465,26 @@ public class Sawa_ControllerTest {
          * Reset all components 
          */
         test.closeAndResetAll();
+        test.erase_search_history();
+        
+        final Field q11 = test.getClass().getDeclaredField("lastSearchItemQueue");
+		q11.setAccessible(true);
+		Queue<List<Item>> queue = new LinkedList<List<Item>>();
+    	list.add(item); 
+		queue.offer(list);
+		q11.set(test, queue);
+   		final Field q22 = test.getClass().getDeclaredField("lastSearchQueue");
+		q22.setAccessible(true);
+		Queue<String> queue2 = new LinkedList<String>();
+		queue2.offer("keyword1");
+		q22.set(test, queue2);
+
+						         
+        result_tbw.setItems(data);
+        field6.set(test, result_tbw);
 		th1.set(test, null);
         test.closeAndResetAll();
+        test.erase_search_history();
 
         
         // assert result: check if all close and clear
