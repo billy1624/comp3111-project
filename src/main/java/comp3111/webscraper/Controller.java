@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Queue;
 
 import com.gargoylesoftware.css.parser.javacc.ParseException;
@@ -52,7 +53,10 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -188,9 +192,9 @@ public class Controller {
 
         // init last search keyword, record item
         lastSearchQueue = new LinkedList<String>();
-        lastSearchQueue.offer("NULL");
+        //lastSearchQueue.offer("NULL");
         lastSearchItemQueue = new LinkedList<List<Item>>();
-        lastSearchItemQueue.offer(null);
+        //lastSearchItemQueue.offer(null);
 
     }
     
@@ -239,7 +243,7 @@ public class Controller {
     @FXML
     private void initialize() {
         // load test case, for test
-        // task6_iii_testCase();
+        task6_iii_testCase();
 
         // disable at the beginning
         lastSearchBt.setDisable(true);
@@ -382,6 +386,7 @@ public class Controller {
     /**
      * Helper function
      * Check any bar is double clicked
+     * @return Boolean - is any bar being selected
      * @author Yeung Chak Ho - chyeungam
      */
     private Boolean has_bar_selected() {
@@ -394,6 +399,10 @@ public class Controller {
     /**
      * Helper function
      * If a bar is selected, reset others
+     * @param var - reserved for implement multiple bar selcetion
+     * @param _dist_data - distribution data, list of item 
+     * @param ps - price start of bin 
+     * @param pe - price end of bin
      * @author Yeung Chak Ho - chyeungam
      */
     private void update_bar_only_one(Integer var, List<Item> _dist_data, Double ps, Double pe) {
@@ -538,7 +547,6 @@ public class Controller {
      * - member's github page link
      * 
      * @author Yeung Chak Ho - chyeungam
-     * @throws Exception 
      */
     public void createAboutUsDialog() {
         Stage dialog = new Stage();
@@ -577,8 +585,8 @@ public class Controller {
 
         // hard code :(
         String[] name = { "Chan Chi Wa", "Ngan Cheuk Hei", "Yeung Chak Ho" };
-        String[] itsc = { "cwchanbf", "chnganaa", "Yeung Chak Ho - chyeungam" };
-        String[] link = { "billy1624", "nganhei", "Yeung Chak Ho - chyeungamYch" };
+        String[] itsc = { "cwchanbf", "chnganaa", "chyeungam" };
+        String[] link = { "billy1624", "nganhei", "sawaYch" };
         Text[] member_name_label = new Text[3];
         Text[] member_itsc_label = new Text[3];
         Hyperlink[] member_github_link = new Hyperlink[3];
@@ -699,7 +707,9 @@ public class Controller {
     public void closeAndResetAll() {
         // 0
         scraper.getWebClient().close();
-        scraperTh.stop();
+        // be careful, handle null thread
+        if(scraperTh != null)
+        	scraperTh.stop();
         busy_idtr.setVisible(false);
 
         // 1
@@ -730,11 +740,28 @@ public class Controller {
         refineBt.setDisable(true);
 
         // 8
-        for (int i = 0; i < lastSearchQueue.size(); ++i)
-            lastSearchQueue.poll();
-
-        for (int i = 0; i < lastSearchItemQueue.size(); ++i)
-            lastSearchItemQueue.poll();
+        if (lastSearchItemQueue.size() > 0 && lastSearchQueue.size() > 0) {        	
+	        final Alert alert = new Alert(AlertType.INFORMATION, "You are going to close current search record now.\nDo you also want to clear latest search history?", ButtonType.YES, ButtonType.NO); // 實體化Alert對話框物件，並直接在建構子設定對話框的訊息類型、文字和按鈕
+	        alert.setTitle("Close current search");
+	        alert.setHeaderText("");
+	        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+	        stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));
+	        final Optional<ButtonType> opt = alert.showAndWait();
+	        final ButtonType rtn = opt.get();
+	        if (rtn == ButtonType.YES) {
+	        	// clear search history
+	            for (int i = 0; i < lastSearchQueue.size(); ++i)
+	                lastSearchQueue.poll();
+	
+	            for (int i = 0; i < lastSearchItemQueue.size(); ++i)
+	                lastSearchItemQueue.poll();
+	        } else if (rtn == ButtonType.NO) {
+	        	lastSearchBt.setDisable(false);
+	        }
+        }else {
+        	lastSearchBt.setDisable(true);
+        }
+      
     }
 
     /**
