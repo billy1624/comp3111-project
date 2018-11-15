@@ -4,6 +4,11 @@ package comp3111.webscraper;
 import java.util.Date;
 
 public class Item implements Comparable<Item> {
+
+	/**
+	 * 
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	private String title ; 
 	private double price ;
 	private Portal portal;
