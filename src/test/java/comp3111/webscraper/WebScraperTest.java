@@ -1,15 +1,18 @@
 package comp3111.webscraper;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.control.TextArea;
+import java.util.List;
+import java.util.Vector;
+
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.*;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.control.TextArea;
 
+@Ignore
 public class WebScraperTest {
 
 	/**

@@ -6,6 +6,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.TextArea;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
 
+@Ignore
 public class PrelovedScraperTest {
 
 	/**

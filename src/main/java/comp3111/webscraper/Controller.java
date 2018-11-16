@@ -3,13 +3,14 @@
  */
 package comp3111.webscraper;
 
-import java.util.Date;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,21 +26,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.embed.swing.JFXPanel;
-import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.image.Image;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.SortType;
-import javafx.scene.control.TableView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -70,14 +56,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import javafx.scene.layout.*;
-import javafx.geometry.*;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -91,11 +69,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.application.HostServices;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 
 
@@ -204,37 +177,6 @@ public class Controller {
 		return date1.compareTo(date2);
     }
 
-    public int MonCompare(String a, String b){
-        final List<String> monList = new ArrayList<String>(Arrays.asList(
-                "Jan",
-                "Feb",
-                "Mar", 
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec"));
-        int a_index = 0;
-        int b_index = 0;
-        for (int i = 0; i < monList.size(); i++) {
-            if (a.equals(monList.get(i))){
-                a_index = i;
-                break;
-            }		
-        }    	
-        for (int i = 0; i < monList.size(); i++) {
-            if (b.equals(monList.get(i))){
-                b_index = i;
-                break;
-            }
-        }
-        return a_index < b_index ? -1 : a_index == b_index ? 0 : 1;
-    }
-
     /**
      * Default initializer.
      * Init javaFx view components if needed
@@ -273,12 +215,8 @@ public class Controller {
         	int result = 0;
 			try {
 				result = DateCompare(r1, r2);
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (java.text.ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 			return result;
 		};
@@ -327,11 +265,7 @@ public class Controller {
                 output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                 DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),df.format(item.getPostedOn()));
-        	   	data.add(tmp);
-
-           	
-           	// DataModel("Title1", "0.0", "item1@example.com", df.format(item.getPostedOn()));
-           	
+        	   	data.add(tmp);                    
             }
             textAreaConsole.textProperty().unbind();
             textAreaConsole.setText(output);
@@ -463,7 +397,7 @@ public class Controller {
 
         if (lastSearchItemQueue.peek() == null) {
             System.out.println("last search item queue EMPTY!");
-            closeAndResetAll();
+            	closeAndResetAll(); // buggy here
             return;
         }
         refine_lastSearch = true;
@@ -704,7 +638,7 @@ public class Controller {
      * 
      */
     @FXML
-    public void closeAndResetAll() {
+    public void closeAndResetAll() {   
         // 0
         scraper.getWebClient().close();
         // be careful, handle null thread
@@ -740,29 +674,51 @@ public class Controller {
         refineBt.setDisable(true);
 
         // 8
-
-        if (lastSearchItemQueue.size() > 0 && lastSearchQueue.size() > 0 && lastSearchQueue.poll()!="NULL" ) {        	
-	        final Alert alert = new Alert(AlertType.INFORMATION, "You are going to close current search record now.\nDo you also want to clear latest search history?", ButtonType.YES, ButtonType.NO); // 實體化Alert對話框物件，並直接在建構子設定對話框的訊息類型、文字和按鈕
-	        alert.setTitle("Close current search");
-	        alert.setHeaderText("");
-	        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-	        stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));
-	        final Optional<ButtonType> opt = alert.showAndWait();
-	        final ButtonType rtn = opt.get();
-	        if (rtn == ButtonType.YES) {
-	        	// clear search history	        	
-	            for (int i = 0; i < lastSearchQueue.size(); ++i)
-	                lastSearchQueue.poll();
-	
-	            for (int i = 0; i < lastSearchItemQueue.size(); ++i)
-	                lastSearchItemQueue.poll();
-	        } else if (rtn == ButtonType.NO) {
-	        	lastSearchBt.setDisable(false);
-	        }
+        if (lastSearchItemQueue.size() > 0 && lastSearchQueue.size() > 0 && lastSearchQueue.peek()!="NULL" ) {        	
+        	clearHistory_Alert();
         }else {
         	lastSearchBt.setDisable(true);
         }
-      
+   
+    }
+    
+    public void clearHistory_Alert() {
+    	Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				final Alert alert = new Alert(AlertType.INFORMATION, "You are going to close current search record now.\nDo you also want to clear latest search history?", ButtonType.YES, ButtonType.NO); // 實體化Alert對話框物件，並直接在建構子設定對話框的訊息類型、文字和按鈕
+		        alert.setTitle("Close current search");
+		        alert.setHeaderText("");
+		        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+		        stage.getIcons().add(new Image( getClass().getResource("/java-icon.png").toString()));
+		        Optional<ButtonType> opt = alert.showAndWait();
+		        ButtonType rtn = ButtonType.YES;
+		        if (opt.isPresent())
+		        	rtn = opt.get();
+		        if (rtn == ButtonType.YES) {
+		        	erase_search_history();
+		        } else if (rtn == ButtonType.NO) {
+		        	lastSearchBt.setDisable(false);
+		        }
+			}
+    		
+    	});
+    	
+    	
+    }
+    
+    public void erase_search_history() {
+      	// clear search history	        	
+        for (int i = 0; i < lastSearchQueue.size(); ++i)
+            lastSearchQueue.poll();
+
+        for (int i = 0; i < lastSearchItemQueue.size(); ++i)
+            lastSearchItemQueue.poll();
+        // push null indicate last record is null
+        lastSearchQueue.offer("NULL");
+        lastSearchItemQueue.offer(null);
     }
 
     /**
@@ -1120,7 +1076,7 @@ public class Controller {
 
 
 // summary update
-private void UpdateSummary(List<Item> result){
+private void UpdateSummary(List<Item> result){	
 	Platform.runLater(new Runnable() {
         @Override
         public void run() {
@@ -1157,16 +1113,17 @@ private void UpdateSummary(List<Item> result){
 	//number of items
 	labelCount.setText(Integer.toString(num));
 	
-	if (num == 0){
+	if (num == 0 || data.isEmpty()){
 	    labelPrice.setText("-");
 	    labelMin.setText("-");
 	    labelLatest.setText("-");
 	}
 	else
 	{
+		
 	    // find latest link
-	    // init first
-	    Latest_item_link =  data.get(0).getUrl();	
+	    // init first		
+	    Latest_item_link =  data.get(0).getUrl();	//indexOutOfBoundsException
 	    int latest_index = 0;
 	    for(int i = 0; i < result.size()-1 ;++i){
 	        if( result.get(i).getPostedOn().compareTo(result.get(latest_index).getPostedOn()) > 0){
@@ -1213,6 +1170,7 @@ public void UpdateTable(List<Item> result){
 	Platform.runLater(new Runnable() {
      @Override
 	        public void run() {
+    	 		if (data.isEmpty()) return;
 	     	   for ( int i = 0; i< tableView.getItems().size(); i++) {
 	          		tableView.getItems().clear();
 	          	}
@@ -1220,7 +1178,7 @@ public void UpdateTable(List<Item> result){
 			 for (Item item : result) {
 			     DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 			     DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),df.format(item.getPostedOn()));
-			   	data.add(tmp);        	
+			   	 data.add(tmp); //NullPointerException 1168       	
 			 }
 	
 		}

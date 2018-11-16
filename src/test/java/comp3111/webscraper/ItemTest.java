@@ -1,14 +1,11 @@
 package comp3111.webscraper;
 
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-import javafx.scene.control.ProgressIndicator;
-
-import static org.junit.Assert.*;
-
-import java.lang.reflect.Field;
 import java.util.Date;
+
+import org.junit.Test;
 
 
 public class ItemTest {
