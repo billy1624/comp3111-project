@@ -15,8 +15,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
+/**
+ * Web Scraper for scrapping item from Preloved, which extends PortalScraper
+ * @author Chan Chi Wa - cwchanbf
+ */
 public class PrelovedScraper extends PortalScraper {
 
+	/**
+	 * Implementing scrape method for Preloved, scrapping search result from it
+	 * @param client WebClient for getting web page from web
+	 * @param keyword Keyword for search on portal
+	 * @param textAreaConsole TextArea on GUI interface, showing program activity
+	 * @return List of search result from the portal
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	@Override
 	public List<Item> scrape(WebClient client, String keyword, TextArea textAreaConsole) {
 		final String PRELOVED_URL = "https://www.preloved.co.uk/";
@@ -90,27 +102,57 @@ public class PrelovedScraper extends PortalScraper {
 	}
 
 
+	/**
+	 * Get the current page number
+	 * @param page The current HtmlPage obj
+	 * @return A list of result rows
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public HtmlElement getCurrPageNum(HtmlPage page) {
 		return page.getFirstByXPath("//li[@class='pagination__nav__item pagination__nav__item--page pagination__nav__item--current-page']/a");
 	}
 
 
+	/**
+	 * Get the result rows from the current page
+	 * @param page The current HtmlPage obj
+	 * @return A list of result rows
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public List<?> getResultRows(HtmlPage page) {
 		return (List<?>) page.getByXPath("//ul[@id='search-results-list']//li[@class='search-result']");
 	}
 
 
+	/**
+	 * Get the title of the current result row
+	 * @param htmlElement The result row HtmlElement
+	 * @return Title of the item
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public String getTitle(HtmlElement htmlElement) {
 		HtmlElement itemName = ((HtmlElement) htmlElement.getFirstByXPath(".//span[@itemprop='name']"));
 		return itemName.asText();
 	}
 
 
+	/**
+	 * Get the url of the current result row
+	 * @param htmlElement The result row HtmlElement
+	 * @return Url of the item
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public String getUrl(HtmlElement htmlElement) {
 		return htmlElement.getAttribute("data-href");
 	}
 
 
+	/**
+	 * Get the price of the current result row
+	 * @param htmlElement The result row HtmlElement
+	 * @return Price of the item
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public double getPrice(HtmlElement htmlElement) {
 		HtmlElement spanPrice = ((HtmlElement) htmlElement.getFirstByXPath(".//span[@itemprop='price']"));
 		// It is possible that an item doesn't have any price, we set the price to 0.0
@@ -122,6 +164,13 @@ public class PrelovedScraper extends PortalScraper {
 	}
 
 
+	/**
+	 * Get the posted date of the current result row
+	 * @param client WebClient for getting web page from web
+	 * @param htmlElement The result row HtmlElement
+	 * @return Posted date of the item
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public Date getPostedDate(WebClient client, HtmlElement htmlElement) {
 		HtmlPage itemPage = null;
 		try {
@@ -152,6 +201,12 @@ public class PrelovedScraper extends PortalScraper {
 	}
 
 
+	/**
+	 * Append the message to GUI console
+	 * @param s The string message append to GUI console
+	 * @param textAreaConsole The text console on GUI
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public void appendTextToUserConsole(String s, TextArea textAreaConsole) {
 		Platform.runLater(() -> textAreaConsole.appendText(s + "\n"));
 	}
