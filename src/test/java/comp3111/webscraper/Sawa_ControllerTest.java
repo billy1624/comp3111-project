@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -464,6 +465,27 @@ public class Sawa_ControllerTest {
          * Reset all components 
          */
         test.closeAndResetAll();
+        test.erase_search_history();
+        
+        final Field q11 = test.getClass().getDeclaredField("lastSearchItemQueue");
+		q11.setAccessible(true);
+		Queue<List<Item>> queue = new LinkedList<List<Item>>();
+    	list.add(item); 
+		queue.offer(list);
+		q11.set(test, queue);
+   		final Field q22 = test.getClass().getDeclaredField("lastSearchQueue");
+		q22.setAccessible(true);
+		Queue<String> queue2 = new LinkedList<String>();
+		queue2.offer("keyword1");
+		q22.set(test, queue2);
+
+						         
+        result_tbw.setItems(data);
+        field6.set(test, result_tbw);
+		th1.set(test, null);
+        test.closeAndResetAll();
+        test.erase_search_history();
+
         
         // assert result: check if all close and clear
         TextArea current_ta = (TextArea)field.get(test);     
@@ -515,13 +537,41 @@ public class Sawa_ControllerTest {
    		// assertion
    		assertEquals(ls_keyword_queue.size(), 2);
    		
-   		/* test actionLastSearch */
-   		Method lastsearch_func = null;
-   		lastsearch_func = test.getClass().getDeclaredMethod("actionLastSearch", (Class<?>[])null);		
-   		lastsearch_func.setAccessible(true);   
-   		lastsearch_func.invoke(test, (Object[])null);   		
-         
-		final Field q1 = test.getClass().getDeclaredField("lastSearchItemQueue");
+   	
+   
+   		Platform.runLater(new Runnable() {
+
+			@Override
+			public void run() {
+				Method lastsearch_func = null;
+				try {
+					lastsearch_func = test.getClass().getDeclaredMethod("actionLastSearch", (Class<?>[])null);
+			   		lastsearch_func.setAccessible(true);
+			   		lastsearch_func.invoke(test, (Object[])null); 
+				} catch (NoSuchMethodException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}		
+			}
+   			
+   		});
+		Method lastsearch_func = null;
+		lastsearch_func = test.getClass().getDeclaredMethod("actionLastSearch", (Class<?>[])null);		
+   		lastsearch_func.setAccessible(true);
+   		
+   	   	final Field q1 = test.getClass().getDeclaredField("lastSearchItemQueue");
 		q1.setAccessible(true);
 		Queue<List<Item>> lsIQ = new LinkedList<List<Item>>();
 		List<Item> list4 = new ArrayList<>();
@@ -532,9 +582,17 @@ public class Sawa_ControllerTest {
     	list4.add(item4);
 		lsIQ.offer(list4);
 		q1.set(test,lsIQ);
-         
-         // execute test method
-   		lastsearch_func.invoke(test, (Object[])null);
+//         
+//         // execute test method
+   		lastsearch_func.invoke(test, (Object[])null);   		 		
+//         
+		lsIQ.poll();
+		q1.set(test,lsIQ);
+   		lastsearch_func.invoke(test, (Object[])null);   		 		
+
+		
+   		lsIQ.offer(list4);
+		q1.set(test,lsIQ);
    		
    		
    		/* test actionRefine */
@@ -563,13 +621,15 @@ public class Sawa_ControllerTest {
    		
    		// one, match
 		bool1.set(test, true);
-		testlist.add(item5);
+   		final Field tfkeyword3 = test.getClass().getDeclaredField("textFieldKeyword");
+		tfkeyword3.setAccessible(true);
+		TextField tf3 = new TextField("01");		
+		tfkeyword3.set(test, tf3);
    		refine_func.invoke(test,(Object[]) null);
    		
-   		// one unmatch
-   		TextField kwtf = (TextField) field1.get(test);
-   		kwtf.setText("123");
-		testlist.add(item6);
+   		// one unmatch   		
+		TextField tf4 = new TextField("xxx");		
+		tfkeyword3.set(test, tf4);
    		refine_func.invoke(test,(Object[]) null);
    		
    		/* test github event handler */
@@ -672,6 +732,24 @@ public class Sawa_ControllerTest {
              }
          }
 		 
+		final Field tfkeyword2 = test.getClass().getDeclaredField("textFieldKeyword");
+		tfkeyword2.setAccessible(true);
+		TextField tf2 = new TextField("google pixel abcdefg");		
+		tfkeyword2.set(test, tf2);	 
+		
+		SearchAsyncTask async_task = test.new SearchAsyncTask();
+    	try {
+    		final Field field88 = test.getClass().getDeclaredField("textAreaConsole");
+            field88.setAccessible(true);
+            TextArea result_taa = new TextArea();       
+            field88.set(test, result_taa); 
+			Thread x = new Thread(async_task);
+			x.start();
+            //async_task.call();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
    		/* test quit */
    		Method method1111 = null;
@@ -726,23 +804,5 @@ public class Sawa_ControllerTest {
         // Get it and assert
         AreaChart current_ac = (AreaChart)field8.get(test);        
         assertEquals(current_ac.getData().size(), expected_num);        
-    }
-        
-    @Test
-    public void test_Async() throws Exception{
-    	/** async task test **/
-    	Platform.runLater(new Runnable() {         
-		    @Override
-		    public void run() {
-		    	Controller test = new Controller();
-		    	SearchAsyncTask async_task = test.new SearchAsyncTask();
-		    	try {
-					async_task.call();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		    }
-		});
-    }
+    }        
 }	

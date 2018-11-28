@@ -1,5 +1,6 @@
 package comp3111.webscraper;
 
+
 import javafx.beans.property.SimpleStringProperty;
 import java.util.Date;
 
