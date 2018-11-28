@@ -171,6 +171,10 @@ public class Controller {
 
     }
     
+    /**
+     * Comparing the data
+     * @author Ngan Cheuk Hei - chnganaa
+     */
     public int DateCompare(String a, String b) throws ParseException, java.text.ParseException {
     	Date date1 = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(a);
     	Date date2 = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(b);    
@@ -251,6 +255,8 @@ public class Controller {
     /**
      * Scaping portal with async 
      * @author Yeung Chak Ho - chyeungam
+     * Call the function to update summary and table
+     * @author Ngan Cheuk Hei - chnganaa
      *
      */
     public class SearchAsyncTask extends Task<List<Item>> {
@@ -290,7 +296,7 @@ public class Controller {
      * Called when the search(i.e. Go) button is pressed.
      * @author Yeung Chak Ho - chyeungam
      * @author Billy
-     * @author Nganhei
+     * @author Ngan Cheuk Hei - chnganaa 
      */
     String lowset_item_link = "";
     String Latest_item_link = "";
@@ -1075,7 +1081,13 @@ public class Controller {
     }
 
 
-// summary update
+    /**
+     * Update summary information
+     * 
+     * @param result - List of item record
+     * @author Ngan Cheuk Hei - chnganaa
+     *
+     */
 private void UpdateSummary(List<Item> result){	
 	Platform.runLater(new Runnable() {
         @Override
@@ -1146,7 +1158,7 @@ private void UpdateSummary(List<Item> result){
 	    }
 	    );
 	    
-	    labelLatest.setText("hi"+ Latest_item_link);
+	    labelLatest.setText(Latest_item_link);
 	    System.out.println("Latestil:"+Latest_item_link);
 
 	
@@ -1165,7 +1177,13 @@ private void UpdateSummary(List<Item> result){
  });
 }
 
-//table update
+/**
+ * Update table information
+ * 
+ * @param result - List of item record
+ * @author Ngan Cheuk Hei - chnganaa
+ *
+ */
 public void UpdateTable(List<Item> result){
 	Platform.runLater(new Runnable() {
      @Override
