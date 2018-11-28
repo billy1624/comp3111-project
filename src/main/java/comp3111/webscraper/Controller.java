@@ -682,7 +682,7 @@ public class Controller {
    
     }
     
-    public void clearHistory_Alert() {
+    public void clearHistory_Alert() {    	    	  
     	Platform.runLater(new Runnable() {
 
 			@Override
@@ -704,9 +704,7 @@ public class Controller {
 		        }
 			}
     		
-    	});
-    	
-    	
+    	});    	    	
     }
     
     public void erase_search_history() {
@@ -960,7 +958,12 @@ public class Controller {
         private Data<String, Integer> item;
         private List<Item> dist_data;
         private Double rng;
-
+        
+        /**
+         * The mouse event for barchart
+         * @param mouseEvent - event type
+         * @author Yeung Chak Ho - chyeungam
+         */
         @Override
         public void handle(MouseEvent mouseEvent) {
             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
