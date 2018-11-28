@@ -1,6 +1,3 @@
-/**
- * 
- */
 package comp3111.webscraper;
 
 import java.text.DateFormat;

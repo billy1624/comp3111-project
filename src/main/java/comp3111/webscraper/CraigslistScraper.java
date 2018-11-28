@@ -14,8 +14,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
+/**
+ * Web Scraper for scrapping item from Craigslist, which extends PortalScraper
+ * @author Chan Chi Wa - cwchanbf
+ */
 public class CraigslistScraper extends PortalScraper {
 
+	/**
+	 * Implementing scrape method for Craigslist, scrapping search result from it
+	 * @param client WebClient for getting web page from web
+	 * @param keyword Keyword for search on portal
+	 * @param textAreaConsole TextArea on GUI interface, showing program activity
+	 * @return List of search result from the portal
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	@Override
 	public List<Item> scrape(WebClient client, String keyword, TextArea textAreaConsole) {
 		final String CRAIGSLIST_URL = "https://newyork.craigslist.org/";
@@ -92,41 +104,83 @@ public class CraigslistScraper extends PortalScraper {
 	}
 
 
+	/**
+	 * Get the item range from number from the current page
+	 * @param page The current HtmlPage obj
+	 * @return Item range from int
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public int getPageItemRangeFrom(HtmlPage page) {
 		HtmlElement itemRangeFrom = page.getFirstByXPath("//form[@id='searchform']//span[@class='rangeFrom']");
 		return Integer.valueOf(itemRangeFrom.asText());
 	}
 
 
+	/**
+	 * Get the item range to number from the current page
+	 * @param page The current HtmlPage obj
+	 * @return Item range to int
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public int getPageItemRangeTo(HtmlPage page) {
 		HtmlElement itemRangeTo = page.getFirstByXPath("//form[@id='searchform']//span[@class='rangeTo']");
 		return Integer.valueOf(itemRangeTo.asText());
 	}
 
 
+	/**
+	 * Get the total page count from the current page
+	 * @param page The current HtmlPage obj
+	 * @return Total page count int
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public int getPageTotalItemCount(HtmlPage page) {
 		HtmlElement itemTotalCount = page.getFirstByXPath("//form[@id='searchform']//span[@class='totalcount']");
 		return Integer.valueOf(itemTotalCount.asText());
 	}
 
 
+	/**
+	 * Get the result rows from the current page
+	 * @param page The current HtmlPage obj
+	 * @return A list of result rows
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public List<?> getResultRows(HtmlPage page) {
 		return (List<?>) page.getByXPath("//li[@class='result-row']");
 	}
 
 
+	/**
+	 * Get the title of the current result row
+	 * @param htmlElement The result row HtmlElement
+	 * @return Title of the item
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public String getTitle(HtmlElement htmlElement) {
 		HtmlAnchor itemAnchor = ((HtmlAnchor) htmlElement.getFirstByXPath(".//p[@class='result-info']/a"));
 		return itemAnchor.asText();
 	}
 
 
+	/**
+	 * Get the url of the current result row
+	 * @param htmlElement The result row HtmlElement
+	 * @return Url of the item
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public String getUrl(HtmlElement htmlElement) {
 		HtmlAnchor itemAnchor = ((HtmlAnchor) htmlElement.getFirstByXPath(".//p[@class='result-info']/a"));
 		return itemAnchor.getHrefAttribute();
 	}
 
 
+	/**
+	 * Get the price of the current result row
+	 * @param htmlElement The result row HtmlElement
+	 * @return Price of the item
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public double getPrice(HtmlElement htmlElement) {
 		HtmlElement spanPrice = ((HtmlElement) htmlElement.getFirstByXPath(".//p[@class='result-info']//span[@class='result-price']"));
 		// It is possible that an item doesn't have any price, we set the price to 0.0
@@ -138,6 +192,12 @@ public class CraigslistScraper extends PortalScraper {
 	}
 
 
+	/**
+	 * Get the posted date of the current result row
+	 * @param htmlElement The result row HtmlElement
+	 * @return Posted date of the item
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public Date getPostedDate(HtmlElement htmlElement) {
 		HtmlElement postedDate = ((HtmlElement) htmlElement.getFirstByXPath(".//time[@class='result-date']"));
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -150,8 +210,15 @@ public class CraigslistScraper extends PortalScraper {
 	}
 
 
+	/**
+	 * Append the message to GUI console
+	 * @param s The string message append to GUI console
+	 * @param textAreaConsole The text console on GUI
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	public void appendTextToUserConsole(String s, TextArea textAreaConsole) {
 		Platform.runLater(() -> textAreaConsole.appendText(s + "\n"));
 	}
+
 
 }
