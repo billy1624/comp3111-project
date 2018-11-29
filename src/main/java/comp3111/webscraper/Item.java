@@ -199,7 +199,7 @@ public class Item implements Comparable<Item> {
 	 *         is less than, equal to, or greater than the specified item's price.
 	 * @author Chan Chi Wa - cwchanbf
 	 * @author Ngan Cheuk Hei - chnganaa
-	 */
+	 */ 
 	@Override
 	public int compareTo(Item o) {
 		return Double.compare(price, o.price);
