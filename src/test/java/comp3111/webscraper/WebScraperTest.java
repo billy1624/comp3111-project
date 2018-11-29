@@ -12,7 +12,7 @@ import org.junit.Test;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.TextArea;
 
-@Ignore
+//@Ignore
 public class WebScraperTest {
 
 	/**

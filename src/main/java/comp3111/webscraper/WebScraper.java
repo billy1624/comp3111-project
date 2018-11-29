@@ -15,7 +15,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 /**
- * WebScraper provide a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword, 
+ * Entry point of scrapping from two different portals
+ * @author Chan Chi Wa - cwchanbf
+ *
+ *
+ * WebScraper provide a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword,
  * the client will go to the default url and parse the page by looking at the HTML DOM.  
  * <br>
  * In this particular sample code, it access to craigslist.org. You can directly search on an entry by typing the URL
@@ -65,16 +69,26 @@ import java.util.concurrent.FutureTask;
  * </pre>
  * extracts all result-row and stores the corresponding HTML elements to a list called items. Later in the loop it extracts the anchor tag 
  * &lsaquo; a &rsaquo; to retrieve the display text (by .asText()) and the link (by .getHrefAttribute()). It also extracts  
- * 
  *
  */
 public class WebScraper {
 
+	/**
+	 * WebClient {@link WebScraper} for all web scraper
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	private WebClient client;
-	private Vector<Item> combinedList;
 
 	/**
-	 * Default Constructor 
+	 * The combined item list {@link Vector} of all item scraped from two different portals
+	 * @author Chan Chi Wa - cwchanbf
+	 */
+	private Vector<Item> combinedList;
+
+
+	/**
+	 * Default Constructor
+	 * @author Chan Chi Wa - cwchanbf
 	 */
 	public WebScraper() {
 		client = new WebClient();
@@ -82,12 +96,13 @@ public class WebScraper {
 		client.getOptions().setJavaScriptEnabled(false);
 	}
 
+
 	/**
 	 * The only method implemented in this class, to scrape web content from the craigslist
-	 * 
 	 * @param keyword - the keyword you want to search
 	 * @param textAreaConsole - the TextArea instance for outputting related hint
 	 * @return A list of Item that has found. A zero size list is return if nothing is found. Null if any exception (e.g. no connectivity)
+	 * @author Chan Chi Wa - cwchanbf
 	 */
 	public List<Item> scrape(String keyword, TextArea textAreaConsole) {
 		combinedList = new Vector<Item>();
@@ -100,11 +115,12 @@ public class WebScraper {
 
 		return combinedList;
 	}
+
 	
 	/**
 	 * Method for return web client instance, used for controller, e.g. for shutdown connection
-	 * @return Web
-	 * 
+	 * @return WebClient in WebScraper class
+	 * @author Chan Chi Wa - cwchanbf
 	 */
 	WebClient getWebClient() {
 		return client;
@@ -114,7 +130,17 @@ public class WebScraper {
 }
 
 
+/**
+ * A item comparator used to sort a list of items by the ascending order of price
+ * @author Chan Chi Wa - cwchanbf
+ */
 class ItemComparator implements Comparator<Item> {
+	/**
+	 * Compare two item based on price and portal, sort two item by the ascending order of price
+	 * @return a negative integer, zero, or a positive integer as this item's price
+	 * 	       is less than, equal to, or greater than the specified item's price.
+	 * @author Chan Chi Wa - cwchanbf
+	 */
 	@Override
 	public int compare(Item a, Item b) {
 		if ( a.compareTo(b) != 0 ) {
@@ -132,3 +158,4 @@ class ItemComparator implements Comparator<Item> {
 		}
 	}
 }
+
