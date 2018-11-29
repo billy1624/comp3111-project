@@ -3,7 +3,10 @@ package comp3111.webscraper;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.Test;
 
@@ -45,15 +48,19 @@ public class ItemTest {
 	}
 	
 	@Test
-	public void test_toString() {
-		Item i = new Item("01", 0.0, Portal.Craigslist, "url", new Date(20181111));
-		assertEquals(i.getPostedOn(),new Date(20181111));
+	public void test_toString() throws ParseException {
+		String date = "1970-01-01 13:36";
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		sdf.setTimeZone(TimeZone.getTimeZone("HKT"));
+		Date d = sdf.parse(date);
+		Item i = new Item("01", 0.0, Portal.Craigslist, "url", d);
+		assertEquals(i.getPostedOn(),d);
 		assertEquals(i.getPortal(),Portal.Craigslist);
 		assertEquals(i.getUrl(), "url");
 		assertEquals(i.getPrice(), 0.0, 0.001);
 		assertEquals(i.getTitle(), "01");
 		String result = i.toString();
-		assertEquals(result, "Item{title='01', price=0.0, portal=Craigslist, url='url', postedOn=Thu Jan 01 13:36:21 HKT 1970}");
+		assertEquals(result, "Item{title='01', price=0.0, portal=Craigslist, url='url', postedOn="+ d +"}");
 		
 		Item b = new Item("02", 5.0, Portal.Craigslist, "url", new Date(20181111));
 				
