@@ -33,3 +33,24 @@ Group Number: 77
 	- Will skip fetching all the ads on search result.
 2. Basic Task 3
 	- The total number of search result is not accurate on newyork.craigslist.org. For example, when I search for `toaster` on the site. On the first page of search result, it is showing item 1 to 120, and 503 items in total was show on the page. However, when I click next page, it now show there are 506 items in total. In fact, if I go to the last page of search result, it only contain 503 items instead of 506 items. **The message showing the current processing item is accurate, i.e. `Fetching... item 121 - 240`. However, the total number of items might not be accurate, i.e. `506 in total`.**
+
+3. Basic Task 6
+
+   - The `Last Search Function` 
+
+     - Refined record is __NOT__ counted as a search record (which means last search will not revert the dataset from a refined record, but it does revert to a record that has not been refined (the original dataset scrape from Portal). __Only__ the search which is scape from Portal and `Initial Empty Record` count as a  `Search Record`)
+     - The initial `Last Search` is `Initial Empty Record`. After the first search then click last search, it should revert every page to empty.
+
+   - The `Close` Item in Menu Bar
+
+     - It will clear all the record and restore all tabs to initial state (Requirement)
+
+     - During scraping process, pressing `Close` will stop the scraping process (Extra)
+
+     - `Close` will ask user whether they want to _Remove_ all search history or not. If yes, then the whole application will restore the initial state with _NO_ search record (Extra)
+
+       - Junit Test report this standard error occur in Test Case because it requires a event thread but not JavaFx thread. It's not a bug of released program.
+
+         ```java
+         Exception in thread "JavaFX Application Thread" java.lang.IllegalStateException: This operation is permitted on the event thread only; currentThread = JavaFX Application Thread
+         ```

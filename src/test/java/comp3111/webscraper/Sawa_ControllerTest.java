@@ -16,6 +16,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.gargoylesoftware.css.parser.javacc.ParseException;
+
 import comp3111.webscraper.Controller.BarChart_BarDBClick_Handler;
 import comp3111.webscraper.Controller.BarChart_BarEntered_Handler;
 import comp3111.webscraper.Controller.BarChart_BarExited_Handler;
@@ -106,7 +108,8 @@ public class Sawa_ControllerTest {
                     @Override
                     public void run() {
 							try {
-								new WebScraperApplication().start(new Stage());				
+								new WebScraperApplication().start(new Stage());
+								System.out.println("test application");
 							} catch (Exception e) {
 								e.printStackTrace();
 							}					
@@ -730,15 +733,14 @@ public class Sawa_ControllerTest {
 						   0, 0, 0, 0, MouseButton.PRIMARY, 1,
 						   true, true, true, true, true, true, true, true, true, true, null));
              }
-         }
-		 
-		final Field tfkeyword2 = test.getClass().getDeclaredField("textFieldKeyword");
-		tfkeyword2.setAccessible(true);
-		TextField tf2 = new TextField("google pixel abcdefg");		
-		tfkeyword2.set(test, tf2);	 
+         }		 	
 		
 		SearchAsyncTask async_task = test.new SearchAsyncTask();
     	try {
+    		final Field tfkeyword2 = test.getClass().getDeclaredField("textFieldKeyword");
+    		tfkeyword2.setAccessible(true);
+    		TextField tf2 = new TextField("google pixel 5");		
+    		tfkeyword2.set(test, tf2);	 
     		final Field field88 = test.getClass().getDeclaredField("textAreaConsole");
             field88.setAccessible(true);
             TextArea result_taa = new TextArea();       
@@ -749,7 +751,7 @@ public class Sawa_ControllerTest {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}    
     	
    		/* test quit */
    		Method method1111 = null;
@@ -804,5 +806,20 @@ public class Sawa_ControllerTest {
         // Get it and assert
         AreaChart current_ac = (AreaChart)field8.get(test);        
         assertEquals(current_ac.getData().size(), expected_num);        
-    }        
+    }
+    
+    @Test
+    public void DateTest() throws ParseException, java.text.ParseException {
+    	Controller test = new Controller();
+
+    	String date1 = "2018-09-09 23:55";
+    	String date2 = "2018-09-09 23:55";
+    	String date3 = "2018-09-10 00:00";
+    	String date4 = "2018-09-08 00:00";
+    	assertEquals(test.DateCompare(date1, date2), 0);
+    	assertEquals(test.DateCompare(date1, date3), -1);
+    	assertEquals(test.DateCompare(date1, date4), 1);
+
+    }
+    
 }	
