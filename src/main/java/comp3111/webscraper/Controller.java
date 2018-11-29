@@ -265,13 +265,13 @@ public class Controller {
             String output = "";
             
             for (Item item : result) {
-                output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+                output += item.toString() + "\n";
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                 DataModel tmp = new DataModel(item.getTitle(), Double.toString(item.getPrice()), item.getUrl(),df.format(item.getPostedOn()));
         	   	data.add(tmp);                    
             }
             textAreaConsole.textProperty().unbind();
-            textAreaConsole.setText(output);
+            textAreaConsole.appendText(output);
 
             // copy for further use
             recordItem = new ArrayList<Item>(result);
@@ -691,7 +691,7 @@ public class Controller {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				final Alert alert = new Alert(AlertType.INFORMATION, "You are going to close current search record now.\nDo you also want to clear latest search history?", ButtonType.YES, ButtonType.NO); // 實體化Alert對話框物件，並直接在建構子設定對話框的訊息類型、文字和按鈕
+				final Alert alert = new Alert(AlertType.INFORMATION, "You are going to close current search record now.\nDo you also want to clear latest search history?", ButtonType.YES, ButtonType.NO);
 		        alert.setTitle("Close current search");
 		        alert.setHeaderText("");
 		        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
