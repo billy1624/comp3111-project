@@ -469,7 +469,6 @@ public class Controller {
 
         // summary page update
        
-				// TODO Auto-generated method stub
 		        UpdateSummary(targetItem_list);
 
 		
@@ -626,8 +625,7 @@ public class Controller {
     }
 
     /**
-     * Handle close button (Task 6.iii) 
-     * TODO: 
+     * Handle close button (Task 6.iii)
      * 0. close webClient connection 
      * 1. clear console 
      * 2. clear search bar keyword 
@@ -691,7 +689,6 @@ public class Controller {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				final Alert alert = new Alert(AlertType.INFORMATION, "You are going to close current search record now.\nDo you also want to clear latest search history?", ButtonType.YES, ButtonType.NO);
 		        alert.setTitle("Close current search");
 		        alert.setHeaderText("");
