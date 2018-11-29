@@ -23,6 +23,20 @@ Group Number: 77
 	- Tasks: Basic 5 & Basic 6
 	- Email: chyeungam@connect.ust.hk
 
+## Proposed Keyword for TA :)
+1. Normal Test Case (Fast)
+	- Keyword: `google pixel 5`
+	- Result Size: ~50 items
+1. Normal Test Case (Slow)
+	- Keyword: `food box`
+	- Result Size: ~600 items
+1. Special Test Case (No Result)
+	- Keyword: `vhghckuhhjjhv:D`
+	- Result Size: 0 item
+1. Crazy Test Case :P
+	- Keyword: `a`
+	- Result Size: ~3,000 item
+
 ## Javadoc
 Javadoc available on: https://billy1624.github.io/COMP3111_Proj/javadoc
 
