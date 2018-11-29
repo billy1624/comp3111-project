@@ -1090,10 +1090,12 @@ private void UpdateSummary(List<Item> result){
         @Override
         public void run() {
 	    int num = 0 ;
+	    int numNo0 = 0;
 	    double TotalPrice = 0;
 	    double LPrice = 0;
 
-	    for (Item item : result) {
+	    for (Item item : result) 
+	    {
 	    	 
 	    	 if (item.getPrice()!=0 && LPrice == 0)
 	    	 {
@@ -1110,10 +1112,14 @@ private void UpdateSummary(List<Item> result){
 		           
 		        }	    			    	
 	    	
-		        // Total price of the items
-		        TotalPrice += item.getPrice(); 
-		         num += 1; 
-		    }
+		     // Total price of the items
+	    	 if (item.getPrice()!=0)
+	    	 {
+		        TotalPrice += item.getPrice();
+		        numNo0 += 1;
+	    	 }
+		     num += 1; 
+		  }
 		            
 	
 	
@@ -1141,7 +1147,7 @@ private void UpdateSummary(List<Item> result){
 	        }
 	    }
 	    
-	    labelPrice.setText(Double.toString(Math.round(TotalPrice/num)));
+	    labelPrice.setText(Double.toString(Math.round(TotalPrice/numNo0)));
 	    labelMin.setText(lowset_item_link);
 	   
 	    labelMin.setOnAction( new EventHandler<ActionEvent>(){
