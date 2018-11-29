@@ -81,6 +81,8 @@ import javafx.stage.StageStyle;
  */
 public class Controller {
 
+    // TODO: Javadoc Missing for all attributes below
+
     @FXML
     private Label labelCount;
 
@@ -152,6 +154,8 @@ public class Controller {
     private MenuBar menuBar;
 
     final ObservableList<DataModel> data = FXCollections.observableArrayList();
+
+    // TODO: Javadoc Missing for all attributes above
     
 
     /**
@@ -170,7 +174,12 @@ public class Controller {
     
     /**
      * Comparing the data
+     * @param a
+     * @param b
      * @author Ngan Cheuk Hei - chnganaa
+     * @return
+     * @throws ParseException
+     * @throws java.text.ParseException
      */
     public int DateCompare(String a, String b) throws ParseException, java.text.ParseException {
     	Date date1 = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(a);
@@ -249,15 +258,18 @@ public class Controller {
             lastSearchItemQueue.poll();
     }
     
+    // TODO: Javadoc Missing
+    String keyword;
+
     /**
      * Scaping portal with async 
-     * @author Yeung Chak Ho - chyeungam
      * Call the function to update summary and table
+     * @author Yeung Chak Ho - chyeungam
      * @author Ngan Cheuk Hei - chnganaa
-     *
      */
-    String keyword;
     public class SearchAsyncTask extends Task<List<Item>> {
+
+        // TODO: Javadoc Missing
         @Override
         protected List<Item> call() throws Exception {
         	keyword = textFieldKeyword.getText();
@@ -290,15 +302,18 @@ public class Controller {
 
     };
 
+    // TODO: Javadoc Missing
+    String lowset_item_link = "";
+
+    // TODO: Javadoc Missing
+    String Latest_item_link = "";
+
     /**
      * Called when the search(i.e. Go) button is pressed.
      * @author Yeung Chak Ho - chyeungam
      * @author Chan Chi Wa - cwchanbf
      * @author Ngan Cheuk Hei - chnganaa 
      */
-    String lowset_item_link = "";
-    String Latest_item_link = "";
-
     @FXML
     private void actionSearch() {
         busy_idtr.setVisible(true);
@@ -683,7 +698,8 @@ public class Controller {
         }
    
     }
-    
+
+    // TODO: Javadoc Missing
     public void clearHistory_Alert() {    	    	  
     	Platform.runLater(new Runnable() {
 
@@ -707,7 +723,8 @@ public class Controller {
     		
     	});    	    	
     }
-    
+
+    // TODO: Javadoc Missing
     public void erase_search_history() {
       	// clear search history	        	
         for (int i = 0; i < lastSearchQueue.size(); ++i)
@@ -727,11 +744,20 @@ public class Controller {
      *
      */
     public static class DataModel {
+
+        // TODO: Javadoc Missing
         private SimpleStringProperty title;
+
+        // TODO: Javadoc Missing
         private SimpleStringProperty price;
+
+        // TODO: Javadoc Missing
         private SimpleStringProperty url;
+
+        // TODO: Javadoc Missing
         private SimpleStringProperty postedd;
 
+        // TODO: Javadoc Missing
         public DataModel(String _title, String _price, String _url, String _posted_date) {
             this.title = new SimpleStringProperty(_title);
             this.price = new SimpleStringProperty(_price);
@@ -740,34 +766,42 @@ public class Controller {
 
         }
 
+        // TODO: Javadoc Missing
         public String getTitle() {
             return title.get();
         }
 
+        // TODO: Javadoc Missing
         public void setTitle(String _title) {
             title.set(_title);
         }
 
+        // TODO: Javadoc Missing
         public String getPrice() {
             return price.get();
         }
 
+        // TODO: Javadoc Missing
         public void setPrice(String _price) {
             price.set(_price);
         }
 
+        // TODO: Javadoc Missing
         public String getUrl() {
             return url.get();
         }
 
+        // TODO: Javadoc Missing
         public void setUrl(String _url) {
             url.set(_url);
         }
 
+        // TODO: Javadoc Missing
         public String getPostedd() {
             return postedd.get();
         }
 
+        // TODO: Javadoc Missing
         public void setPostedd(String _posted_date) {
             this.postedd.set(_posted_date);
         }
@@ -909,8 +943,11 @@ public class Controller {
      *
      */
     public class BarChart_BarEntered_Handler implements EventHandler<MouseEvent> {
+
+        // TODO: Javadoc Missing
         private Data<String, Integer> item;
 
+        // TODO: Javadoc Missing
         @Override
         public void handle(MouseEvent event) {
             System.out.println("Cursor Enter Bar");
@@ -919,6 +956,7 @@ public class Controller {
                     item.getNode().setStyle("-fx-bar-fill: #a9e200;");
         }
 
+        // TODO: Javadoc Missing
         public void setData(Data<String, Integer> input) {
             item = input;
         }
@@ -933,14 +971,18 @@ public class Controller {
      *
      */
     public class BarChart_BarExited_Handler implements EventHandler<MouseEvent> {
+
+        // TODO: Javadoc Missing
         private Data<String, Integer> item;
 
+        // TODO: Javadoc Missing
         @Override
         public void handle(MouseEvent event) {
             if (!has_bar_selected())
                 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
         }
 
+        // TODO: Javadoc Missing
         public void setData(Data<String, Integer> input) {
             item = input;
         }
@@ -956,8 +998,14 @@ public class Controller {
      *
      */
     public class BarChart_BarDBClick_Handler implements EventHandler<MouseEvent> {
+
+        // TODO: Javadoc Missing
         private Data<String, Integer> item;
+
+        // TODO: Javadoc Missing
         private List<Item> dist_data;
+
+        // TODO: Javadoc Missing
         private Double rng;
         
         /**
