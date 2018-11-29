@@ -231,7 +231,7 @@ public class Controller {
      * @author Yeung Chak Ho - chyeungam
      */
     private void updateLastSearch_Keyword() {
-        lastSearchQueue.offer(textFieldKeyword.getText());
+        lastSearchQueue.offer(keyword);
         if (lastSearchQueue.size() == 3)
             lastSearchQueue.poll();
         return;
@@ -256,12 +256,13 @@ public class Controller {
      * @author Ngan Cheuk Hei - chnganaa
      *
      */
+    String keyword;
     public class SearchAsyncTask extends Task<List<Item>> {
         @Override
         protected List<Item> call() throws Exception {
-
-            List<Item> result = scraper.scrape(textFieldKeyword.getText(), textAreaConsole);
-            System.out.println("actionSearch: " + textFieldKeyword.getText());
+        	keyword = textFieldKeyword.getText();
+            List<Item> result = scraper.scrape(keyword, textAreaConsole);
+            System.out.println("actionSearch: " + keyword);
             String output = "";
             
             for (Item item : result) {
@@ -685,7 +686,7 @@ public class Controller {
    
     }
     
-    public void clearHistory_Alert() {
+    public void clearHistory_Alert() {    	    	  
     	Platform.runLater(new Runnable() {
 
 			@Override
@@ -707,9 +708,7 @@ public class Controller {
 		        }
 			}
     		
-    	});
-    	
-    	
+    	});    	    	
     }
     
     public void erase_search_history() {
@@ -963,7 +962,12 @@ public class Controller {
         private Data<String, Integer> item;
         private List<Item> dist_data;
         private Double rng;
-
+        
+        /**
+         * The mouse event for barchart
+         * @param mouseEvent - event type
+         * @author Yeung Chak Ho - chyeungam
+         */
         @Override
         public void handle(MouseEvent mouseEvent) {
             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
@@ -1128,7 +1132,7 @@ private void UpdateSummary(List<Item> result){
 	//number of items
 	labelCount.setText(Integer.toString(num));
 	
-	if (num == 0 || data.isEmpty()){
+	if (num == 0 || result.isEmpty()){
 	    labelPrice.setText("-");
 	    labelMin.setText("-");
 	    labelLatest.setText("-");
@@ -1138,7 +1142,7 @@ private void UpdateSummary(List<Item> result){
 		
 	    // find latest link
 	    // init first		
-	    Latest_item_link =  data.get(0).getUrl();	//indexOutOfBoundsException
+	    Latest_item_link =  result.get(0).getUrl();	//indexOutOfBoundsException
 	    int latest_index = 0;
 	    for(int i = 0; i < result.size()-1 ;++i){
 	        if( result.get(i).getPostedOn().compareTo(result.get(latest_index).getPostedOn()) > 0){
