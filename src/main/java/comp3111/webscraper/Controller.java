@@ -293,7 +293,7 @@ public class Controller {
     /**
      * Called when the search(i.e. Go) button is pressed.
      * @author Yeung Chak Ho - chyeungam
-     * @author Billy
+     * @author Chan Chi Wa - cwchanbf
      * @author Ngan Cheuk Hei - chnganaa 
      */
     String lowset_item_link = "";
