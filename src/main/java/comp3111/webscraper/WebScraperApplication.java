@@ -52,7 +52,9 @@ import java.net.URLEncoder;
  */
 public class WebScraperApplication extends Application {
 
-	// TODO: Javadoc Missing
+	/**
+	 * Link of ui xml file
+	 */
     private static final String UI_FILE = "/ui.fxml";  //It is very important that you put the file under folder src/main/resources/
 	
 	/* 
