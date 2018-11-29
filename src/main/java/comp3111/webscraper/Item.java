@@ -7,6 +7,7 @@ import java.util.Date;
 /**
  * Item class represent a item posted on a portal, which implements Comparable interface
  * @author Chan Chi Wa - cwchanbf
+ * @author Ngan Cheuk Hei - chnganaa
  */
 public class Item implements Comparable<Item> {
 
@@ -44,6 +45,7 @@ public class Item implements Comparable<Item> {
 	/**
 	 * A default constructor
 	 * @author Chan Chi Wa - cwchanbf
+	 * @author Ngan Cheuk Hei - chnganaa
 	 */
 	public Item() {
 
@@ -58,6 +60,7 @@ public class Item implements Comparable<Item> {
 	 * @param url Url of the item
 	 * @param postedOn Posted date of the item
 	 * @author Chan Chi Wa - cwchanbf
+	 * @author Ngan Cheuk Hei - chnganaa
 	 */
 	public Item(String title, double price, Portal portal, String url, Date postedOn) {
 		this.title = title;
@@ -72,6 +75,7 @@ public class Item implements Comparable<Item> {
 	 * Get the title of the item
 	 * @return Title of the item
 	 * @author Chan Chi Wa - cwchanbf
+	 * @author Ngan Cheuk Hei - chnganaa
 	 */
 	public String getTitle() {
 		return title;
@@ -92,6 +96,7 @@ public class Item implements Comparable<Item> {
 	 * Get the price of the item
 	 * @return Price of the item
 	 * @author Chan Chi Wa - cwchanbf
+	 * @author Ngan Cheuk Hei - chnganaa
 	 */
 	public double getPrice() {
 		return price;
@@ -112,6 +117,7 @@ public class Item implements Comparable<Item> {
 	 * Get the portal {@link Portal} of the item
 	 * @return Portal of the item
 	 * @author Chan Chi Wa - cwchanbf
+	 * @author Ngan Cheuk Hei - chnganaa
 	 */
 	public Portal getPortal() {
 		return portal;
@@ -132,6 +138,7 @@ public class Item implements Comparable<Item> {
 	 * Get the url of the item
 	 * @return Url of the item
 	 * @author Chan Chi Wa - cwchanbf
+	 * @author Ngan Cheuk Hei - chnganaa
 	 */
 	public String getUrl() {
 		return url;
@@ -152,6 +159,7 @@ public class Item implements Comparable<Item> {
 	 * Get the posted date {@link Date} of the item
 	 * @return Posted date of the item
 	 * @author Chan Chi Wa - cwchanbf
+	 * @author Ngan Cheuk Hei - chnganaa
 	 */
 	public Date getPostedOn() {
 		return postedOn;
@@ -172,6 +180,7 @@ public class Item implements Comparable<Item> {
 	 * Override the toString method for item class
 	 * @return String representation of the item
 	 * @author Chan Chi Wa - cwchanbf
+	 * @author Ngan Cheuk Hei - chnganaa
 	 */
 	@Override
 	public String toString() {
@@ -189,6 +198,7 @@ public class Item implements Comparable<Item> {
 	 * @return A negative integer, zero, or a positive integer as this item's price
 	 *         is less than, equal to, or greater than the specified item's price.
 	 * @author Chan Chi Wa - cwchanbf
+	 * @author Ngan Cheuk Hei - chnganaa
 	 */
 	@Override
 	public int compareTo(Item o) {
