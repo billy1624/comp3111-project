@@ -1132,7 +1132,7 @@ private void UpdateSummary(List<Item> result){
 	//number of items
 	labelCount.setText(Integer.toString(num));
 	
-	if (num == 0 || data.isEmpty()){
+	if (num == 0 || result.isEmpty()){
 	    labelPrice.setText("-");
 	    labelMin.setText("-");
 	    labelLatest.setText("-");
@@ -1142,7 +1142,7 @@ private void UpdateSummary(List<Item> result){
 		
 	    // find latest link
 	    // init first		
-	    Latest_item_link =  data.get(0).getUrl();	//indexOutOfBoundsException
+	    Latest_item_link =  result.get(0).getUrl();	//indexOutOfBoundsException
 	    int latest_index = 0;
 	    for(int i = 0; i < result.size()-1 ;++i){
 	        if( result.get(i).getPostedOn().compareTo(result.get(latest_index).getPostedOn()) > 0){
