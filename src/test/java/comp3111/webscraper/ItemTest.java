@@ -53,7 +53,8 @@ public class ItemTest {
 		assertEquals(i.getPrice(), 0.0, 0.001);
 		assertEquals(i.getTitle(), "01");
 		String result = i.toString();
-		assertEquals(result, "Item{title='01', price=0.0, portal=Craigslist, url='url', postedOn=Thu Jan 01 13:36:21 HKT 1970}");
+		// [CS]T [HK]T problem here
+		assertEquals(result, "Item{title='01', price=0.0, portal=Craigslist, url='url', postedOn=Thu Jan 01 13:36:21 CST 1970}");
 		
 		Item b = new Item("02", 5.0, Portal.Craigslist, "url", new Date(20181111));
 				
