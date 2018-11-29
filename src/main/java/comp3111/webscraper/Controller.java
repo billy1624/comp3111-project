@@ -231,7 +231,7 @@ public class Controller {
      * @author Yeung Chak Ho - chyeungam
      */
     private void updateLastSearch_Keyword() {
-        lastSearchQueue.offer(textFieldKeyword.getText());
+        lastSearchQueue.offer(keyword);
         if (lastSearchQueue.size() == 3)
             lastSearchQueue.poll();
         return;
@@ -256,12 +256,13 @@ public class Controller {
      * @author Ngan Cheuk Hei - chnganaa
      *
      */
+    String keyword;
     public class SearchAsyncTask extends Task<List<Item>> {
         @Override
         protected List<Item> call() throws Exception {
-
-            List<Item> result = scraper.scrape(textFieldKeyword.getText(), textAreaConsole);
-            System.out.println("actionSearch: " + textFieldKeyword.getText());
+        	keyword = textFieldKeyword.getText();
+            List<Item> result = scraper.scrape(keyword, textAreaConsole);
+            System.out.println("actionSearch: " + keyword);
             String output = "";
             
             for (Item item : result) {
