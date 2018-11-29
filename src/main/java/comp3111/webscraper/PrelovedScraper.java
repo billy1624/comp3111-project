@@ -86,12 +86,17 @@ public class PrelovedScraper extends PortalScraper {
 					item.setPrice(this.getPrice(htmlItem));
 					item.setPostedOn(this.getPostedDate(client, htmlItem));
 
+					String fetchingPostedDate = "Getting " + Portal.Preloved + " item's posted date... (" + (i+1) + " of " + items.size() + " processed)";
+					System.out.println(fetchingPostedDate);
+					this.appendTextToUserConsole(fetchingPostedDate, textAreaConsole);
+
 					result.add(item);
 				}
 				System.out.println("item count: " + items.size());
 			} while (!FETCH_ONE_PAGE_ONLY && pageNum < totalPage);
 
 			System.out.println("result count: " + result.size());
+			this.appendTextToUserConsole("\n", textAreaConsole);
 
 		} catch (Exception e) {
 			e.printStackTrace();

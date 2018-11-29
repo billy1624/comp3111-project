@@ -40,19 +40,6 @@ public class Item implements Comparable<Item> {
 	 */
 	private Date postedOn;
 
-	/**
-	 * @deprecated Need To Remove Before Submission
-	 * @author Chan Chi Wa - cwchanbf
-	 */
-	private String posted_date; // TODO: Need to remove before submission
-
-	public String getPosted_date() { // TODO: Need to remove before submission
-		return posted_date;
-	}
-	public void setPosted_date(String posted_date) { // TODO: Need to remove before submission
-		this.posted_date = posted_date;
-	}
-
 
 	/**
 	 * A default constructor
@@ -196,7 +183,6 @@ public class Item implements Comparable<Item> {
 				", postedOn=" + postedOn +
 				'}';
 	}
-
 
 	/**
 	 * Implement compareTo method {@link Comparable}
