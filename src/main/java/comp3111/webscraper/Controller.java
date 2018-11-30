@@ -478,7 +478,7 @@ public class Controller {
 
         for (; iter.hasNext();) {
             Item item = iter.next();
-            if (item.getTitle().matches("(.*)" + textFieldKeyword.getText() + "(.*)")) {
+            if (item.getTitle().toLowerCase().matches("(.*)" + textFieldKeyword.getText().toLowerCase() + "(.*)")) {
                 output += item.toString() + "\n";
             } else
                 iter.remove();
