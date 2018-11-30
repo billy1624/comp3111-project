@@ -86,83 +86,186 @@ import javafx.stage.StageStyle;
 public class Controller {
 
     // TODO: Javadoc Missing for all attributes below
-
+	/**
+	 * label of fetched item count
+	 */
     @FXML
     private Label labelCount;
 
+    /**
+     * label of total price
+     */
     @FXML
     private Label labelPrice;
 
+    /**
+     * label of lowest price product
+     */
     @FXML
     private Hyperlink labelMin;
 
+    /**
+     * label of latest posted item
+     */
     @FXML
     private Hyperlink labelLatest;
 
+    /**
+     * Keyword textField
+     */
     @FXML
     private TextField textFieldKeyword;
 
+    /**
+     * Console display all item record
+     */
     @FXML
     private TextArea textAreaConsole;
 
+    /**
+     * TableView instance binding with DataModel
+     */
     @FXML
     private TableView<DataModel> tableView;
 
+    /**
+     * BarChart instance
+     */
     @FXML
     private BarChart barChartHistogram;
 
+    /**
+     * AreaChart instance
+     * unused, just initialize
+     */
     @FXML
     private AreaChart areaChart;
 
+    /**
+     * ComboBox 
+     * contain history record
+     * unused, just initialize
+     */
     @FXML
     private ComboBox areaChartCb;
 
+    /**
+     * Trigger actionLastSearch
+     * Revert the search record
+     */
     @FXML
     private MenuItem lastSearchBt;
 
+    /**
+     * TableView column component
+     * post title
+     */
     @FXML
     private TableColumn<DataModel, String> title_col;
 
+    /**
+     * TableView column component
+     * item price
+     */
     @FXML
     private TableColumn<DataModel, String> price_col;
 
     //@FXML
     //private TableColumn<DataModel, String> url_col;
-    
+    /**
+     * TableView column component
+     * item hyperlink
+     */
     @FXML
     private TableColumn<DataModel, Hyperlink> url_col;
 
+    /**
+     * TableView column component
+     * item posted date
+     */
     @FXML
     private TableColumn<DataModel, String> posted_date_col;
 
+    /**
+     * Trigger actionRefine
+     * Search record filtering
+     */
     @FXML
     private Button refineBt;
 
+    /**
+     * Indicator of async task running
+     */
     @FXML
     private ProgressIndicator busy_idtr;
 
+    /**
+     * Webscrpper instance
+     */
     private WebScraper scraper;
 
+    /**
+     * Provide hyperlink services
+     */
     private static HostServices hservices;
 
+    /**
+     * Current search record in List of item
+     */
     private List<Item> recordItem;
 
+    /**
+     * BarChart state machine vector
+     * indicate is selected or not
+     */
     private List<Boolean> bar_smVector;
 
+    /**
+     * lastSearch Keyword queue
+     */
     private Queue<String> lastSearchQueue;
-
+    
+    /**
+     * lastSearch Record queue
+     */
     private Queue<List<Item>> lastSearchItemQueue;
 
+    /**
+     * Thread for scraper
+     */
     private Thread scraperTh;
 
+    /**
+     * Indicator for lastSearch
+     * Indicate current refine action require last record or not
+     */
     private boolean refine_lastSearch;
 
+    /**
+     * JavaFx menubar UI component
+     */
     @FXML
     private MenuBar menuBar;
 
+    /**
+     * List of data for TableView, binding to Class DataModel
+     */
     final ObservableList<DataModel> data = FXCollections.observableArrayList();
+    
+    /**
+     * Memorize current keyword
+     */
+    private String keyword;
+    
+    /**
+     * Lowset price item url string
+     */
+    private String lowset_item_link = "";
 
-    // TODO: Javadoc Missing for all attributes above
+    /**
+     * Latest posted item url string 
+     */
+    private String Latest_item_link = "";
     
 
     /**
@@ -267,8 +370,7 @@ public class Controller {
             lastSearchItemQueue.poll();
     }
     
-    // TODO: Javadoc Missing
-    String keyword;
+
 
     /**
      * Scaping portal with async 
@@ -279,7 +381,11 @@ public class Controller {
      */
     public class SearchAsyncTask extends Task<List<Item>> {
 
-        // TODO: Javadoc Missing
+    	/**
+    	 * Execute async task body;
+    	 * Perform Portal scraping, can be halt by CloseAndReset() 
+    	 * @author Yeung Chak Ho - chyeungam
+    	 */
         @Override
         protected List<Item> call() throws Exception {
         	keyword = textFieldKeyword.getText();
@@ -312,11 +418,6 @@ public class Controller {
 
     };
 
-    // TODO: Javadoc Missing
-    String lowset_item_link = "";
-
-    // TODO: Javadoc Missing
-    String Latest_item_link = "";
 
     /**
      * Called when the search(i.e. Go) button is pressed.
@@ -479,7 +580,7 @@ public class Controller {
 
         for (; iter.hasNext();) {
             Item item = iter.next();
-            if (item.getTitle().matches("(.*)" + textFieldKeyword.getText() + "(.*)")) {
+            if (item.getTitle().toLowerCase().matches("(.*)" + textFieldKeyword.getText().toLowerCase() + "(.*)")) {
                 output += item.toString() + "\n";
             } else
                 iter.remove();
@@ -711,7 +812,11 @@ public class Controller {
    
     }
 
-    // TODO: Javadoc Missing
+    /**
+     * Dialog for asking user to remove all search or not
+     * Run in Async
+     * @author Yeung Chak Ho - chyeungam
+     */
     public void clearHistory_Alert() {    	    	  
     	Platform.runLater(new Runnable() {
 
@@ -736,7 +841,10 @@ public class Controller {
     	});    	    	
     }
 
-    // TODO: Javadoc Missing
+    /**
+     * Remove all search record in lastSearchQueue
+     * @author Yeung Chak Ho - chyeungam
+     */
     public void erase_search_history() {
       	// clear search history	        	
         for (int i = 0; i < lastSearchQueue.size(); ++i)
@@ -749,10 +857,19 @@ public class Controller {
         lastSearchItemQueue.offer(null);
     }
     
-    
-    public class HyperlinkCell implements Callback<TableColumn<DataModel, Hyperlink>, TableCell<DataModel, Hyperlink>> {    	             
-
-		@Override
+    /**
+     * Table view hyperlink cell callback class
+     * Hyperlink Column require it to work
+     * @author Yeung Chak Ho - chyeungam
+     */
+    public class HyperlinkCell implements Callback<TableColumn<DataModel, Hyperlink>, TableCell<DataModel, Hyperlink>> {
+		/**
+		 * TableCell call
+		 * Its input param type DataModel, output param type Hyperlink
+		 * @return A TableCell obj in type of <DataModel, Hyperlink>
+		 * @author Yeung Chak Ho - chyeunga
+		 */
+    	@Override
 		public TableCell<DataModel, Hyperlink> call(TableColumn<DataModel, Hyperlink> param) {
 			 TableCell<DataModel, Hyperlink> cell = new TableCell<DataModel, Hyperlink>() {
 	                @Override
@@ -765,10 +882,8 @@ public class Controller {
     }
 
     /**
-     * DataModel for Barchart histogram
-     * 
-     * @author Yeung Chak Ho - chyeungam
-     *
+     * DataModel for Barchart histogram/ TableView 
+     * @author Yeung Chak Ho - chyeungam     
      */
     public static class DataModel {
         public class tableView_url_EventHandler implements EventHandler<ActionEvent> {
@@ -779,21 +894,39 @@ public class Controller {
         	}
         }
 
-        // TODO: Javadoc Missing
+        /**
+         * Title for barchart and tableview item
+         */
         private SimpleStringProperty title;
 
-        // TODO: Javadoc Missing
+        /**
+         * Price for barchart and tableview item 
+         */
         private SimpleStringProperty price;
 
-        // TODO: Javadoc Missing
+        /**
+         * url for barchart and tableview item
+         */
         private SimpleStringProperty url;
-        
+ 
+        /**
+         * Hyperlink url for barchart and tableview item
+         */
         private Hyperlink hyplink;
 
-        // TODO: Javadoc Missing
+        /**
+         * Posted Date for barchart and tableview item
+         */
         private SimpleStringProperty postedd;
 
-        // TODO: Javadoc Missing
+        /**
+         * Constructor, initialize a DataModel item, for futher bind to Visual Components
+         * @param _title - name of the post
+         * @param _price - price of the item
+         * @param _url - the website link to the post
+         * @param _posted_date - the latest posted data (included edit update)
+         * @author Yeung Chak Ho - chyeungam
+         */
         public DataModel(String _title, String _price, String _url, String _posted_date) {
             this.title = new SimpleStringProperty(_title);
             this.price = new SimpleStringProperty(_price);
@@ -804,50 +937,92 @@ public class Controller {
 
         }
         
+        /**
+         * Get hyperlink obj of datamodel item
+         * @return hyperlink object
+         * @author Yeung Chak Ho - chyeungam
+         */
         public Hyperlink getHyplink() {
             return hyplink;
         }
-     
+        
+        /**
+         * Set Hyperlink to datamodel item
+         * @param websiteurl - url should be string begin with http://
+         * @author Yeung Chak Ho - chyeungam
+         */
         public void setHyplink(String websiteUrl) {
             this.hyplink = new Hyperlink(websiteUrl);
         }
 
-        // TODO: Javadoc Missing
+        /**
+         * Get datamodel item name
+         * @return post name
+         * @author Yeung Chak Ho - chyeungam
+         */
         public String getTitle() {
             return title.get();
         }
 
-        // TODO: Javadoc Missing
+        /**
+         * Set datamodel item name
+         * @param _title - set the post title
+         * @author Yeung Chak Ho - chyeungam
+         */
         public void setTitle(String _title) {
             title.set(_title);
         }
 
-        // TODO: Javadoc Missing
+        /**
+         * Get datamodel item price
+         * @return price of prduct
+         * @author Yeung Chak Ho - chyeungam
+         */
         public String getPrice() {
             return price.get();
         }
 
-        // TODO: Javadoc Missing
+        /**
+         * Set datamodel item price
+         * @param _price - set price
+         * @author Yeung Chak Ho - chyeungam
+         */
         public void setPrice(String _price) {
             price.set(_price);
         }
 
-        // TODO: Javadoc Missing
+        /**
+         * Get the url
+         * @return url string of item
+         * @author Yeung Chak Ho - chyeungam
+         */
         public String getUrl() {
             return url.get();
         }
 
-        // TODO: Javadoc Missing
+        /**
+         * Set the url
+         * @param _url - website link of product
+         * @author Yeung Chak Ho - chyeungam
+         */
         public void setUrl(String _url) {
             url.set(_url);
         }
               
-        // TODO: Javadoc Missing
+        /**
+         * Get posted date
+         * @return item posted date string
+         * @author Yeung Chak Ho - chyeungam
+         */
         public String getPostedd() {
             return postedd.get();
         }
 
-        // TODO: Javadoc Missing
+        /**
+         * Set posted date
+         * @param _posted_date - item posted date string
+         * @author Yeung Chak Ho - chyeungam        
+         */
         public void setPostedd(String _posted_date) {
             this.postedd.set(_posted_date);
         }
@@ -990,10 +1165,15 @@ public class Controller {
      */
     public class BarChart_BarEntered_Handler implements EventHandler<MouseEvent> {
 
-        // TODO: Javadoc Missing
+        /**
+         * Barchart data model
+         */
         private Data<String, Integer> item;
 
-        // TODO: Javadoc Missing
+        /**
+         * BarChart mouse enter bar event hanlder call
+         * @author Yeung Chak Ho - chyeungam        
+         */
         @Override
         public void handle(MouseEvent event) {
             System.out.println("Cursor Enter Bar");
@@ -1002,7 +1182,11 @@ public class Controller {
                     item.getNode().setStyle("-fx-bar-fill: #a9e200;");
         }
 
-        // TODO: Javadoc Missing
+        /**
+         * Set target bar's data and Config it to class attribute         
+         * @param input target bar's data
+         * @author Yeung Chak Ho - chyeungam
+         */
         public void setData(Data<String, Integer> input) {
             item = input;
         }
@@ -1018,17 +1202,26 @@ public class Controller {
      */
     public class BarChart_BarExited_Handler implements EventHandler<MouseEvent> {
 
-        // TODO: Javadoc Missing
+    	/**
+         * Barchart data model
+         */
         private Data<String, Integer> item;
 
-        // TODO: Javadoc Missing
+        /**
+         * BarChart mouse exited bar event hanlder call
+         * @author Yeung Chak Ho - chyeungam        
+         */
         @Override
         public void handle(MouseEvent event) {
             if (!has_bar_selected())
                 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
         }
 
-        // TODO: Javadoc Missing
+        /**
+         * Set target bar's data and Config it to class attribute         
+         * @param input target bar's data
+         * @author Yeung Chak Ho - chyeungam
+         */
         public void setData(Data<String, Integer> input) {
             item = input;
         }
@@ -1055,7 +1248,6 @@ public class Controller {
         /**
          * The range between each set of data
          */
-
         private Double rng;
         
         /**

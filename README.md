@@ -24,6 +24,7 @@ Group Number: 77
     - Email: chyeungam@connect.ust.hk
 
 ## Proposed Keyword for TA :)
+
 1. Normal Test Case (Fast)
     - Keyword: `google pixel 5`
     - Result Size: ~50 items
@@ -38,6 +39,7 @@ Group Number: 77
     - Result Size: ~3,000 item
 
 ## Javadoc
+
 Javadoc available on: https://billy1624.github.io/COMP3111_Proj/javadoc
 
 ## Assumptions & Special Note
@@ -74,8 +76,12 @@ Javadoc available on: https://billy1624.github.io/COMP3111_Proj/javadoc
 4. Basic Task 6
     - The `Last Search Function` 
 
-        - Refined record is __NOT__ counted as a search record (which means last search will not revert the dataset from a refined record, but it does revert to a record that has not been refined (the original dataset scrape from Portal). __Only__ the search which is scape from Portal and `Initial Empty Record` count as a  `Search Record`)
-        
+        - Refined record is __Counted__ as a search record (which means last search will revert the dataset from a refined record, but it does __NOT__ revert to a record that has not been refined (the original dataset scrape from Portal). Also, `Initial Empty Record` count as a  `Search Record`)
+
+            - Example: Search [Google pixel 5] -> Refine[Google Pixel 5] -> Search [Apple] -> LastSearch
+
+                You should get the result of Refined[Google Pixel 5]
+
         - The initial `Last Search` is `Initial Empty Record`. After the first search then click last search, it should revert every page to empty.
 
     - The `Close` Item in Menu Bar
@@ -87,7 +93,7 @@ Javadoc available on: https://billy1624.github.io/COMP3111_Proj/javadoc
         - `Close` will ask user whether they want to _Remove_ all search history or not. If yes, then the whole application will restore the initial state with _NO_ search record (Extra)
 
         - Junit Test report this standard error occur in Test Case because it requires a event thread but not JavaFx thread. It's not a bug of released program.
-
+        
             ```java
             Exception in thread "JavaFX Application Thread" java.lang.IllegalStateException: This operation is permitted on the event thread only; currentThread = JavaFX Application Thread
             ```
