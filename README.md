@@ -23,6 +23,23 @@ Group Number: 77
 	- Tasks: Basic 5 & Basic 6
 	- Email: chyeungam@connect.ust.hk
 
+## Proposed Keyword for TA :)
+1. Normal Test Case (Fast)
+	- Keyword: `google pixel 5`
+	- Result Size: ~50 items
+1. Normal Test Case (Slow)
+	- Keyword: `food box`
+	- Result Size: ~600 items
+1. Special Test Case (No Result)
+	- Keyword: `vhghckuhhjjhv:D`
+	- Result Size: 0 item
+1. Crazy Test Case :P
+	- Keyword: `a`
+	- Result Size: ~3,000 item
+
+## Javadoc
+Javadoc available on: https://billy1624.github.io/COMP3111_Proj/javadoc
+
 ## Assumptions & Special Note
 
 1. Basic Task 2
@@ -33,8 +50,18 @@ Group Number: 77
 	- Will skip fetching all the ads on search result.
 2. Basic Task 3
 	- The total number of search result is not accurate on newyork.craigslist.org. For example, when I search for `toaster` on the site. On the first page of search result, it is showing item 1 to 120, and 503 items in total was show on the page. However, when I click next page, it now show there are 506 items in total. In fact, if I go to the last page of search result, it only contain 503 items instead of 506 items. **The message showing the current processing item is accurate, i.e. `Fetching... item 121 - 240`. However, the total number of items might not be accurate, i.e. `506 in total`.**
+		- For more details, please refer to our team's opened issue on https://github.com/khwang0/2018F-COMP3111/issues/68, [Basic 2 & 3] Incorrect Number of Item Display on Craigslist Search Result #68
 
-3. Basic Task 6
+3. Basic Task 2 & 3 on JUnit Test
+	- When running scrape test there are warning message like below showing up, which is normal
+		```
+		Nov 29, 2018 1:33:59 PM com.gargoylesoftware.htmlunit.WebClient printContentIfNecessary
+		INFO: statusCode=[404] contentType=[text/html]
+		Nov 29, 2018 1:34:00 PM com.gargoylesoftware.htmlunit.WebClient printContentIfNecessary
+		INFO: File: /www.googletagmanager.com/ns.html
+		```
+
+4. Basic Task 6
 
    - The `Last Search Function` 
 

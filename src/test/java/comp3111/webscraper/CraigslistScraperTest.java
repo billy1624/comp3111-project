@@ -20,7 +20,7 @@ import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
 
-@Ignore
+//@Ignore
 public class CraigslistScraperTest {
 
 	/**
