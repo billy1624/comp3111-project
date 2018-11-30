@@ -36,16 +36,12 @@ public class DataModelTest {
 	        assertThat(x.get(),is("01/01/2001"));
 
 		} catch (SecurityException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         
@@ -59,16 +55,12 @@ public class DataModelTest {
 	        assertThat(x.get(),is("55.6"));
 
 		} catch (SecurityException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -81,16 +73,12 @@ public class DataModelTest {
 	        assertThat(x.get(),is("Hi"));
 
 		} catch (SecurityException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         
@@ -103,16 +91,12 @@ public class DataModelTest {
 	        assertThat(x.get(),is("www.google.com"));
 
 		} catch (SecurityException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
