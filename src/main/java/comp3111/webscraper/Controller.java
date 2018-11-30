@@ -422,7 +422,7 @@ public class Controller {
         refine_lastSearch = true;
         String output = "";
         for (Item item : lastSearchItemQueue.peek()) {
-            output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+            output += item.toString() + "\n";
         }		
         
         /*
@@ -468,7 +468,7 @@ public class Controller {
         for (; iter.hasNext();) {
             Item item = iter.next();
             if (item.getTitle().matches("(.*)" + textFieldKeyword.getText() + "(.*)")) {
-                output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+                output += item.toString() + "\n";
             } else
                 iter.remove();
         }
@@ -1026,7 +1026,7 @@ public class Controller {
                         item.getNode().setStyle("-fx-bar-fill: #f3622d;");
                         String output = "";
                         for (Item item : dist_data) {
-                            output += item.getTitle() + "\t" + item.getPrice() + "\t" + item.getUrl() + "\n";
+                            output += item.toString() + "\n";
                         }
                         textAreaConsole.textProperty().unbind();
                         textAreaConsole.setText(output);
