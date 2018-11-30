@@ -86,96 +86,186 @@ import javafx.stage.StageStyle;
 public class Controller {
 
     // TODO: Javadoc Missing for all attributes below
-
+	/**
+	 * label of fetched item count
+	 */
     @FXML
     private Label labelCount;
 
+    /**
+     * label of total price
+     */
     @FXML
     private Label labelPrice;
 
+    /**
+     * label of lowest price product
+     */
     @FXML
     private Hyperlink labelMin;
 
+    /**
+     * label of latest posted item
+     */
     @FXML
     private Hyperlink labelLatest;
 
+    /**
+     * Keyword textField
+     */
     @FXML
     private TextField textFieldKeyword;
 
+    /**
+     * Console display all item record
+     */
     @FXML
     private TextArea textAreaConsole;
 
+    /**
+     * TableView instance binding with DataModel
+     */
     @FXML
     private TableView<DataModel> tableView;
 
+    /**
+     * BarChart instance
+     */
     @FXML
     private BarChart barChartHistogram;
 
+    /**
+     * AreaChart instance
+     * unused, just initialize
+     */
     @FXML
     private AreaChart areaChart;
 
+    /**
+     * ComboBox 
+     * contain history record
+     * unused, just initialize
+     */
     @FXML
     private ComboBox areaChartCb;
 
+    /**
+     * Trigger actionLastSearch
+     * Revert the search record
+     */
     @FXML
     private MenuItem lastSearchBt;
 
+    /**
+     * TableView column component
+     * post title
+     */
     @FXML
     private TableColumn<DataModel, String> title_col;
 
+    /**
+     * TableView column component
+     * item price
+     */
     @FXML
     private TableColumn<DataModel, String> price_col;
 
     //@FXML
     //private TableColumn<DataModel, String> url_col;
-    
+    /**
+     * TableView column component
+     * item hyperlink
+     */
     @FXML
     private TableColumn<DataModel, Hyperlink> url_col;
 
+    /**
+     * TableView column component
+     * item posted date
+     */
     @FXML
     private TableColumn<DataModel, String> posted_date_col;
 
+    /**
+     * Trigger actionRefine
+     * Search record filtering
+     */
     @FXML
     private Button refineBt;
 
+    /**
+     * Indicator of async task running
+     */
     @FXML
     private ProgressIndicator busy_idtr;
 
+    /**
+     * Webscrpper instance
+     */
     private WebScraper scraper;
 
+    /**
+     * Provide hyperlink services
+     */
     private static HostServices hservices;
 
+    /**
+     * Current search record in List of item
+     */
     private List<Item> recordItem;
 
+    /**
+     * BarChart state machine vector
+     * indicate is selected or not
+     */
     private List<Boolean> bar_smVector;
 
+    /**
+     * lastSearch Keyword queue
+     */
     private Queue<String> lastSearchQueue;
-
+    
+    /**
+     * lastSearch Record queue
+     */
     private Queue<List<Item>> lastSearchItemQueue;
 
+    /**
+     * Thread for scraper
+     */
     private Thread scraperTh;
 
+    /**
+     * Indicator for lastSearch
+     * Indicate current refine action require last record or not
+     */
     private boolean refine_lastSearch;
 
+    /**
+     * JavaFx menubar UI component
+     */
     @FXML
     private MenuBar menuBar;
 
+    /**
+     * List of data for TableView, binding to Class DataModel
+     */
     final ObservableList<DataModel> data = FXCollections.observableArrayList();
     
     /**
      * Memorize current keyword
      */
-    String keyword;
+    private String keyword;
     
     /**
      * Lowset price item url string
      */
-    String lowset_item_link = "";
+    private String lowset_item_link = "";
 
     /**
      * Latest posted item url string 
      */
-    String Latest_item_link = "";
+    private String Latest_item_link = "";
     
 
     /**
