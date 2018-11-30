@@ -377,6 +377,7 @@ public class Controller {
      * Call the function to update summary and table
      * @author Yeung Chak Ho - chyeungam
      * @author Ngan Cheuk Hei - chnganaa
+     * @author Chan Chi Wa - cwchanbf
      */
     public class SearchAsyncTask extends Task<List<Item>> {
 
