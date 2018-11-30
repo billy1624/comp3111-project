@@ -8,13 +8,11 @@ public enum Portal {
 
     /**
      * Portal: Craigslist
-     * @author Chan Chi Wa - cwchanbf
      */
     Craigslist,
 
     /**
      * Portal: Preloved
-     * @author Chan Chi Wa - cwchanbf
      */
     Preloved,
 

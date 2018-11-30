@@ -26,8 +26,6 @@ import java.net.URLEncoder;
 
 
 /**
- * @author kevinw
- * 
  * The entry point of the entire program. It is quite unlikely you need to change this file. But you can change it if you want :)
  * 
  * GUI
@@ -48,7 +46,7 @@ import java.net.URLEncoder;
  * function will do is to load this ui.fxml into a GUI application. The ui.fxml has specified that "all event will be handled by the class - 
  * Controller". Let's trace the function void start which will be called by the framework shortly after the program start.  
  *
- * 
+ * @author kevinw
  */
 public class WebScraperApplication extends Application {
 

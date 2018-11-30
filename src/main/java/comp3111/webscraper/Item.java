@@ -13,31 +13,26 @@ public class Item implements Comparable<Item> {
 
 	/**
 	 * The title of the item posted on a portal
-	 * @author Chan Chi Wa - cwchanbf
 	 */
 	private String title ;
 
 	/**
 	 * The price of the item posted on a portal
-	 * @author Chan Chi Wa - cwchanbf
 	 */
 	private double price ;
 
 	/**
 	 * The portal {@link Portal} of the item posted on
-	 * @author Chan Chi Wa - cwchanbf
 	 */
 	private Portal portal;
 
 	/**
 	 * The url of the posted item
-	 * @author Chan Chi Wa - cwchanbf
 	 */
 	private String url ;
 
 	/**
 	 * The posted date {@link Date} of the item
-	 * @author Chan Chi Wa - cwchanbf
 	 */
 	private Date postedOn;
 

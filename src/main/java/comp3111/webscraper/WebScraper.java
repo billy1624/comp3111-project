@@ -75,13 +75,11 @@ public class WebScraper {
 
 	/**
 	 * WebClient {@link WebScraper} for all web scraper
-	 * @author Chan Chi Wa - cwchanbf
 	 */
 	private WebClient client;
 
 	/**
 	 * The combined item list {@link Vector} of all item scraped from two different portals
-	 * @author Chan Chi Wa - cwchanbf
 	 */
 	private Vector<Item> combinedList;
 
