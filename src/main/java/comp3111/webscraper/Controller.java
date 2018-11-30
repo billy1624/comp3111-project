@@ -284,12 +284,12 @@ public class Controller {
     
     /**
      * Comparing the data
-     * @param a
-     * @param b
+     * @param a - First date string
+     * @param b - Second date string
      * @author Ngan Cheuk Hei - chnganaa
-     * @return
-     * @throws ParseException
-     * @throws java.text.ParseException
+     * @return 0, 1, -1, representing the comparison result
+     * @throws ParseException cannot parse the date string to date obj
+     * @throws java.text.ParseException cannot parse the date string to date obj
      */
     public int DateCompare(String a, String b) throws ParseException, java.text.ParseException {
     	Date date1 = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(a);
@@ -866,7 +866,7 @@ public class Controller {
 		/**
 		 * TableCell call
 		 * Its input param type DataModel, output param type Hyperlink
-		 * @return A TableCell obj in type of <DataModel, Hyperlink>
+		 * @return A TableCell obj in type of {@code TableCell<DataModel, Hyperlink>}
 		 * @author Yeung Chak Ho - chyeunga
 		 */
     	@Override
@@ -886,6 +886,10 @@ public class Controller {
      * @author Yeung Chak Ho - chyeungam     
      */
     public static class DataModel {
+        /**
+         * Handle table url column clicked, open link in browser
+         * @author Yeung Chak Ho - chyeungam
+         */
         public class tableView_url_EventHandler implements EventHandler<ActionEvent> {
         	@Override
         	public void handle(ActionEvent event) {
@@ -948,7 +952,7 @@ public class Controller {
         
         /**
          * Set Hyperlink to datamodel item
-         * @param websiteurl - url should be string begin with http://
+         * @param websiteUrl - url should be string begin with http://
          * @author Yeung Chak Ho - chyeungam
          */
         public void setHyplink(String websiteUrl) {
@@ -1469,7 +1473,7 @@ private void UpdateSummary(List<Item> result){
 	    );
 	}
         };
-	        
+
  });
 }
 
