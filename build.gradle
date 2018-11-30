@@ -47,3 +47,10 @@ jacocoTestReport {
 	}
 }
 
+javadoc {
+    source = sourceSets.main.allJava
+    options.memberLevel = JavadocMemberLevel.PRIVATE
+    classpath = configurations.compile
+    destinationDir = file("${buildDir}/docs/javadoc")
+}
+
