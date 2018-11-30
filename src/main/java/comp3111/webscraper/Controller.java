@@ -1111,17 +1111,26 @@ public class Controller {
      */
     public class BarChart_BarExited_Handler implements EventHandler<MouseEvent> {
 
-        // TODO: Javadoc Missing
+    	/**
+         * Barchart data model
+         */
         private Data<String, Integer> item;
 
-        // TODO: Javadoc Missing
+        /**
+         * BarChart mouse exited bar event hanlder call
+         * @author Yeung Chak Ho - chyeungam        
+         */
         @Override
         public void handle(MouseEvent event) {
             if (!has_bar_selected())
                 item.getNode().setStyle("-fx-bar-fill: #f3622d;");
         }
 
-        // TODO: Javadoc Missing
+        /**
+         * Set target bar's data and Config it to class attribute         
+         * @param input target bar's data
+         * @author Yeung Chak Ho - chyeungam
+         */
         public void setData(Data<String, Integer> input) {
             item = input;
         }
