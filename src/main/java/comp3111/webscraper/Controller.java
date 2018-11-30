@@ -959,8 +959,17 @@ public class Controller {
      *
      */
     public class BarChart_BarDBClick_Handler implements EventHandler<MouseEvent> {
-        private Data<String, Integer> item;
+        /**
+         * Barchart bar item, catogry(String), numberOfItem(Integer)
+         */
+    	private Data<String, Integer> item;
+        /**
+         * List of Item that need to plot
+         */
         private List<Item> dist_data;
+        /**
+         * The range between each set of data
+         */
         private Double rng;
         
         /**
@@ -1028,7 +1037,7 @@ public class Controller {
      * 
      * @author Yeung Chak Ho - chyeungam
      */
-    void task6_iii_testCase() {
+    public void task6_iii_testCase() {
         /* Data that used in the test case */
         final ObservableList<DataModel> data = FXCollections.observableArrayList(
                 new DataModel("Title1", "0.0", "item1@example.com", "01/02/2018"),
