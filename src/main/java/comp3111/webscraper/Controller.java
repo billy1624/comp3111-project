@@ -14,12 +14,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Queue;
-
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.util.Callback;
 import com.gargoylesoftware.css.parser.javacc.ParseException;
 
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.WritableObjectValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -122,8 +126,11 @@ public class Controller {
     @FXML
     private TableColumn<DataModel, String> price_col;
 
+    //@FXML
+    //private TableColumn<DataModel, String> url_col;
+    
     @FXML
-    private TableColumn<DataModel, String> url_col;
+    private TableColumn<DataModel, Hyperlink> url_col;
 
     @FXML
     private TableColumn<DataModel, String> posted_date_col;
@@ -136,7 +143,7 @@ public class Controller {
 
     private WebScraper scraper;
 
-    private HostServices hservices;
+    private static HostServices hservices;
 
     private List<Item> recordItem;
 
@@ -213,8 +220,10 @@ public class Controller {
         title_col.setCellFactory(TextFieldTableCell.forTableColumn());
         price_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("price"));
         price_col.setCellFactory(TextFieldTableCell.forTableColumn());
-        url_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("url"));
-        url_col.setCellFactory(TextFieldTableCell.forTableColumn());
+        url_col.setCellValueFactory(new PropertyValueFactory<DataModel, Hyperlink>("hyplink"));
+        url_col.setCellFactory(new HyperlinkCell());
+        //url_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("url"));
+        //url_col.setCellFactory(TextFieldTableCell.forTableColumn());
         posted_date_col.setCellValueFactory(new PropertyValueFactory<DataModel,String>("postedd"));
         posted_date_col.setCellFactory(TextFieldTableCell.forTableColumn());
         tableView.setItems(data);
@@ -398,6 +407,8 @@ public class Controller {
             hservices.showDocument("https://github.com/" + text);
         }
     }
+    
+
 
     /**
      * Called when the new button is pressed. Very dummy action - print something in
@@ -736,6 +747,21 @@ public class Controller {
         lastSearchQueue.offer("NULL");
         lastSearchItemQueue.offer(null);
     }
+    
+    
+    public class HyperlinkCell implements Callback<TableColumn<DataModel, Hyperlink>, TableCell<DataModel, Hyperlink>> {    	             
+
+		@Override
+		public TableCell<DataModel, Hyperlink> call(TableColumn<DataModel, Hyperlink> param) {
+			 TableCell<DataModel, Hyperlink> cell = new TableCell<DataModel, Hyperlink>() {
+	                @Override
+	                protected void updateItem(Hyperlink item, boolean empty) {
+	                    setGraphic(item);
+	                }
+	            };
+	            return cell;
+		}
+    }
 
     /**
      * DataModel for Barchart histogram
@@ -744,6 +770,13 @@ public class Controller {
      *
      */
     public static class DataModel {
+        public class tableView_url_EventHandler implements EventHandler<ActionEvent> {
+        	@Override
+        	public void handle(ActionEvent event) {
+        		String text = ((Hyperlink) event.getSource()).getText();
+        		hservices.showDocument(text);    		
+        	}
+        }
 
         // TODO: Javadoc Missing
         private SimpleStringProperty title;
@@ -753,6 +786,8 @@ public class Controller {
 
         // TODO: Javadoc Missing
         private SimpleStringProperty url;
+        
+        private Hyperlink hyplink;
 
         // TODO: Javadoc Missing
         private SimpleStringProperty postedd;
@@ -762,8 +797,18 @@ public class Controller {
             this.title = new SimpleStringProperty(_title);
             this.price = new SimpleStringProperty(_price);
             this.url = new SimpleStringProperty(_url);
+            this.hyplink = new Hyperlink(_url);
+            this.hyplink.setOnAction(new tableView_url_EventHandler());
             this.postedd = new SimpleStringProperty(_posted_date);
 
+        }
+        
+        public Hyperlink getHyplink() {
+            return hyplink;
+        }
+     
+        public void setHyplink(String websiteUrl) {
+            this.hyplink = new Hyperlink(websiteUrl);
         }
 
         // TODO: Javadoc Missing
@@ -795,7 +840,7 @@ public class Controller {
         public void setUrl(String _url) {
             url.set(_url);
         }
-
+              
         // TODO: Javadoc Missing
         public String getPostedd() {
             return postedd.get();
@@ -998,14 +1043,18 @@ public class Controller {
      *
      */
     public class BarChart_BarDBClick_Handler implements EventHandler<MouseEvent> {
-
-        // TODO: Javadoc Missing
-        private Data<String, Integer> item;
-
-        // TODO: Javadoc Missing
+        /**
+         * Barchart bar item, catogry(String), numberOfItem(Integer)
+         */
+    	private Data<String, Integer> item;
+        /**
+         * List of Item that need to plot
+         */
         private List<Item> dist_data;
+        /**
+         * The range between each set of data
+         */
 
-        // TODO: Javadoc Missing
         private Double rng;
         
         /**
@@ -1073,7 +1122,7 @@ public class Controller {
      * 
      * @author Yeung Chak Ho - chyeungam
      */
-    void task6_iii_testCase() {
+    public void task6_iii_testCase() {
         /* Data that used in the test case */
         final ObservableList<DataModel> data = FXCollections.observableArrayList(
                 new DataModel("Title1", "0.0", "item1@example.com", "01/02/2018"),
@@ -1085,8 +1134,10 @@ public class Controller {
         title_col.setCellFactory(TextFieldTableCell.forTableColumn());
         price_col.setCellValueFactory(new PropertyValueFactory<DataModel, String>("price"));
         price_col.setCellFactory(TextFieldTableCell.forTableColumn());
-        url_col.setCellValueFactory(new PropertyValueFactory<DataModel, String>("url"));
-        url_col.setCellFactory(TextFieldTableCell.forTableColumn());
+//        url_col.setCellValueFactory(new PropertyValueFactory<DataModel, String>("url"));
+//        url_col.setCellFactory(TextFieldTableCell.forTableColumn());
+        url_col.setCellValueFactory(new PropertyValueFactory<DataModel, Hyperlink>("hyplink"));
+        url_col.setCellFactory(new HyperlinkCell());
         posted_date_col.setCellValueFactory(new PropertyValueFactory<DataModel, String>("postedd"));
         posted_date_col.setCellFactory(TextFieldTableCell.forTableColumn());
         tableView.setItems(data);
